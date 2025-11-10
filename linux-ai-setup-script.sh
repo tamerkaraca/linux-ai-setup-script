@@ -942,6 +942,24 @@ configure_git() {
     echo -e "${GREEN}[BAŞARILI]${NC} Git yapılandırması tamamlandı."
 }
 
+mask_secret() {
+    local secret="$1"
+    local length=${#secret}
+    if [ "$length" -le 8 ]; then
+        echo "$secret"
+        return
+    fi
+
+    local prefix=${secret:0:4}
+    local suffix=${secret: -4}
+    local middle_length=$((length - 8))
+    local mask=""
+    while [ ${#mask} -lt "$middle_length" ]; do
+        mask="${mask}*"
+    done
+    echo "${prefix}${mask}${suffix}"
+}
+
 # GLM-4.6 Claude Code yapılandırması
 configure_glm_claude() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
@@ -965,18 +983,50 @@ configure_glm_claude() {
     echo -e "${GREEN}4.${NC} API Key'inizi kopyalayın"
     echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}\n"
     
-    read -p "GLM API Key'inizi girin: " GLM_API_KEY
+    local default_base_url="https://api.z.ai/api/anthropic"
+    local current_api_key=""
+    local current_base_url="$default_base_url"
+
+    if [ -f "$SETTINGS_FILE" ]; then
+        if command -v jq &> /dev/null; then
+            current_api_key=$(jq -r '.env.ANTHROPIC_AUTH_TOKEN // ""' "$SETTINGS_FILE" 2>/dev/null || echo "")
+            local detected_base
+            detected_base=$(jq -r '.env.ANTHROPIC_BASE_URL // ""' "$SETTINGS_FILE" 2>/dev/null || echo "")
+            if [ -n "$detected_base" ]; then
+                current_base_url="$detected_base"
+            fi
+        else
+            current_api_key=$(grep -m1 'ANTHROPIC_AUTH_TOKEN' "$SETTINGS_FILE" | sed -nE 's/.*"ANTHROPIC_AUTH_TOKEN": *"(.*)".*/\1/p')
+            local raw_base
+            raw_base=$(grep -m1 'ANTHROPIC_BASE_URL' "$SETTINGS_FILE" | sed -nE 's/.*"ANTHROPIC_BASE_URL": *"(.*)".*/\1/p')
+            if [ -n "$raw_base" ]; then
+                current_base_url="$raw_base"
+            fi
+        fi
+    fi
+
+    local masked_key_display="Henüz ayarlı değil"
+    if [ -n "$current_api_key" ]; then
+        masked_key_display=$(mask_secret "$current_api_key")
+    fi
+
+    read -r -p "GLM API Key [${masked_key_display}]: " GLM_API_KEY
     
     if [ -z "$GLM_API_KEY" ]; then
-        echo -e "${RED}[HATA]${NC} API Key boş olamaz!"
-        return 1
+        if [ -n "$current_api_key" ]; then
+            GLM_API_KEY="$current_api_key"
+            echo -e "${YELLOW}[BİLGİ]${NC} Mevcut API Key korunuyor."
+        else
+            echo -e "${RED}[HATA]${NC} API Key boş olamaz!"
+            return 1
+        fi
     fi
     
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Base URL (varsayılan: https://api.z.ai/api/anthropic)"
-    read -p "Base URL (Enter ile varsayılanı kullan): " GLM_BASE_URL
+    echo -e "\n${YELLOW}[BİLGİ]${NC} Base URL [Varsayılan: $current_base_url]"
+    read -r -p "Base URL: " GLM_BASE_URL
     
     if [ -z "$GLM_BASE_URL" ]; then
-        GLM_BASE_URL="https://api.z.ai/api/anthropic"
+        GLM_BASE_URL="$current_base_url"
     fi
     
     echo -e "${YELLOW}[BİLGİ]${NC} settings.json dosyası oluşturuluyor..."

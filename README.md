@@ -5,13 +5,13 @@
 ## 🇬🇧 English Guide
 
 ### Overview
-`linux-ai-setup-script.sh` automates preparing a Linux workstation for AI development. It corrects accidental Windows CRLF endings, detects the system's package manager (`apt`, `dnf`, `yum`, `pacman`), upgrades the OS, and installs all required runtimes (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5). On top of that it bootstraps frequently used AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) and Pipx-based AI frameworks (SuperGemini/SuperQwen/SuperClaude), plus helpers for Git, GLM-4.6 credentials, and MCP server cleanup.
+`linux-ai-setup-script.sh` automates preparing a Linux workstation for AI development. It corrects accidental Windows CRLF endings, detects the system's package manager (`apt`, `dnf`, `yum`, `pacman`), upgrades the OS, and installs all required runtimes (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5). On top of that it bootstraps frequently used AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI, and Pipx-based AI frameworks (SuperGemini/SuperQwen/SuperClaude), plus helpers for Git, GLM-4.6 credentials, and MCP server cleanup.
 
 ### Features
 - Automatic package-manager detection, colored logging, and CRLF self-healing so the script can be checked into Git safely.
 - System upgrade + essential developer tooling (curl, wget, git, jq, zip/unzip, build toolchains).
 - Full Python toolchain (python3, pip, pipx, UV) and JavaScript runtimes (NVM-managed Node.js, Bun).
-- AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI.
+- AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI, plus GitHub CLI.
 - AI framework menu for SuperGemini, SuperQwen, SuperClaude with guided API-key prompts.
 - Removal menu to undo SuperGemini/SuperQwen/SuperClaude installs and purge their configs in one go.
 - PHP installer with selectable versions, Laravel-friendly extension packs, automatic Composer bootstrap, and version switcher.
@@ -50,8 +50,9 @@
   - `11` – AI CLI Tools menu (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI; choose individually or all).
   - `12` – AI Frameworks menu (SuperGemini, SuperQwen, SuperClaude; installs via Pipx).
   - `13` – AI Framework removal menu (SuperGemini, SuperQwen, SuperClaude; uninstall + config cleanup).
-  - `14` – Configure GLM-4.6 endpoint/key for Claude Code.
-  - `15` – MCP Server management (list/reset local MCP instances).
+  - `14` – GitHub CLI (gh) installation.
+  - `15` – Configure GLM-4.6 endpoint/key for Claude Code.
+  - `16` – MCP Server management (list/reset local MCP instances).
   - `0` – Exit.
 - Within sub-menus, typing `0` returns to the previous screen. Prompts default to the safest option if you simply press `Enter`.
 
@@ -71,13 +72,13 @@
 ## 🇹🇷 Türkçe Rehber
 
 ### Genel Bakış
-`linux-ai-setup-script.sh`, Linux tabanlı geliştirici makinelerde uçtan uca AI çalışma ortamını hazırlar. Windows’tan gelen CRLF satır sonlarını düzeltir, paket yöneticisini (`apt`, `dnf`, `yum`, `pacman`) otomatik saptar, sistemi günceller ve gerekli tüm çalışma ortamlarını (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5) kurar. Buna ek olarak sık kullanılan AI CLI araçlarını (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex) ve Pipx tabanlı AI framework’lerini (SuperGemini/SuperQwen/SuperClaude) yükler; Git yapılandırması, GLM-4.6 anahtarı ve MCP sunucu temizliği gibi yardımcı menüler sağlar.
+`linux-ai-setup-script.sh`, Linux tabanlı geliştirici makinelerde uçtan uca AI çalışma ortamını hazırlar. Windows’tan gelen CRLF satır sonlarını düzeltir, paket yöneticisini (`apt`, `dnf`, `yum`, `pacman`) otomatik saptar, sistemi günceller ve gerekli tüm çalışma ortamlarını (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5) kurar. Buna ek olarak sık kullanılan AI CLI araçlarını (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI ve Pipx tabanlı AI framework’lerini (SuperGemini/SuperQwen/SuperClaude) yükler; Git yapılandırması, GLM-4.6 anahtarı ve MCP sunucu temizliği gibi yardımcı menüler sağlar.
 
 ### Özellikler
 - Paket yöneticisi tespiti, renkli günlükler ve CRLF otomatik düzeltmesi ile sürüm kontrolünde güvenli kullanım.
 - Sistem güncellemesi + temel geliştirici araçları (curl, wget, git, jq, zip/unzip, derleme araçları).
 - Python ekosistemi (python3, pip, pipx, UV) ve JavaScript çalıştırıcıları (NVM ile Node.js, Bun).
-- AI CLI kurulumları: Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, GitHub Copilot CLI.
+- AI CLI kurulumları: Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, GitHub Copilot CLI, GitHub CLI.
 - Pipx üzerinden SuperGemini, SuperQwen, SuperClaude kurulum menüsü ve anahtar istemleri.
 - SuperGemini/SuperQwen/SuperClaude için temiz kaldırma menüsü ve yapılandırma temizliği.
 - PHP 7.4/8.x kurulumu, Laravel eklentileri, Composer kurulumu ve sürüm değiştirme menüsü.
@@ -108,11 +109,12 @@
   - `3-6` – Python araçları: Python3, Pip, Pipx, UV.
   - `7-8` – JavaScript araçları: NVM/Node.js ve Bun.
   - `9-10` – PHP kurulumu (7.4/8.x + eklentiler + Composer) ve sürüm geçişi.
-  - `11` – AI CLI Araçları menüsü (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex).
+  - `11` – AI CLI Araçları menüsü (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI).
   - `12` – AI Framework menüsü (SuperGemini, SuperQwen, SuperClaude).
   - `13` – AI Framework kaldırma menüsü (SuperGemini, SuperQwen, SuperClaude temiz kaldırma).
-  - `14` – Claude Code için GLM-4.6 anahtar/base URL yapılandırması.
-  - `15` – MCP Sunucularını listeleme ve temizleme menüsü.
+  - `14` – GitHub CLI (gh) kurulumu.
+  - `15` – Claude Code için GLM-4.6 anahtar/base URL yapılandırması.
+  - `16` – MCP Sunucularını listeleme ve temizleme menüsü.
   - `0` – Çıkış.
 - Alt menülerde `0` yazarak geri dönebilir, `Enter` ile varsayılan yanıtları kabul edebilirsiniz.
 

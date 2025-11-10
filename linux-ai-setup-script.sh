@@ -115,31 +115,30 @@ detect_package_manager() {
 # Sistem güncelleme ve temel paketler
 update_system() {
     echo -e "\n${YELLOW}[BİLGİ]${NC} Sistem güncelleniyor..."
-    eval $UPDATE_CMD
+    eval "$UPDATE_CMD"
     
     echo -e "${YELLOW}[BİLGİ]${NC} Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
     
     if [ "$PKG_MANAGER" = "apt" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip-full"
-        eval $INSTALL_CMD curl wget git jq zip unzip p7zip-full
+        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip-full
         echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (build-essential) kuruluyor..."
-        eval $INSTALL_CMD build-essential
+        eval "$INSTALL_CMD" build-essential
         
     elif [ "$PKG_MANAGER" = "dnf" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
-        eval $INSTALL_CMD curl wget git jq zip unzip p7zip
+        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
         echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (Development Tools) kuruluyor..."
         sudo dnf groupinstall "Development Tools" -y
         
     elif [ "$PKG_MANAGER" = "pacman" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
-        eval $INSTALL_CMD curl wget git jq zip unzip p7zip
+        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
         echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (base-devel) kuruluyor..."
         sudo pacman -S base-devel --noconfirm
         
     elif [ "$PKG_MANAGER" = "yum" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
-        eval $INSTALL_CMD curl wget git jq zip unzip p7zip
+        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
         echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (Development Tools) kuruluyor..."
         sudo yum groupinstall "Development Tools" -y
     fi
@@ -159,7 +158,7 @@ install_python() {
     fi
     
     echo -e "${YELLOW}[BİLGİ]${NC} Python3 kuruluyor..."
-    eval $INSTALL_CMD python3 python3-pip python3-venv
+    eval "$INSTALL_CMD" python3 python3-pip python3-venv
     
     if command -v python3 &> /dev/null; then
         echo -e "${GREEN}[BAŞARILI]${NC} Python kurulumu tamamlandı: $(python3 --version)"
@@ -216,13 +215,13 @@ install_pipx() {
     echo -e "${YELLOW}[BİLGİ]${NC} Sistem paket yöneticisi ile pipx kuruluyor..."
     
     if [ "$PKG_MANAGER" = "apt" ]; then
-        eval $INSTALL_CMD pipx
+        eval "$INSTALL_CMD" pipx
     elif [ "$PKG_MANAGER" = "dnf" ]; then
-        eval $INSTALL_CMD pipx
+        eval "$INSTALL_CMD" pipx
     elif [ "$PKG_MANAGER" = "pacman" ]; then
-        eval $INSTALL_CMD python-pipx
+        eval "$INSTALL_CMD" python-pipx
     elif [ "$PKG_MANAGER" = "yum" ]; then
-        eval $INSTALL_CMD pipx
+        eval "$INSTALL_CMD" pipx
     fi
     
     if ! command -v pipx &> /dev/null; then
@@ -264,7 +263,7 @@ install_pipx() {
         if [ -f "$rc_file" ]; then
             if ! grep -q '.local/bin' "$rc_file"; then
                 echo '' >> "$rc_file"
-                echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$rc_file"
+                echo "export PATH=\"$HOME/.local/bin:$PATH\"" >> "$rc_file"
             fi
         fi
     done
@@ -300,7 +299,7 @@ install_uv() {
         if [ -f "$rc_file" ]; then
             if ! grep -q '.cargo/bin' "$rc_file"; then
                 echo '' >> "$rc_file"
-                echo 'export PATH="$HOME/.cargo/bin:$PATH"' >> "$rc_file"
+                echo "export PATH=\"$HOME/.cargo/bin:$PATH\"" >> "$rc_file"
             fi
         fi
     done
@@ -335,8 +334,8 @@ install_nvm() {
             if ! grep -q 'NVM_DIR' "$rc_file"; then
                 echo -e "${YELLOW}[BİLGİ]${NC} NVM $rc_file dosyasına ekleniyor..."
                 echo '' >> "$rc_file"
-                echo 'export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"' >> "$rc_file"
-                echo '[ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"' >> "$rc_file"
+                echo "export NVM_DIR=\"$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")\"" >> "$rc_file"
+                echo "[ -s \"$NVM_DIR/nvm.sh\" ] && \\. \"$NVM_DIR/nvm.sh\"" >> "$rc_file"
             fi
         fi
     done
@@ -368,8 +367,8 @@ install_bun() {
             if ! grep -q '.bun/bin' "$rc_file"; then
                 echo '' >> "$rc_file"
                 echo '# Bun.js PATH' >> "$rc_file"
-                echo 'export BUN_INSTALL="$HOME/.bun"' >> "$rc_file"
-                echo 'export PATH="$BUN_INSTALL/bin:$PATH"' >> "$rc_file"
+                echo "export BUN_INSTALL=\"$HOME/.bun\"" >> "$rc_file"
+                echo "export PATH=\"$BUN_INSTALL/bin:$PATH\"" >> "$rc_file"
             fi
         fi
     done
@@ -426,7 +425,7 @@ install_supergemini() {
     echo -e "  ${GREEN}1${NC} - Express (Önerilen, hızlı kurulum)"
     echo -e "  ${GREEN}2${NC} - Minimal (Sadece çekirdek, en hızlı)"
     echo -e "  ${GREEN}3${NC} - Full (Tüm özellikler)"
-    read -p "Seçiminiz (1/2/3) [Varsayılan: 1]: " setup_choice
+    read -r -p "Seçiminiz (1/2/3) [Varsayılan: 1]: " setup_choice
     
     SETUP_CMD=""
     case $setup_choice in
@@ -757,11 +756,10 @@ install_claude_code() {
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'claude login' komutunu çalıştırın ve oturum açın."
         echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
         
-        claude login
+                claude login
         
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -p "Devam etmek için Enter'a basın..."
-    else
+                echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
+                read -r -p "Devam etmek için Enter'a basın..."    else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}claude login${NC}' komutunu çalıştırın."
     fi
@@ -788,7 +786,7 @@ install_gemini_cli() {
         gemini auth 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
         echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..."
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}gemini auth${NC}' komutunu çalıştırın."
@@ -816,7 +814,7 @@ install_opencode_cli() {
         opencode login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
         echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..."
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}opencode login${NC}' komutunu çalıştırın."
@@ -844,7 +842,7 @@ install_qoder_cli() {
         qodercli login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
         echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..."
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}qodercli login${NC}' komutunu çalıştırın."
@@ -871,8 +869,7 @@ install_qwen_cli() {
         
         qwen login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..."
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}qwen login${NC}' komutunu çalıştırın."
@@ -911,8 +908,7 @@ install_copilot_cli() {
 
 
 
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Devam etmek için Enter'a basabilirsiniz."
-        read -r -p "Devam etmek için Enter'a basın..." _
+        read -r -p "Devam etmek için Enter'a basın..."
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen '${GREEN}copilot auth login${NC}' ve '${GREEN}copilot auth activate${NC}' komutlarını daha sonra çalıştırın."
@@ -934,7 +930,7 @@ install_copilot_cli() {
     touch "$rc_file"
 
     local alias_line
-    alias_line=$(printf 'eval "$(copilot alias -- %s)"' "$detected_shell")
+    alias_line=$(printf "eval \"\$(copilot alias -- %s)\"" "$detected_shell")
 
     if copilot alias -- "$detected_shell" >/dev/null 2>&1; then
         eval "$(copilot alias -- "$detected_shell")" 2>/dev/null || true
@@ -992,7 +988,7 @@ install_codex_cli() {
         echo -e "  ${GREEN}1${NC} - ChatGPT hesabı ile giriş (Önerilen)"
         echo -e "  ${GREEN}2${NC} - OpenAI API Key ile giriş"
         echo -e "  ${GREEN}3${NC} - Manuel olarak daha sonra yapacağım"
-        read -p "Seçiminiz (1/2/3): " auth_choice
+        read -r -p "Seçiminiz (1/2/3): " auth_choice
         
         case $auth_choice in
             1)
@@ -1003,7 +999,7 @@ install_codex_cli() {
                 ;;
             2)
                 echo -e "\n${YELLOW}[BİLGİ]${NC} OpenAI API Key girişi"
-                read -p "OpenAI API Key'inizi girin: " OPENAI_KEY
+                read -r -p "OpenAI API Key'inizi girin: " OPENAI_KEY
                 
                 if [ -n "$OPENAI_KEY" ]; then
                     for rc_file in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
@@ -1047,6 +1043,63 @@ install_codex_cli() {
     echo -e "\n${GREEN}[BAŞARILI]${NC} OpenAI Codex CLI kurulumu tamamlandı!"
 }
 
+# GitHub CLI kurulumu
+install_github_cli() {
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} GitHub CLI (gh) kurulumu başlatılıyor (https://github.com/cli/cli)..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    if command -v gh &> /dev/null; then
+        echo -e "${GREEN}[BAŞARILI]${NC} GitHub CLI zaten kurulu: $(gh --version | head -n 1)"
+        return 0
+    fi
+
+    echo -e "${YELLOW}[BİLGİ]${NC} GitHub CLI sistem paket yöneticisi ile kuruluyor..."
+
+    case "$PKG_MANAGER" in
+        apt)
+            echo -e "${YELLOW}[BİLGİ]${NC} Debian/Ubuntu için GitHub CLI deposu ekleniyor..."
+            type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
+            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
+              && sudo chmod go+rw /usr/share/keyrings/githubcli-archive-keyring.gpg \
+              && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+              && sudo apt update \
+              && sudo apt install gh -y
+            ;;
+        dnf|yum)
+            echo -e "${YELLOW}[BİLGİ]${NC} Fedora/CentOS/RHEL için GitHub CLI deposu ekleniyor..."
+            if [ "$PKG_MANAGER" = "dnf" ]; then
+                sudo dnf install 'dnf-command(config-manager)' -y
+                sudo dnf config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+                sudo dnf install gh -y
+            else # yum
+                sudo yum install 'yum-command(config-manager)' -y
+                sudo yum-config-manager --add-repo https://cli.github.com/packages/rpm/gh-cli.repo
+                sudo yum install gh -y
+            fi
+            ;;
+        pacman)
+            echo -e "${YELLOW}[BİLGİ]${NC} Arch Linux için GitHub CLI kuruluyor..."
+            sudo pacman -S github-cli --noconfirm
+            ;;
+        *)
+            echo -e "${RED}[HATA]${NC} Desteklenmeyen paket yöneticisi: $PKG_MANAGER. GitHub CLI manuel kurulmalı."
+            return 1
+            ;;
+    esac
+
+    if command -v gh &> /dev/null; then
+        echo -e "${GREEN}[BAŞARILI]${NC} GitHub CLI kurulumu tamamlandı: $(gh --version | head -n 1)"
+        echo -e "\n${CYAN}[BİLGİ]${NC} GitHub CLI Kullanım İpuçları:"
+        echo -e "  ${GREEN}•${NC} Giriş yapmak için: ${GREEN}gh auth login${NC}"
+        echo -e "  ${GREEN}•${NC} Mevcut durumu görmek için: ${GREEN}gh status${NC}"
+        echo -e "  ${GREEN}•${NC} Daha fazla bilgi: ${GREEN}gh help${NC} veya https://cli.github.com/"
+    else
+        echo -e "${RED}[HATA]${NC} GitHub CLI kurulumu başarısız!"
+        return 1
+    fi
+}
+
 # AI Frameworks menüsü
 install_ai_frameworks_menu() {
     while true; do
@@ -1060,7 +1113,7 @@ install_ai_frameworks_menu() {
         echo -e "  ${RED}0${NC} - Ana Menüye Dön"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2)"
 
-        read -p "Seçiminiz: " framework_choices
+        read -r -p "Seçiminiz: " framework_choices
         if [ "$framework_choices" = "0" ] || [ -z "$framework_choices" ]; then
             echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
             break
@@ -1099,7 +1152,7 @@ install_ai_frameworks_menu() {
             break
         fi
 
-        read -p "Başka bir AI Framework kurmak ister misiniz? (e/h) [h]: " continue_choice
+        read -r -p "Başka bir AI Framework kurmak ister misiniz? (e/h) [h]: " continue_choice
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi
@@ -1118,7 +1171,7 @@ remove_ai_frameworks_menu() {
         echo -e "  ${RED}0${NC} - Ana Menüye Dön"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,3)"
 
-        read -p "Seçiminiz: " removal_choices
+        read -r -p "Seçiminiz: " removal_choices
         if [ "$removal_choices" = "0" ] || [ -z "$removal_choices" ]; then
             echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
             break
@@ -1147,7 +1200,7 @@ remove_ai_frameworks_menu() {
             break
         fi
 
-        read -p "Başka bir AI Framework kaldırmak ister misiniz? (e/h) [h]: " continue_choice
+        read -r -p "Başka bir AI Framework kaldırmak ister misiniz? (e/h) [h]: " continue_choice
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi
@@ -1171,7 +1224,7 @@ install_ai_cli_tools_menu() {
         echo -e "  ${RED}0${NC} - Ana Menüye Dön"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
 
-        read -p "Seçiminiz: " cli_choices
+        read -r -p "Seçiminiz: " cli_choices
         if [ "$cli_choices" = "0" ] || [ -z "$cli_choices" ]; then
             echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
             break
@@ -1208,7 +1261,7 @@ install_ai_cli_tools_menu() {
             break
         fi
 
-        read -p "Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]: " continue_choice
+        read -r -p "Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]: " continue_choice
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi
@@ -1236,10 +1289,10 @@ configure_git() {
     echo -e "${CYAN}Not: Bu bilgiler commit atarken kullanılacaktır. (Mevcut değeri korumak için Enter'a basın)${NC}"
 
     # Yeni kullanıcı adını sor
-    read -p "Git Kullanıcı Adınız [${current_name:-örn: Tamer KARACA}]: " GIT_USER_NAME
+    read -r -p "Git Kullanıcı Adınız [${current_name:-örn: Tamer KARACA}]: " GIT_USER_NAME
     
     # Yeni e-postayı sor
-    read -p "Git E-posta Adresiniz [${current_email:-örn: tamer@smedyazilim.com}]: " GIT_USER_EMAIL
+    read -r -p "Git E-posta Adresiniz [${current_email:-örn: tamer@smedyazilim.com}]: " GIT_USER_EMAIL
 
     # Eğer yeni bir değer girildiyse güncelle
     if [ -n "$GIT_USER_NAME" ]; then
@@ -1397,7 +1450,7 @@ manage_mcp_servers_menu() {
         echo -e "  ${RED}0${NC} - Ana Menüye Dön"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2)"
 
-        read -p "Seçiminiz: " mcp_choices
+        read -r -p "Seçiminiz: " mcp_choices
         if [ "$mcp_choices" = "0" ] || [ -z "$mcp_choices" ]; then
             echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
             break
@@ -1426,7 +1479,7 @@ manage_mcp_servers_menu() {
             break
         fi
 
-        read -p "Başka bir sunucu yönetmek ister misiniz? (e/h) [h]: " continue_choice
+        read -r -p "Başka bir sunucu yönetmek ister misiniz? (e/h) [h]: " continue_choice
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi
@@ -1473,7 +1526,7 @@ cleanup_magic_mcp() {
     echo -e "  ${RED}0${NC} - İptal"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
 
-    read -p "Seçiminiz: " choices
+    read -r -p "Seçiminiz: " choices
     if [ "$choices" = "0" ] || [ -z "$choices" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Temizleme işlemi iptal edildi."
         return 0
@@ -1560,7 +1613,7 @@ cleanup_qwen_mcp() {
     echo -e "  ${RED}0${NC} - İptal"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
 
-    read -p "Seçiminiz: " choices
+    read -r -p "Seçiminiz: " choices
     if [ "$choices" = "0" ] || [ -z "$choices" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Temizleme işlemi iptal edildi."
         return 0
@@ -1644,10 +1697,7 @@ cleanup_claude_mcp() {
         echo -e "  ${GREEN}${index}${NC} - ${server}"
         index=$((index + 1))
     done
-    echo -e "  ${RED}0${NC} - İptal"
-    echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
-
-    read -p "Seçiminiz: " choices
+    read -r -p "Seçiminiz: " choices
     if [ "$choices" = "0" ] || [ -z "$choices" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Temizleme işlemi iptal edildi."
         return 0
@@ -1968,7 +2018,7 @@ install_php_version_menu() {
     echo -e "  ${RED}0${NC} - İptal"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
 
-    read -p "Seçiminiz: " php_choices
+    read -r -p "Seçiminiz: " php_choices
     if [ "$php_choices" = "0" ] || [ -z "$php_choices" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} PHP kurulumu iptal edildi."
         return 0
@@ -2033,7 +2083,7 @@ switch_php_version_menu() {
     done
     echo -e "  ${RED}0${NC} - İptal"
 
-    read -p "Aktifleştirmek istediğiniz sürüm: " switch_choice
+    read -r -p "Aktifleştirmek istediğiniz sürüm: " switch_choice
     if [ "$switch_choice" = "0" ] || [ -z "$switch_choice" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} PHP sürüm geçişi iptal edildi."
         return 0
@@ -2095,9 +2145,11 @@ show_menu() {
     echo -e "  ${GREEN}11${NC} - AI CLI Araçları Kurulum Menüsü"
     echo -e "  ${GREEN}12${NC} - AI Frameworks Kurulum Menüsü"
     echo -e "  ${GREEN}13${NC} - AI Framework Kaldırma Menüsü"
+    echo -e "\n${CYAN}=== GitHub Araçları ===${NC}"
+    echo -e "  ${GREEN}14${NC} - GitHub CLI (gh) Kurulumu"
     echo -e "\n${CYAN}=== Yapılandırma & Yönetim ===${NC}"
-    echo -e "  ${GREEN}14${NC} - Claude Code için GLM-4.6 yapılandırması"
-    echo -e "  ${GREEN}15${NC} - MCP Sunucu Yönetim Menüsü"
+    echo -e "  ${GREEN}15${NC} - Claude Code için GLM-4.6 yapılandırması"
+    echo -e "  ${GREEN}16${NC} - MCP Sunucu Yönetim Menüsü"
     echo -e "  ${RED}0${NC}  - Çıkış\n"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 2,3,4)"
     echo -e "${YELLOW}[BİLGİ]${NC} Python araçları için Python (3), Node.js araçları için NVM (7) gereklidir!\n"
@@ -2157,6 +2209,9 @@ main() {
 
                     # AI Frameworks
                     install_ai_frameworks_menu
+                    
+                    # GitHub Araçları
+                    install_github_cli # GitHub CLI does not have an interactive_mode parameter, so call directly
                     
                     # Diğer Yapılandırmalar
                     configure_glm_claude
@@ -2233,10 +2288,14 @@ main() {
                     action_performed=true
                     ;;
                 14)
-                    configure_glm_claude
+                    install_github_cli
                     action_performed=true
                     ;;
                 15)
+                    configure_glm_claude
+                    action_performed=true
+                    ;;
+                16)
                     manage_mcp_servers_menu
                     action_performed=true
                     ;;

@@ -5,10 +5,11 @@
 ## 🇬🇧 English Guide
 
 ### Overview
-`linux-ai-setup-script.sh` automates preparing a Linux workstation for AI development. It corrects accidental Windows CRLF endings, detects the system's package manager (`apt`, `dnf`, `yum`, `pacman`), upgrades the OS, and installs all required runtimes (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5). On top of that it bootstraps frequently used AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI, and Pipx-based AI frameworks (SuperGemini/SuperQwen/SuperClaude), plus helpers for Git, GLM-4.6 credentials, and MCP server cleanup.
+The `setup` script automates preparing a Linux workstation for AI development. It corrects accidental Windows CRLF endings, detects the system's package manager (`apt`, `dnf`, `yum`, `pacman`), upgrades the OS, and installs all required runtimes (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5). On top of that it bootstraps frequently used AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI, and Pipx-based AI frameworks (SuperGemini/SuperQwen/SuperClaude), plus helpers for Git, GLM-4.6 credentials, and MCP server cleanup.
 
 ### Features
-- Automatic package-manager detection, colored logging, and CRLF self-healing so the script can be checked into Git safely.
+- **Modular & On-Demand Installation:** The `setup` script provides an interactive menu to select and install only the components you need. Each component is downloaded and executed via `curl` on demand, avoiding a full repository clone for initial setup.
+- Automatic package-manager detection, colored logging, and CRLF self-healing.
 - System upgrade + essential developer tooling (curl, wget, git, jq, zip/unzip, build toolchains).
 - Full Python toolchain (python3, pip, pipx, UV) and JavaScript runtimes (NVM-managed Node.js, Bun).
 - AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI, plus GitHub CLI.
@@ -23,37 +24,51 @@
 - Optional but recommended: `dos2unix` for faster CRLF fixes and `shellcheck` for static analysis.
 
 ### Installation
-1. **Clone or download** the repository:
+
+You have two primary ways to use this setup script:
+
+#### 1. Quick Install via cURL (Recommended for initial setup)
+This method downloads and runs the main `setup` script directly, which then allows you to selectively install components.
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+```
+
+#### 2. Local Clone and Run
+If you prefer to inspect the code or contribute, you can clone the repository:
+
+1. **Clone the repository:**
    ```bash
    git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
    cd linux-ai-setup-script
    ```
-2. **Make the script executable** and run quick linting:
+2. **Make the main script executable** (and optionally run quick linting):
    ```bash
-   chmod +x linux-ai-setup-script.sh
-   bash -n linux-ai-setup-script.sh
-   shellcheck linux-ai-setup-script.sh   # optional but recommended
+   chmod +x setup
+   bash -n setup
+   shellcheck setup   # optional but recommended
    ```
 3. **Run the installer** (use `sudo` password when asked):
    ```bash
-   ./linux-ai-setup-script.sh
+   ./setup
    ```
 
 ### Usage
-- Launching the script opens an interactive menu. You may enter a single number or comma-separated choices to perform multiple operations in one run (e.g., `1,7,11`).
+- Launching the `setup` script opens an interactive menu. You may enter a single number to perform an operation. Some options lead to sub-menus.
 - Menu overview:
-  - `1` – Install everything: updates the OS, configures Git, installs Python+pip+pipx+UV, sets up NVM/Node.js/Bun, installs all AI CLIs, runs the AI frameworks menu, configures GLM-4.6, and opens the MCP management menu.
-  - `2` – System prep + Git configuration only.
-  - `3-6` – Python stack: Python3, Pip, Pipx, UV.
-  - `7-8` – JavaScript runtimes: NVM/Node.js and Bun.
-  - `9-10` – PHP installer (7.4/8.x + extensions + Composer) and version switcher.
-  - `11` – AI CLI Tools menu (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI; choose individually or all).
-  - `12` – AI Frameworks menu (SuperGemini, SuperQwen, SuperClaude; installs via Pipx).
-  - `13` – AI Framework removal menu (SuperGemini, SuperQwen, SuperClaude; uninstall + config cleanup).
-  - `14` – GitHub CLI (gh) installation.
-  - `15` – Configure GLM-4.6 endpoint/key for Claude Code.
-  - `16` – MCP Server management (list/reset local MCP instances).
-  - `0` – Exit.
+  - `1` – Update System and Install Basic Packages
+  - `2` – Install Python and Related Tools (Pip, Pipx, UV)
+  - `3` – Install Node.js and Related Tools (NVM, Bun.js)
+  - `4` – Install AI Frameworks (SuperGemini, SuperQwen, SuperClaude) - *This opens a sub-menu.*
+  - `5` – Install AI CLI Tools (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) - *This opens a sub-menu.*
+  - `6` – Git Configuration
+  - `7` – GLM-4.6 Claude Code Configuration
+  - `8` – PHP and Composer Installation
+  - `9` – GitHub CLI Installation
+  - `10` – Uninstall AI Frameworks - *This opens a sub-menu.*
+  - `11` – MCP Server Management - *This opens a sub-menu.*
+  - `A` – Install All (Sequentially)
+  - `0` – Exit
 - Within sub-menus, typing `0` returns to the previous screen. Prompts default to the safest option if you simply press `Enter`.
 
 ### Usage Details & Tips
@@ -63,18 +78,19 @@
 - **Idempotent behavior:** Re-running the script is safe; existing tools are detected, and missing components are installed. Use targeted menu selections for incremental updates (e.g., rerun option `11` to refresh AI CLIs).
 - **Troubleshooting:** If a CLI remains unavailable after installation, ensure your shell has the updated PATH entries and reopen the terminal. Logs are color-coded (`[BİLGİ]`, `[UYARI]`, `[HATA]`) to highlight the current step.
 - **Composer availability:** Installing any PHP version automatically downloads Composer (signature-verified) into `/usr/local/bin/composer`, so Laravel or other PHP projects can start immediately.
-- **GLM credentials:** Menu option `14` shows your existing GLM API key in masked form (`abcd***wxyz`). Press `Enter` to keep it or type a new key to overwrite; the base URL prompt behaves the same way.
+- **GLM credentials:** Menu option 7 shows your existing GLM API key in masked form (`abcd***wxyz`). Press `Enter` to keep it or type a new key to overwrite; the base URL prompt behaves the same way.
 - **Auto-sourcing:** Whenever PATH or toolchain exports are updated, the script reloads your shell config (`~/.bashrc`, `~/.zshrc`, or `~/.profile`) automatically and prints a notice so follow-up commands in the same run can see the changes.
-- **Testing:** Before submitting changes, run `shellcheck linux-ai-setup-script.sh` and `bash -n linux-ai-setup-script.sh`. For smoke tests, you can set `PKG_MANAGER=apt ./linux-ai-setup-script.sh --dry-run` once the flag is implemented.
+- **Testing:** Before submitting changes, run `shellcheck setup` and `bash -n setup`. For smoke tests, you can set `PKG_MANAGER=apt ./setup --dry-run` once the flag is implemented.
 
 ---
 
 ## 🇹🇷 Türkçe Rehber
 
 ### Genel Bakış
-`linux-ai-setup-script.sh`, Linux tabanlı geliştirici makinelerde uçtan uca AI çalışma ortamını hazırlar. Windows’tan gelen CRLF satır sonlarını düzeltir, paket yöneticisini (`apt`, `dnf`, `yum`, `pacman`) otomatik saptar, sistemi günceller ve gerekli tüm çalışma ortamlarını (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5) kurar. Buna ek olarak sık kullanılan AI CLI araçlarını (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI ve Pipx tabanlı AI framework’lerini (SuperGemini/SuperQwen/SuperClaude) yükler; Git yapılandırması, GLM-4.6 anahtarı ve MCP sunucu temizliği gibi yardımcı menüler sağlar.
+`setup`, Linux tabanlı geliştirici makinelerde uçtan uca AI çalışma ortamını hazırlar. Windows’tan gelen CRLF satır sonlarını düzeltir, paket yöneticisini (`apt`, `dnf`, `yum`, `pacman`) otomatik saptar, sistemi günceller ve gerekli tüm çalışma ortamlarını (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5) kurar. Buna ek olarak sık kullanılan AI CLI araçlarını (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI ve Pipx tabanlı AI framework’lerini (SuperGemini/SuperQwen/SuperClaude) yükler; Git yapılandırması, GLM-4.6 anahtarı ve MCP sunucu temizliği gibi yardımcı menüler sağlar.
 
 ### Özellikler
+- **Modüler ve İsteğe Bağlı Kurulum:** `setup` script'i, yalnızca ihtiyacınız olan bileşenleri seçip kurmanız için etkileşimli bir menü sunar. Her bileşen, ilk kurulum için tüm depoyu klonlamaya gerek kalmadan, isteğe bağlı olarak `curl` aracılığıyla indirilir ve çalıştırılır.
 - Paket yöneticisi tespiti, renkli günlükler ve CRLF otomatik düzeltmesi ile sürüm kontrolünde güvenli kullanım.
 - Sistem güncellemesi + temel geliştirici araçları (curl, wget, git, jq, zip/unzip, derleme araçları).
 - Python ekosistemi (python3, pip, pipx, UV) ve JavaScript çalıştırıcıları (NVM ile Node.js, Bun).
@@ -85,37 +101,51 @@
 - Git, GLM-4.6 yapılandırması ve MCP sunucu yönetimine yönelik etkileşimli rehberler.
 
 ### Kurulum
-1. **Depoyu klonlayın veya indirin:**
+
+Bu kurulum script'ini kullanmak için iki ana yöntem bulunmaktadır:
+
+#### 1. cURL ile Hızlı Kurulum (İlk kurulum için önerilir)
+Bu yöntem, ana `setup` script'ini doğrudan indirir ve çalıştırır; bu sayede bileşenleri seçerek kurabilirsiniz.
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+```
+
+#### 2. Yerel Klonlama ve Çalıştırma
+Kodu incelemeyi veya katkıda bulunmayı tercih ediyorsanız, depoyu klonlayabilirsiniz:
+
+1. **Depoyu klonlayın:**
    ```bash
    git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
    cd linux-ai-setup-script
    ```
-2. **Script’i çalıştırılabilir yapın ve hızlı kontrolleri çalıştırın:**
+2. **Ana script'i çalıştırılabilir yapın** (ve isteğe bağlı olarak hızlı lint kontrolü yapın):
    ```bash
-   chmod +x linux-ai-setup-script.sh
-   bash -n linux-ai-setup-script.sh
-   shellcheck linux-ai-setup-script.sh   # isteğe bağlı fakat önerilir
+   chmod +x setup
+   bash -n setup
+   shellcheck setup   # isteğe bağlı fakat önerilir
    ```
 3. **Kurulumu başlatın** (`sudo` parolanızı isteyebilir):
    ```bash
-   ./linux-ai-setup-script.sh
+   ./setup
    ```
 
 ### Kullanım
-- Script açıldığında etkileşimli bir menü görürsünüz. Tek bir seçenek girebilir veya virgülle ayırarak birden fazla işlemi aynı anda tetikleyebilirsiniz (örn. `1,7,11`).
+- `setup` script'ini başlattığınızda etkileşimli bir menü açılır. Bir işlem gerçekleştirmek için tek bir sayı girebilirsiniz. Bazı seçenekler alt menülere yönlendirir.
 - Menü özeti:
-  - `1` – Her şeyi kurar: sistemi günceller, Git’i ayarlar, Python+pip+pipx+UV yükler, NVM/Node.js/Bun kurar, tüm AI CLI araçlarını kurar, AI framework menüsünü çalıştırır, GLM-4.6 yapılandırmasını yapar ve MCP yönetim menüsünü açar.
-  - `2` – Sadece sistem hazırlığı + Git ayarları.
-  - `3-6` – Python araçları: Python3, Pip, Pipx, UV.
-  - `7-8` – JavaScript araçları: NVM/Node.js ve Bun.
-  - `9-10` – PHP kurulumu (7.4/8.x + eklentiler + Composer) ve sürüm geçişi.
-  - `11` – AI CLI Araçları menüsü (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI).
-  - `12` – AI Framework menüsü (SuperGemini, SuperQwen, SuperClaude).
-  - `13` – AI Framework kaldırma menüsü (SuperGemini, SuperQwen, SuperClaude temiz kaldırma).
-  - `14` – GitHub CLI (gh) kurulumu.
-  - `15` – Claude Code için GLM-4.6 anahtar/base URL yapılandırması.
-  - `16` – MCP Sunucularını listeleme ve temizleme menüsü.
-  - `0` – Çıkış.
+  - `1` – Sistemi Güncelle ve Temel Paketleri Kur
+  - `2` – Python ve İlgili Araçları Kur (Pip, Pipx, UV)
+  - `3` – Node.js ve İlgili Araçları Kur (NVM, Bun.js)
+  - `4` – AI Frameworklerini Kur (SuperGemini, SuperQwen, SuperClaude) - *Bu bir alt menü açar.*
+  - `5` – AI CLI Araçlarını Kur (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) - *Bu bir alt menü açar.*
+  - `6` – Git Yapılandırması
+  - `7` – GLM-4.6 Claude Code Yapılandırması
+  - `8` – PHP ve Composer Kurulumu
+  - `9` – GitHub CLI Kurulumu
+  - `10` – AI Frameworklerini Kaldır - *Bu bir alt menü açar.*
+  - `11` – MCP Sunucu Yönetimi - *Bu bir alt menü açar.*
+  - `A` – Hepsini Kur (Sırayla)
+  - `0` – Çıkış
 - Alt menülerde `0` yazarak geri dönebilir, `Enter` ile varsayılan yanıtları kabul edebilirsiniz.
 
 ### Kullanım Detayları
@@ -125,6 +155,6 @@
 - **Tekrar çalıştırma:** Script idem-potent çalışır; eksik bileşenleri tamamlamak veya belirli menüleri (örn. sadece AI CLI’ları) yeniden kurmak için tekrar çalıştırabilirsiniz.
 - **Sorun giderme:** Kurulumdan sonra komut bulunamıyorsa PATH güncellemelerinin yüklendiğinden emin olun ve terminali kapatıp açın. `[BİLGİ]`, `[UYARI]`, `[HATA]` etiketleri hangi adımda olduğunuzu gösterir.
 - **Composer kullanımı:** Herhangi bir PHP sürümü kurduğunuzda script otomatik olarak imza doğrulamalı Composer'i `/usr/local/bin/composer` yoluna ekler; Laravel projelerine hemen başlayabilirsiniz.
-- **GLM bilgileri:** `14` numaralı menüde mevcut GLM API key maskeleme ile (`abcd***wxyz`) gösterilir. Enter'a bastığınızda değer korunur, yeni key girerseniz eskisiyle değiştirilir; Base URL için de aynı mantık geçerlidir.
+- **GLM bilgileri:** 7 numaralı menüde mevcut GLM API key maskeleme ile (`abcd***wxyz`) gösterilir. Enter'a bastığınızda değer korunur, yeni key girerseniz eskisiyle değiştirilir; Base URL için de aynı mantık geçerlidir.
 - **Otomatik source:** PATH veya ortam değişikliklerinde script uygun shell dosyasını (`~/.bashrc`, `~/.zshrc`, `~/.profile`) otomatik olarak `source` eder ve bilgi mesajı gösterir; böylece aynı oturumda komutlar güncel yolu görür.
-- **Test önerisi:** Değişiklik yapıyorsanız `shellcheck linux-ai-setup-script.sh` ve `bash -n linux-ai-setup-script.sh` çalıştırın; ayrıca uygun olduğunda `PKG_MANAGER=apt ./linux-ai-setup-script.sh --dry-run` gibi duman testleri planlayın.
+- **Test önerisi:** Değişiklik yapıyorsanız `shellcheck setup` ve `bash -n setup` çalıştırın; ayrıca uygun olduğunda `PKG_MANAGER=apt ./setup --dry-run` gibi duman testleri planlayın.

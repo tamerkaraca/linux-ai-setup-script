@@ -13,7 +13,7 @@
 - Full Python toolchain (python3, pip, pipx, UV) and JavaScript runtimes (NVM-managed Node.js, Bun).
 - AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, and OpenAI Codex CLI.
 - AI framework menu for SuperGemini, SuperQwen, SuperClaude with guided API-key prompts.
-- PHP installer with selectable versions, Laravel-friendly extension packs, and version switcher.
+- PHP installer with selectable versions, Laravel-friendly extension packs, automatic Composer bootstrap, and version switcher.
 - Configuration helpers: interactive Git setup, GLM-4.6 configuration for Claude Code, MCP server listing/reset.
 
 ### Requirements
@@ -45,7 +45,7 @@
   - `2` – System prep + Git configuration only.
   - `3-6` – Python stack: Python3, Pip, Pipx, UV.
   - `7-8` – JavaScript runtimes: NVM/Node.js and Bun.
-  - `9-10` – PHP installer (7.4/8.x + extensions) and version switcher.
+  - `9-10` – PHP installer (7.4/8.x + extensions + Composer) and version switcher.
   - `11` – AI CLI Tools menu (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex; choose individually or all).
   - `12` – AI Frameworks menu (SuperGemini, SuperQwen, SuperClaude; installs via Pipx).
   - `13` – Configure GLM-4.6 endpoint/key for Claude Code.
@@ -59,6 +59,7 @@
 - **Environment updates:** The script appends PATH exports for Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`), and Bun (`~/.bun/bin`) to `~/.bashrc`, `~/.zshrc`, and `~/.profile` when present. Restart your shell or `source ~/.bashrc` afterwards.
 - **Idempotent behavior:** Re-running the script is safe; existing tools are detected, and missing components are installed. Use targeted menu selections for incremental updates (e.g., rerun option `11` to refresh AI CLIs).
 - **Troubleshooting:** If a CLI remains unavailable after installation, ensure your shell has the updated PATH entries and reopen the terminal. Logs are color-coded (`[BİLGİ]`, `[UYARI]`, `[HATA]`) to highlight the current step.
+- **Composer availability:** Installing any PHP version automatically downloads Composer (signature-verified) into `/usr/local/bin/composer`, so Laravel or other PHP projects can start immediately.
 - **Testing:** Before submitting changes, run `shellcheck linux-ai-setup-script.sh` and `bash -n linux-ai-setup-script.sh`. For smoke tests, you can set `PKG_MANAGER=apt ./linux-ai-setup-script.sh --dry-run` once the flag is implemented.
 
 ---
@@ -74,7 +75,7 @@
 - Python ekosistemi (python3, pip, pipx, UV) ve JavaScript çalıştırıcıları (NVM ile Node.js, Bun).
 - AI CLI kurulumları: Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI.
 - Pipx üzerinden SuperGemini, SuperQwen, SuperClaude kurulum menüsü ve anahtar istemleri.
-- PHP 7.4/8.x kurulumu, Laravel eklentileri ve sürüm değiştirme menüsü.
+- PHP 7.4/8.x kurulumu, Laravel eklentileri, Composer kurulumu ve sürüm değiştirme menüsü.
 - Git, GLM-4.6 yapılandırması ve MCP sunucu yönetimine yönelik etkileşimli rehberler.
 
 ### Kurulum
@@ -101,7 +102,7 @@
   - `2` – Sadece sistem hazırlığı + Git ayarları.
   - `3-6` – Python araçları: Python3, Pip, Pipx, UV.
   - `7-8` – JavaScript araçları: NVM/Node.js ve Bun.
-  - `9-10` – PHP kurulumu (7.4/8.x + eklentiler) ve sürüm geçişi.
+  - `9-10` – PHP kurulumu (7.4/8.x + eklentiler + Composer) ve sürüm geçişi.
   - `11` – AI CLI Araçları menüsü (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex).
   - `12` – AI Framework menüsü (SuperGemini, SuperQwen, SuperClaude).
   - `13` – Claude Code için GLM-4.6 anahtar/base URL yapılandırması.
@@ -115,4 +116,5 @@
 - **Ortam değişkenleri:** Script; Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`) ve Bun (`~/.bun/bin`) yollarını `~/.bashrc`, `~/.zshrc`, `~/.profile` dosyalarınıza ekler. İşlem sonrası terminalinizi yeniden başlatın veya `source ~/.bashrc` çalıştırın.
 - **Tekrar çalıştırma:** Script idem-potent çalışır; eksik bileşenleri tamamlamak veya belirli menüleri (örn. sadece AI CLI’ları) yeniden kurmak için tekrar çalıştırabilirsiniz.
 - **Sorun giderme:** Kurulumdan sonra komut bulunamıyorsa PATH güncellemelerinin yüklendiğinden emin olun ve terminali kapatıp açın. `[BİLGİ]`, `[UYARI]`, `[HATA]` etiketleri hangi adımda olduğunuzu gösterir.
+- **Composer kullanımı:** Herhangi bir PHP sürümü kurduğunuzda script otomatik olarak imza doğrulamalı Composer'i `/usr/local/bin/composer` yoluna ekler; Laravel projelerine hemen başlayabilirsiniz.
 - **Test önerisi:** Değişiklik yapıyorsanız `shellcheck linux-ai-setup-script.sh` ve `bash -n linux-ai-setup-script.sh` çalıştırın; ayrıca uygun olduğunda `PKG_MANAGER=apt ./linux-ai-setup-script.sh --dry-run` gibi duman testleri planlayın.

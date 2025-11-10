@@ -1407,6 +1407,74 @@ register_php_alternative() {
     fi
 }
 
+install_composer() {
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} Composer kurulumu denetleniyor..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    if command -v composer &> /dev/null; then
+        echo -e "${GREEN}[BAŞARILI]${NC} Composer zaten kurulu: $(composer --version)"
+        return 0
+    fi
+
+    if ! command -v php &> /dev/null; then
+        echo -e "${RED}[HATA]${NC} Composer kurulumu için PHP gereklidir. Lütfen önce PHP kurun."
+        return 1
+    fi
+
+    local temp_dir
+    temp_dir=$(mktemp -d)
+    if [ ! -d "$temp_dir" ]; then
+        echo -e "${RED}[HATA]${NC} Geçici dizin oluşturulamadı."
+        return 1
+    fi
+
+    local installer_path="$temp_dir/composer-setup.php"
+    local installer_sig_url="https://composer.github.io/installer.sig"
+    local installer_url="https://getcomposer.org/installer"
+
+    echo -e "${YELLOW}[BİLGİ]${NC} Composer installer indiriliyor..."
+    local expected_checksum
+    expected_checksum=$(curl -sS "$installer_sig_url") || true
+    if [ -z "$expected_checksum" ]; then
+        echo -e "${RED}[HATA]${NC} Installer imza bilgisi alınamadı."
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    if ! php -r "copy('$installer_url', '$installer_path');"; then
+        echo -e "${RED}[HATA]${NC} Composer installer indirilemedi."
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    local actual_checksum
+    actual_checksum=$(php -r "echo hash_file('sha384', '$installer_path');")
+    if [ "$expected_checksum" != "$actual_checksum" ]; then
+        echo -e "${RED}[HATA]${NC} İmza doğrulaması başarısız! Kurulum iptal edildi."
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    echo -e "${YELLOW}[BİLGİ]${NC} Installer doğrulandı, Composer yükleniyor..."
+    if ! sudo php "$installer_path" --quiet --install-dir=/usr/local/bin --filename=composer; then
+        echo -e "${RED}[HATA]${NC} Composer kurulumu başarısız oldu."
+        rm -rf "$temp_dir"
+        return 1
+    fi
+
+    rm -rf "$temp_dir"
+
+    if command -v composer &> /dev/null; then
+        echo -e "${GREEN}[BAŞARILI]${NC} Composer kurulumu tamamlandı: $(composer --version)"
+        echo -e "${CYAN}[BİLGİ]${NC} Composer projeleri oluşturmak için: ${GREEN}composer init${NC}"
+        echo -e "${CYAN}[BİLGİ]${NC} Bağımlılık kurmak için: ${GREEN}composer install${NC}"
+    else
+        echo -e "${YELLOW}[UYARI]${NC} Composer komutu bulunamadı. PATH ayarlarınızı kontrol edin."
+        return 1
+    fi
+}
+
 install_php_version() {
     local version="$1"
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
@@ -1523,6 +1591,7 @@ install_php_version_menu() {
     echo -e "${YELLOW}[BİLGİ]${NC} Kurmak istediğiniz PHP sürüm(ler)ini seçin:"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
+    local php_version_installed=false
     local index=1
     for version in "${PHP_SUPPORTED_VERSIONS[@]}"; do
         echo -e "  ${GREEN}${index}${NC} - PHP ${version}"
@@ -1553,8 +1622,14 @@ install_php_version_menu() {
         fi
 
         local selected_version="${PHP_SUPPORTED_VERSIONS[$idx]}"
-        install_php_version "$selected_version"
+        if install_php_version "$selected_version"; then
+            php_version_installed=true
+        fi
     done
+
+    if [ "$php_version_installed" = true ]; then
+        install_composer
+    fi
 }
 
 switch_php_version_menu() {

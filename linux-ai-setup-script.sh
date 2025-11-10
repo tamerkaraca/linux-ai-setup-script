@@ -559,6 +559,7 @@ install_superclaude() {
 
 # Claude Code kurulumu
 install_claude_code() {
+    local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Claude Code kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -567,20 +568,26 @@ install_claude_code() {
     
     echo -e "${GREEN}[BAŞARILI]${NC} Claude Code sürümü: $(claude --version)"
     
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Claude Code'a giriş yapmanız gerekiyor."
-    echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'claude login' komutunu çalıştırın ve oturum açın."
-    echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
-    
-    claude login
-    
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-    read -p "Devam etmek için Enter'a basın..."
+    if [ "$interactive_mode" = true ]; then
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Claude Code'a giriş yapmanız gerekiyor."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'claude login' komutunu çalıştırın ve oturum açın."
+        echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        
+        claude login
+        
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
+        read -p "Devam etmek için Enter'a basın..."
+    else
+        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}claude login${NC}' komutunu çalıştırın."
+    fi
     
     echo -e "${GREEN}[BAŞARILI]${NC} Claude Code kurulumu tamamlandı!"
 }
 
 # Gemini CLI kurulumu
 install_gemini_cli() {
+    local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Gemini CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -589,20 +596,26 @@ install_gemini_cli() {
     
     echo -e "${GREEN}[BAŞARILI]${NC} Gemini CLI sürümü: $(gemini --version)"
     
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Gemini CLI'ya giriş yapmanız gerekiyor."
-    echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'gemini auth' veya ilgili oturum açma komutunu çalıştırın."
-    echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
-    
-    gemini auth 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
-    
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-    read -p "Devam etmek için Enter'a basın..."
+    if [ "$interactive_mode" = true ]; then
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Gemini CLI'ya giriş yapmanız gerekiyor."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'gemini auth' veya ilgili oturum açma komutunu çalıştırın."
+        echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        
+        gemini auth 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
+        
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
+        read -p "Devam etmek için Enter'a basın..."
+    else
+        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}gemini auth${NC}' komutunu çalıştırın."
+    fi
     
     echo -e "${GREEN}[BAŞARILI]${NC} Gemini CLI kurulumu tamamlandı!"
 }
 
 # OpenCode CLI kurulumu
 install_opencode_cli() {
+    local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} OpenCode CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -611,20 +624,26 @@ install_opencode_cli() {
     
     echo -e "${GREEN}[BAŞARILI]${NC} OpenCode CLI sürümü: $(opencode --version)"
     
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi OpenCode CLI'ya giriş yapmanız gerekiyor."
-    echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'opencode login' veya ilgili oturum açma komutunu çalıştırın."
-    echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
-    
-    opencode login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
-    
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-    read -p "Devam etmek için Enter'a basın..."
+    if [ "$interactive_mode" = true ]; then
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi OpenCode CLI'ya giriş yapmanız gerekiyor."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'opencode login' veya ilgili oturum açma komutunu çalıştırın."
+        echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        
+        opencode login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
+        
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
+        read -p "Devam etmek için Enter'a basın..."
+    else
+        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}opencode login${NC}' komutunu çalıştırın."
+    fi
     
     echo -e "${GREEN}[BAŞARILI]${NC} OpenCode CLI kurulumu tamamlandı!"
 }
 
 # Qoder CLI kurulumu
 install_qoder_cli() {
+    local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Qoder CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -633,20 +652,26 @@ install_qoder_cli() {
     
     echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI sürümü: $(qodercli --version)"
     
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Qoder CLI'ya giriş yapmanız gerekiyor."
-    echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'qodercli login' veya ilgili oturum açma komutunu çalıştırın."
-    echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
-    
-    qodercli login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
-    
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-    read -p "Devam etmek için Enter'a basın..."
+    if [ "$interactive_mode" = true ]; then
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Qoder CLI'ya giriş yapmanız gerekiyor."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'qodercli login' veya ilgili oturum açma komutunu çalıştırın."
+        echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        
+        qodercli login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
+        
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
+        read -p "Devam etmek için Enter'a basın..."
+    else
+        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}qodercli login${NC}' komutunu çalıştırın."
+    fi
     
     echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI kurulumu tamamlandı!"
 }
 
 # Qwen CLI kurulumu
 install_qwen_cli() {
+    local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Qwen CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -655,20 +680,26 @@ install_qwen_cli() {
     
     echo -e "${GREEN}[BAŞARILI]${NC} Qwen CLI sürümü: $(qwen --version)"
     
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Qwen CLI'ya giriş yapmanız gerekiyor."
-    echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'qwen login' veya ilgili oturum açma komutunu çalıştırın."
-    echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
-    
-    qwen login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
-    
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-    read -p "Devam etmek için Enter'a basın..."
+    if [ "$interactive_mode" = true ]; then
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Qwen CLI'ya giriş yapmanız gerekiyor."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'qwen login' veya ilgili oturum açma komutunu çalıştırın."
+        echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        
+        qwen login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
+        
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
+        read -p "Devam etmek için Enter'a basın..."
+    else
+        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}qwen login${NC}' komutunu çalıştırın."
+    fi
     
     echo -e "${GREEN}[BAŞARILI]${NC} Qwen CLI kurulumu tamamlandı!"
 }
 
 # OpenAI Codex CLI kurulumu
 install_codex_cli() {
+    local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} OpenAI Codex CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -677,59 +708,64 @@ install_codex_cli() {
     
     echo -e "${GREEN}[BAŞARILI]${NC} Codex CLI sürümü: $(codex --version)"
     
-    echo -e "\n${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}   Codex CLI Kimlik Doğrulama Seçenekleri:${NC}"
-    echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
-    echo -e "${GREEN}Seçenek 1:${NC} ChatGPT hesabı ile giriş (Önerilen)"
-    echo -e "  • ChatGPT Plus, Pro, Business, Edu veya Enterprise planı gereklidir"
-    echo -e "  • Kullanım kredileri dahildir"
-    echo -e "  • Komut: ${GREEN}codex${NC} çalıştırın ve 'Sign in with ChatGPT' seçeneğini seçin"
-    echo -e "\n${GREEN}Seçenek 2:${NC} OpenAI API Key ile giriş"
-    echo -e "  • https://platform.openai.com/api-keys adresinden API key alın"
-    echo -e "  • Environment variable olarak ayarlayın: ${GREEN}export OPENAI_API_KEY=\"your-key\"${NC}"
-    echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}\n"
-    
-    echo -e "${YELLOW}[BİLGİ]${NC} Hangi yöntemi kullanmak istersiniz?"
-    echo -e "  ${GREEN}1${NC} - ChatGPT hesabı ile giriş (Önerilen)"
-    echo -e "  ${GREEN}2${NC} - OpenAI API Key ile giriş"
-    echo -e "  ${GREEN}3${NC} - Manuel olarak daha sonra yapacağım"
-    read -p "Seçiminiz (1/2/3): " auth_choice
-    
-    case $auth_choice in
-        1)
-            echo -e "\n${YELLOW}[BİLGİ]${NC} Codex başlatılıyor, ChatGPT ile giriş yapın..."
-            echo -e "${YELLOW}[BİLGİ]${NC} Tarayıcıda açılan sayfadan giriş yapın."
-            echo -e "${YELLOW}[BİLGİ]${NC} Giriş tamamlandıktan sonra buraya dönün.\n"
-            codex --auth-only 2>/dev/null || codex
-            ;;
-        2)
-            echo -e "\n${YELLOW}[BİLGİ]${NC} OpenAI API Key girişi"
-            read -p "OpenAI API Key'inizi girin: " OPENAI_KEY
-            
-            if [ -n "$OPENAI_KEY" ]; then
-                for rc_file in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
-                    if [ -f "$rc_file" ]; then
-                        if ! grep -q 'OPENAI_API_KEY' "$rc_file"; then
-                            echo '' >> "$rc_file"
-                            echo "export OPENAI_API_KEY=\"$OPENAI_KEY\"" >> "$rc_file"
-                            echo -e "${GREEN}[BAŞARILI]${NC} API Key $rc_file dosyasına eklendi"
-                        fi
-                    fi
-                done
+    if [ "$interactive_mode" = true ]; then
+        echo -e "\n${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
+        echo -e "${YELLOW}   Codex CLI Kimlik Doğrulama Seçenekleri:${NC}"
+        echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
+        echo -e "${GREEN}Seçenek 1:${NC} ChatGPT hesabı ile giriş (Önerilen)"
+        echo -e "  • ChatGPT Plus, Pro, Business, Edu veya Enterprise planı gereklidir"
+        echo -e "  • Kullanım kredileri dahildir"
+        echo -e "  • Komut: ${GREEN}codex${NC} çalıştırın ve 'Sign in with ChatGPT' seçeneğini seçin"
+        echo -e "\n${GREEN}Seçenek 2:${NC} OpenAI API Key ile giriş"
+        echo -e "  • https://platform.openai.com/api-keys adresinden API key alın"
+        echo -e "  • Environment variable olarak ayarlayın: ${GREEN}export OPENAI_API_KEY=\"your-key\"${NC}"
+        echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}\n"
+        
+        echo -e "${YELLOW}[BİLGİ]${NC} Hangi yöntemi kullanmak istersiniz?"
+        echo -e "  ${GREEN}1${NC} - ChatGPT hesabı ile giriş (Önerilen)"
+        echo -e "  ${GREEN}2${NC} - OpenAI API Key ile giriş"
+        echo -e "  ${GREEN}3${NC} - Manuel olarak daha sonra yapacağım"
+        read -p "Seçiminiz (1/2/3): " auth_choice
+        
+        case $auth_choice in
+            1)
+                echo -e "\n${YELLOW}[BİLGİ]${NC} Codex başlatılıyor, ChatGPT ile giriş yapın..."
+                echo -e "${YELLOW}[BİLGİ]${NC} Tarayıcıda açılan sayfadan giriş yapın."
+                echo -e "${YELLOW}[BİLGİ]${NC} Giriş tamamlandıktan sonra buraya dönün.\n"
+                codex --auth-only 2>/dev/null || codex
+                ;;
+            2)
+                echo -e "\n${YELLOW}[BİLGİ]${NC} OpenAI API Key girişi"
+                read -p "OpenAI API Key'inizi girin: " OPENAI_KEY
                 
-                export OPENAI_API_KEY="$OPENAI_KEY"
-                echo -e "${GREEN}[BAŞARILI]${NC} API Key ayarlandı"
-            else
-                echo -e "${RED}[HATA]${NC} API Key boş olamaz!"
-            fi
-            ;;
-        3)
-            echo -e "${YELLOW}[BİLGİ]${NC} Kimlik doğrulama atlandı. Daha sonra yapabilirsiniz."
-            ;;
-        *)
-            echo -e "${RED}[HATA]${NC} Geçersiz seçim!"
-            ;;
-    esac
+                if [ -n "$OPENAI_KEY" ]; then
+                    for rc_file in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
+                        if [ -f "$rc_file" ]; then
+                            if ! grep -q 'OPENAI_API_KEY' "$rc_file"; then
+                                echo '' >> "$rc_file"
+                                echo "export OPENAI_API_KEY=\"$OPENAI_KEY\"" >> "$rc_file"
+                                echo -e "${GREEN}[BAŞARILI]${NC} API Key $rc_file dosyasına eklendi"
+                            fi
+                        fi
+                    done
+                    
+                    export OPENAI_API_KEY="$OPENAI_KEY"
+                    echo -e "${GREEN}[BAŞARILI]${NC} API Key ayarlandı"
+                else
+                    echo -e "${RED}[HATA]${NC} API Key boş olamaz!"
+                fi
+                ;;
+            3)
+                echo -e "${YELLOW}[BİLGİ]${NC} Kimlik doğrulama atlandı. Daha sonra yapabilirsiniz."
+                ;;
+            *)
+                echo -e "${RED}[HATA]${NC} Geçersiz seçim!"
+                ;;
+        esac
+    else
+        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}codex${NC}' komutunu çalıştırarak kimlik doğrulama yapın."
+    fi
     
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Codex CLI Kullanım İpuçları:"
@@ -838,12 +874,12 @@ install_ai_cli_tools_menu() {
                 5) install_qwen_cli ;;
                 6) install_codex_cli ;;
                 7)
-                    install_claude_code
-                    install_gemini_cli
-                    install_opencode_cli
-                    install_qoder_cli
-                    install_qwen_cli
-                    install_codex_cli
+                    install_claude_code false
+                    install_gemini_cli false
+                    install_opencode_cli false
+                    install_qoder_cli false
+                    install_qwen_cli false
+                    install_codex_cli false
                     all_installed=true
                     ;;
                 *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;
@@ -1656,7 +1692,12 @@ main() {
                 install_bun
                 
                 # AI CLI araçları
-                install_ai_cli_tools_menu
+                install_claude_code false
+                install_gemini_cli false
+                install_opencode_cli false
+                install_qoder_cli false
+                install_qwen_cli false
+                install_codex_cli false
 
                 # AI Frameworks
                 install_ai_frameworks_menu

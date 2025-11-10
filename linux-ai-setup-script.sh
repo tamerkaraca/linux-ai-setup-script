@@ -885,42 +885,80 @@ install_qwen_cli() {
 install_copilot_cli() {
     local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu başlatılıyor..."
+    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu (https://github.com/github/copilot-cli talimatları) başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    npm install -g @githubnext/github-copilot-cli
-
-    if command -v github-copilot-cli &> /dev/null; then
-        echo -e "${GREEN}[BAŞARILI]${NC} GitHub Copilot CLI sürümü: $(github-copilot-cli --version)"
-    else
-        echo -e "${RED}[HATA]${NC} GitHub Copilot CLI komutu bulunamadı. Kurulum adımlarını kontrol edin."
+    if ! npm install -g @githubnext/github-copilot-cli; then
+        echo -e "${RED}[HATA]${NC} 'npm install -g @githubnext/github-copilot-cli' komutu başarısız oldu."
         return 1
     fi
 
+    if ! command -v github-copilot-cli &> /dev/null; then
+        echo -e "${RED}[HATA]${NC} GitHub Copilot CLI komutu bulunamadı. PATH ayarlarını kontrol edin."
+        return 1
+    fi
+
+    echo -e "${GREEN}[BAŞARILI]${NC} GitHub Copilot CLI sürümü: $(github-copilot-cli --version)"
+
     if [ "$interactive_mode" = true ]; then
         echo -e "\n${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
-        echo -e "${YELLOW}   GitHub Copilot CLI Kimlik Doğrulama Adımları:${NC}"
+        echo -e "${YELLOW}   Resmi GitHub yönergelerine göre kimlik doğrulama:${NC}"
         echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
         echo -e "  ${GREEN}1.${NC} ${GREEN}github-copilot-cli auth login${NC} komutunu çalıştırın."
-        echo -e "  ${GREEN}2.${NC} Tarayıcıda açılan GitHub sayfasından Copilot erişimini onaylayın."
+        echo -e "  ${GREEN}2.${NC} Tarayıcıda açılan GitHub Copilot sayfasından erişimi onaylayın."
         echo -e "  ${GREEN}3.${NC} ${GREEN}github-copilot-cli auth activate${NC} ile kabuk entegrasyonunu tamamlayın."
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi oturum açma adımlarını başlatıyoruz. Tamamlandığında bu pencereye dönün.\n"
+        echo -e "\n${YELLOW}[BİLGİ]${NC} İşlemleri sizin yerinize başlatıyoruz; gerekirse komutları manuel tekrarlayabilirsiniz.\n"
 
-        github-copilot-cli auth login || echo -e "${YELLOW}[UYARI]${NC} Otomatik oturum açma başarısız olduysa komutu manuel olarak tekrarlayın."
-        github-copilot-cli auth activate || echo -e "${YELLOW}[UYARI]${NC} Shell entegrasyonu daha sonra manuel yapılabilir."
+        github-copilot-cli auth login || echo -e "${YELLOW}[UYARI]${NC} 'auth login' adımı tamamlanamadıysa lütfen manuel çalıştırın."
+        github-copilot-cli auth activate || echo -e "${YELLOW}[UYARI]${NC} Shell aktivasyonu tamamlanamadıysa manuel olarak tekrar edin."
 
         echo -e "\n${YELLOW}[BİLGİ]${NC} Devam etmek için Enter'a basabilirsiniz."
         read -r -p "Devam etmek için Enter'a basın..." _
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra '${GREEN}github-copilot-cli auth login${NC}' ve '${GREEN}github-copilot-cli auth activate${NC}' komutlarını çalıştırın."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen '${GREEN}github-copilot-cli auth login${NC}' ve '${GREEN}github-copilot-cli auth activate${NC}' komutlarını daha sonra çalıştırın."
+    fi
+
+    local detected_shell
+    detected_shell=$(basename "${SHELL:-bash}")
+    case "$detected_shell" in
+        bash|zsh) ;;
+        *) detected_shell="bash" ;;
+    esac
+
+    local rc_file
+    if [ "$detected_shell" = "zsh" ]; then
+        rc_file="$HOME/.zshrc"
+    else
+        rc_file="$HOME/.bashrc"
+    fi
+    touch "$rc_file"
+
+    local alias_line
+    alias_line=$(printf 'eval "$(github-copilot-cli alias -- %s)"' "$detected_shell")
+
+    if github-copilot-cli alias -- "$detected_shell" >/dev/null 2>&1; then
+        eval "$(github-copilot-cli alias -- "$detected_shell")" 2>/dev/null || true
+
+        if ! grep -Fq 'github-copilot-cli alias' "$rc_file"; then
+            {
+                echo ''
+                echo '# GitHub Copilot CLI aliasları'
+                echo "$alias_line"
+            } >> "$rc_file"
+            echo -e "${GREEN}[BAŞARILI]${NC} Copilot CLI aliasları ${rc_file} dosyasına eklendi."
+        else
+            echo -e "${YELLOW}[BİLGİ]${NC} Copilot CLI aliasları zaten ${rc_file} dosyasında mevcut."
+        fi
+    else
+        echo -e "${YELLOW}[UYARI]${NC} 'github-copilot-cli alias -- ${detected_shell}' komutu başarısız oldu. Aliasları manuel oluşturun."
     fi
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI Kullanım İpuçları:"
-    echo -e "  ${GREEN}•${NC} Doğal dil ile kod üretimi: ${GREEN}github-copilot-cli suggest \"read a csv\"${NC}"
-    echo -e "  ${GREEN}•${NC} Terminal komutu oluşturma: ${GREEN}github-copilot-cli explain \"what does ls -la do\"${NC}"
-    echo -e "  ${GREEN}•${NC} Shell entegrasyonu: ${GREEN}eval \"$(github-copilot-cli alias -- \"bash\")\"${NC}"
+    echo -e "  ${GREEN}•${NC} Kod isteği: ${GREEN}github-copilot-cli suggest \"read a csv\"${NC}"
+    echo -e "  ${GREEN}•${NC} Komut açıklaması: ${GREEN}github-copilot-cli explain \"what does ls -la do\"${NC}"
+    echo -e "  ${GREEN}•${NC} Aliasları tekrar yükleme: ${GREEN}eval \"\$(github-copilot-cli alias -- ${detected_shell})\"${NC}"
     echo -e "  ${GREEN}•${NC} Daha fazla bilgi: https://github.com/github/copilot-cli${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 

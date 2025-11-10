@@ -56,7 +56,7 @@
 - Within sub-menus, typing `0` returns to the previous screen. Prompts default to the safest option if you simply press `Enter`.
 
 ### Usage Details & Tips
-- **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api. GitHub Copilot CLI opens your browser for `github-copilot-cli auth login` and supports shell aliases via `github-copilot-cli alias`.
+- **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api. GitHub Copilot CLI flows follow https://github.com/github/copilot-cli (`npm install -g @githubnext/github-copilot-cli`, `github-copilot-cli auth login`, `github-copilot-cli auth activate`, and `eval "$(github-copilot-cli alias -- bash|zsh)"`), with the script auto-adding the alias to your shell RC.
 - **Privileges:** Package installations run via `sudo`; review the prompts before confirming. System upgrades may take several minutes.
 - **Environment updates:** The script appends PATH exports for Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`), and Bun (`~/.bun/bin`) to `~/.bashrc`, `~/.zshrc`, and `~/.profile` when present. Restart your shell or `source ~/.bashrc` afterwards.
 - **Idempotent behavior:** Re-running the script is safe; existing tools are detected, and missing components are installed. Use targeted menu selections for incremental updates (e.g., rerun option `11` to refresh AI CLIs).

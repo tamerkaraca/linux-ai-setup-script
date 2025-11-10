@@ -21,7 +21,7 @@
 - `bash` 5+, `sudo` privileges, and an active internet connection (cURL downloads, package repos).
 - Optional but recommended: `dos2unix` for faster CRLF fixes and `shellcheck` for static analysis.
 
-### Installation (Kurulum)
+### Installation
 1. **Clone or download** the repository:
    ```bash
    git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
@@ -38,7 +38,7 @@
    ./linux-ai-setup-script.sh
    ```
 
-### Usage (Kullanım)
+### Usage
 - Launching the script opens an interactive menu. You may enter a single number or comma-separated choices to perform multiple operations in one run (e.g., `1,7,11`).
 - Menu overview:
   - `1` – Install everything (system prep, runtimes, CLIs, frameworks, configs).
@@ -53,7 +53,7 @@
   - `0` – Exit.
 - Within sub-menus, typing `0` returns to the previous screen. Prompts default to the safest option if you simply press `Enter`.
 
-### Usage Details & Tips (Kullanım Detayları)
+### Usage Details & Tips
 - **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api.
 - **Privileges:** Package installations run via `sudo`; review the prompts before confirming. System upgrades may take several minutes.
 - **Environment updates:** The script appends PATH exports for Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`), and Bun (`~/.bun/bin`) to `~/.bashrc`, `~/.zshrc`, and `~/.profile` when present. Restart your shell or `source ~/.bashrc` afterwards.

@@ -14,12 +14,14 @@ install_qoder_cli() {
         return 0
     fi
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Qoder CLI indiriliyor ve kuruluyor..."
-    if curl -fsSL https://qoder.com/install.sh | bash; then
+    echo -e "${YELLOW}[BİLGİ]${NC} Qoder CLI npm ile kuruluyor..."
+    if ! command -v npm &> /dev/null; then
+        echo -e "${RED}[HATA]${NC} npm bulunamadı. Lütfen Node.js ve npm'i kurun (Ana Menü -> 3. Node.js ve İlgili Araçları Kur)."
+        return 1
+    fi
+
+    if sudo npm install -g qoder; then
         echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI kurulumu tamamlandı."
-        # Qoder CLI'ın PATH'e eklenmesi gerekebilir, genellikle installer bunu yapar.
-        # Eğer yapmazsa, burada PATH'i güncellemek gerekebilir.
-        # Şimdilik varsayalım ki installer PATH'i günlüyor veya ~/.local/bin gibi bir yere kuruyor.
         reload_shell_configs silent # PATH güncellemelerini uygulamak için
     else
         echo -e "${RED}[HATA]${NC} Qoder CLI kurulumu başarısız oldu."

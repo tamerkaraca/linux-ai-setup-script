@@ -599,13 +599,14 @@ remove_supergemini() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    local removal_performed=false
+    local pipx_removed=false
+    local paths_removed=false
 
     if command -v pipx &> /dev/null; then
         if pipx list 2>/dev/null | grep -q "SuperGemini"; then
             if pipx uninstall SuperGemini; then
                 echo -e "${GREEN}[BAŞARILI]${NC} SuperGemini pipx ortamından kaldırıldı."
-                removal_performed=true
+                pipx_removed=true
             else
                 echo -e "${RED}[HATA]${NC} SuperGemini pipx ortamından kaldırılamadı."
             fi
@@ -622,19 +623,20 @@ remove_supergemini() {
         "$HOME/.cache/SuperGemini"
         "$HOME/.SuperGemini"
         "$HOME/.supergemini"
+        "$HOME/.gemini"
     )
 
     for path in "${supergemini_paths[@]}"; do
         if [ -e "$path" ]; then
             rm -rf "$path"
             echo -e "${GREEN}[TEMİZLENDİ]${NC} $path"
-            removal_performed=true
+            paths_removed=true
         fi
     done
 
     hash -r 2>/dev/null || true
 
-    if [ "$removal_performed" = true ]; then
+    if [ "$pipx_removed" = true ] || [ "$paths_removed" = true ]; then
         echo -e "${GREEN}[BAŞARILI]${NC} SuperGemini kaldırma işlemi tamamlandı."
     else
         echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini için kaldırılacak bir bileşen bulunamadı."
@@ -646,13 +648,14 @@ remove_superqwen() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    local removal_performed=false
+    local pipx_removed=false
+    local paths_removed=false
 
     if command -v pipx &> /dev/null; then
         if pipx list 2>/dev/null | grep -q "SuperQwen"; then
             if pipx uninstall SuperQwen; then
                 echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen pipx ortamından kaldırıldı."
-                removal_performed=true
+                pipx_removed=true
             else
                 echo -e "${RED}[HATA]${NC} SuperQwen pipx ortamından kaldırılamadı."
             fi
@@ -669,19 +672,20 @@ remove_superqwen() {
         "$HOME/.cache/SuperQwen"
         "$HOME/.SuperQwen"
         "$HOME/.superqwen"
+        "$HOME/.qwen"
     )
 
     for path in "${superqwen_paths[@]}"; do
         if [ -e "$path" ]; then
             rm -rf "$path"
             echo -e "${GREEN}[TEMİZLENDİ]${NC} $path"
-            removal_performed=true
+            paths_removed=true
         fi
     done
 
     hash -r 2>/dev/null || true
 
-    if [ "$removal_performed" = true ]; then
+    if [ "$pipx_removed" = true ] || [ "$paths_removed" = true ]; then
         echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen kaldırma işlemi tamamlandı."
     else
         echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen için kaldırılacak bir bileşen bulunamadı."
@@ -693,13 +697,14 @@ remove_superclaude() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    local removal_performed=false
+    local pipx_removed=false
+    local paths_removed=false
 
     if command -v pipx &> /dev/null; then
         if pipx list 2>/dev/null | grep -q "SuperClaude"; then
             if pipx uninstall SuperClaude; then
                 echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude pipx ortamından kaldırıldı."
-                removal_performed=true
+                pipx_removed=true
             else
                 echo -e "${RED}[HATA]${NC} SuperClaude pipx ortamından kaldırılamadı."
             fi
@@ -716,19 +721,20 @@ remove_superclaude() {
         "$HOME/.cache/SuperClaude"
         "$HOME/.SuperClaude"
         "$HOME/.superclaude"
+        "$HOME/.claude"
     )
 
     for path in "${superclaude_paths[@]}"; do
         if [ -e "$path" ]; then
             rm -rf "$path"
             echo -e "${GREEN}[TEMİZLENDİ]${NC} $path"
-            removal_performed=true
+            paths_removed=true
         fi
     done
 
     hash -r 2>/dev/null || true
 
-    if [ "$removal_performed" = true ]; then
+    if [ "$pipx_removed" = true ] || [ "$paths_removed" = true ]; then
         echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude kaldırma işlemi tamamlandı."
     else
         echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude için kaldırılacak bir bileşen bulunamadı."

@@ -10,8 +10,6 @@ install_gemini_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} Gemini CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-
-
     npm install -g @google/gemini-cli
     
     echo -e "${GREEN}[BAŞARILI]${NC} Gemini CLI sürümü: $(gemini --version)"

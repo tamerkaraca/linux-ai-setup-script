@@ -10,8 +10,6 @@ install_qwen_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} Qwen CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-
-
     npm install -g @qwen-code/qwen-code@latest
     
     echo -e "${GREEN}[BAŞARILI]${NC} Qwen CLI sürümü: $(qwen --version)"

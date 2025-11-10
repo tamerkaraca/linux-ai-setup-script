@@ -10,8 +10,6 @@ install_opencode_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} OpenCode CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-
-
     npm i -g opencode-ai
     
     echo -e "${GREEN}[BAŞARILI]${NC} OpenCode CLI sürümü: $(opencode --version)"

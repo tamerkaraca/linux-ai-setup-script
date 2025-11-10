@@ -9,8 +9,6 @@ install_superqwen() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen Framework (Pipx) kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-
-
     if ! command -v pipx &> /dev/null; then
         echo -e "${YELLOW}[UYARI]${NC} SuperQwen için önce Pipx kuruluyor..."
         install_pipx

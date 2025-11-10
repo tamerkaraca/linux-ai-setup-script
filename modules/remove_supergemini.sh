@@ -9,8 +9,6 @@ remove_supergemini() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-
-
     local pipx_removed=false
     local paths_removed=false
 

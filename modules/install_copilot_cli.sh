@@ -10,8 +10,6 @@ install_copilot_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu (https://github.com/github/copilot-cli talimatları) başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-
-
     if ! npm install -g @github/copilot; then
         echo -e "${RED}[HATA]${NC} 'npm install -g @githubnext/github-copilot-cli' komutu başarısız oldu."
         return 1

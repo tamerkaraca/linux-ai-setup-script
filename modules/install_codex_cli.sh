@@ -10,8 +10,6 @@ install_codex_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} OpenAI Codex CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-
-
     npm install -g @openai/codex
     
     echo -e "${GREEN}[BAŞARILI]${NC} Codex CLI sürümü: $(codex --version)"

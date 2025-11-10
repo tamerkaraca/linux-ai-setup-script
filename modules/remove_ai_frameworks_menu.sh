@@ -17,8 +17,6 @@ run_module() {
 
 # AI Framework Kaldırma menüsü
 remove_ai_frameworks_menu() {
-
-
     while true; do
         clear
         echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"

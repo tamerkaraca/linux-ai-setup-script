@@ -9,8 +9,6 @@ remove_superqwen() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-
-
     local pipx_removed=false
     local paths_removed=false
 

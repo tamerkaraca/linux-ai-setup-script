@@ -17,8 +17,6 @@ run_module() {
 
 # MCP Sunucu Yönetimi menüsü
 manage_mcp_servers_menu() {
-
-
     while true; do
         clear
         echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"

@@ -9,8 +9,6 @@ install_superclaude() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude Framework (Pipx) kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-
-
     if ! command -v pipx &> /dev/null; then
         echo -e "${YELLOW}[UYARI]${NC} SuperClaude için önce Pipx kuruluyor..."
         install_pipx

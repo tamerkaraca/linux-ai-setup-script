@@ -10,8 +10,6 @@ install_claude_code() {
     echo -e "${YELLOW}[BİLGİ]${NC} Claude Code kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-
-
     npm install -g @anthropic-ai/claude-code
     
     echo -e "${GREEN}[BAŞARILI]${NC} Claude Code sürümü: $(claude --version)"

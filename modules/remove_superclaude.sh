@@ -9,8 +9,6 @@ remove_superclaude() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-
-
     local pipx_removed=false
     local paths_removed=false
 

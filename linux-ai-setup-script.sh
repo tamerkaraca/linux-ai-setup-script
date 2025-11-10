@@ -744,6 +744,58 @@ install_codex_cli() {
     echo -e "\n${GREEN}[BAŞARILI]${NC} OpenAI Codex CLI kurulumu tamamlandı!"
 }
 
+# AI CLI Araçları menüsü
+install_ai_cli_tools_menu() {
+    while true; do
+        echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║           AI CLI Araçları Kurulum Menüsü        ║${NC}"
+        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+        echo -e "  ${GREEN}1${NC} - Claude Code CLI"
+        echo -e "  ${GREEN}2${NC} - Gemini CLI"
+        echo -e "  ${GREEN}3${NC} - OpenCode CLI"
+        echo -e "  ${GREEN}4${NC} - Qoder CLI"
+        echo -e "  ${GREEN}5${NC} - Qwen CLI"
+        echo -e "  ${GREEN}6${NC} - OpenAI Codex CLI"
+        echo -e "  ${GREEN}7${NC} - Tüm AI CLI Araçları"
+        echo -e "  ${RED}0${NC} - Ana Menüye Dön"
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
+
+        read -p "Seçiminiz: " cli_choices
+        if [ "$cli_choices" = "0" ] || [ -z "$cli_choices" ]; then
+            echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
+            break
+        fi
+
+        IFS=',' read -ra SELECTED_CLI <<< "$cli_choices"
+
+        for choice in "${SELECTED_CLI[@]}"; do
+            choice=$(echo "$choice" | tr -d ' ')
+            case $choice in
+                1) install_claude_code ;;
+                2) install_gemini_cli ;;
+                3) install_opencode_cli ;;
+                4) install_qoder_cli ;;
+                5) install_qwen_cli ;;
+                6) install_codex_cli ;;
+                7)
+                    install_claude_code
+                    install_gemini_cli
+                    install_opencode_cli
+                    install_qoder_cli
+                    install_qwen_cli
+                    install_codex_cli
+                    ;;
+                *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;
+            esac
+        done
+        
+        read -p "Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]: " continue_choice
+        if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
+            break
+        fi
+    done
+}
+
 # Git yapılandırması
 configure_git() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
@@ -1435,22 +1487,16 @@ show_menu() {
     echo -e "\n${CYAN}=== PHP Araçları ===${NC}"
     echo -e "  ${GREEN}9${NC} - PHP (7.4/8.x) kurulumu + Laravel eklentileri"
     echo -e "  ${GREEN}10${NC} - Kurulu PHP sürümleri arasında geçiş"
-    echo -e "\n${CYAN}=== AI CLI Araçları ===${NC}"
-    echo -e "  ${GREEN}11${NC} - Claude Code CLI"
-    echo -e "  ${GREEN}12${NC} - Gemini CLI"
-    echo -e "  ${GREEN}13${NC} - OpenCode CLI"
-    echo -e "  ${GREEN}14${NC} - Qoder CLI"
-    echo -e "  ${GREEN}15${NC} - Qwen CLI"
-    echo -e "  ${GREEN}16${NC} - OpenAI Codex CLI"
-    echo -e "\n${CYAN}=== AI Frameworks ===${NC}"
-    echo -e "  ${GREEN}17${NC}  - SuperGemini Framework (Pipx ile)"
-    echo -e "  ${GREEN}18${NC}  - SuperQwen Framework (Pipx ile)"
-    echo -e "  ${GREEN}19${NC}  - SuperClaude Framework (Pipx ile)"
-    echo -e "\n${CYAN}=== Yapılandırma & Araçlar ===${NC}"
-    echo -e "  ${GREEN}20${NC} - Claude Code için GLM-4.6 yapılandırması"
-    echo -e "  ${GREEN}21${NC} - SuperGemini MCP Sunucu Yönetimi"
-    echo -e "  ${GREEN}22${NC} - SuperQwen MCP Sunucu Yönetimi"
-    echo -e "  ${GREEN}23${NC} - SuperClaude MCP Sunucu Yönetimi"
+    echo -e "\n${CYAN}=== AI Araçları ve Frameworkler ===${NC}"
+    echo -e "  ${GREEN}11${NC} - AI CLI Araçları Kurulum Menüsü"
+    echo -e "  ${GREEN}12${NC} - SuperGemini Framework (Pipx ile)"
+    echo -e "  ${GREEN}13${NC} - SuperQwen Framework (Pipx ile)"
+    echo -e "  ${GREEN}14${NC} - SuperClaude Framework (Pipx ile)"
+    echo -e "\n${CYAN}=== Yapılandırma & Yönetim ===${NC}"
+    echo -e "  ${GREEN}15${NC} - Claude Code için GLM-4.6 yapılandırması"
+    echo -e "  ${GREEN}16${NC} - SuperGemini MCP Sunucu Yönetimi"
+    echo -e "  ${GREEN}17${NC} - SuperQwen MCP Sunucu Yönetimi"
+    echo -e "  ${GREEN}18${NC} - SuperClaude MCP Sunucu Yönetimi"
     echo -e "  ${RED}0${NC}  - Çıkış\n"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 2,3,4)"
     echo -e "${YELLOW}[BİLGİ]${NC} Python araçları için Python (3), Node.js araçları için NVM (7) gereklidir!\n"
@@ -1489,12 +1535,7 @@ main() {
                 install_bun
                 
                 # AI CLI araçları
-                install_claude_code
-                install_gemini_cli
-                install_opencode_cli
-                install_qoder_cli
-                install_qwen_cli
-                install_codex_cli
+                install_ai_cli_tools_menu
 
                 # AI Frameworks
                 install_supergemini
@@ -1546,54 +1587,14 @@ main() {
                 switch_php_version_menu
                 ;;
             11)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Claude Code için önce NVM kurulumu yapılıyor..."
+                if [ "$NVM_INSTALLED" = false ] && ! command -v nvm &> /dev/null; then
+                    echo -e "${YELLOW}[UYARI]${NC} AI CLI araçları için önce NVM kurulumu yapılıyor..."
                     install_nvm
                     NVM_INSTALLED=true
                 fi
-                install_claude_code
+                install_ai_cli_tools_menu
                 ;;
             12)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Gemini CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_gemini_cli
-                ;;
-            13)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} OpenCode CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_opencode_cli
-                ;;
-            14)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Qoder CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_qoder_cli
-                ;;
-            15)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Qwen CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_qwen_cli
-                ;;
-            16)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Codex CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_codex_cli
-                ;;
-            17)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperGemini için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1605,7 +1606,7 @@ main() {
                 fi
                 install_supergemini
                 ;;
-            18)
+            13)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperQwen için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1617,7 +1618,7 @@ main() {
                 fi
                 install_superqwen
                 ;;
-            19)
+            14)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperClaude için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1629,16 +1630,16 @@ main() {
                 fi
                 install_superclaude
                 ;;
-            20)
+            15)
                 configure_glm_claude
                 ;;
-            21)
+            16)
                 cleanup_magic_mcp
                 ;;
-            22)
+            17)
                 cleanup_qwen_mcp
                 ;;
-            23)
+            18)
                 cleanup_claude_mcp
                 ;;
             0)

@@ -909,8 +909,7 @@ install_copilot_cli() {
         echo -e "  ${GREEN}3.${NC} ${GREEN}copilot auth activate${NC} ile kabuk entegrasyonunu tamamlayın."
         echo -e "\n${YELLOW}[BİLGİ]${NC} İşlemleri sizin yerinize başlatıyoruz; gerekirse komutları manuel tekrarlayabilirsiniz.\n"
 
-        copilot auth login || echo -e "${YELLOW}[UYARI]${NC} 'auth login' adımı tamamlanamadıysa lütfen manuel çalıştırın."
-        copilot auth activate || echo -e "${YELLOW}[UYARI]${NC} Shell aktivasyonu tamamlanamadıysa manuel olarak tekrar edin."
+
 
         echo -e "\n${YELLOW}[BİLGİ]${NC} Devam etmek için Enter'a basabilirsiniz."
         read -r -p "Devam etmek için Enter'a basın..." _

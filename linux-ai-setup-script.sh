@@ -1059,12 +1059,14 @@ install_github_cli() {
     case "$PKG_MANAGER" in
         apt)
             echo -e "${YELLOW}[BİLGİ]${NC} Debian/Ubuntu için GitHub CLI deposu ekleniyor..."
-            type -p curl >/dev/null || (sudo apt update && sudo apt install curl -y)
-            curl -fsSL https://cli.github.com/packages/githubcli-archive-keyring.gpg | sudo dd of=/usr/share/keyrings/githubcli-archive-keyring.gpg \
-              && sudo chmod go+rw /usr/share/keyrings/githubcli-archive-keyring.gpg \
-              && echo "deb [arch=$(dpkg --print-architecture) signed-by=/usr/share/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
-              && sudo apt update \
-              && sudo apt install gh -y
+            (type -p wget >/dev/null || (sudo apt update && sudo apt install wget -y)) \
+                && sudo mkdir -p -m 755 /etc/apt/keyrings \
+                && out=$(mktemp) && wget -nv -O"$out" https://cli.github.com/packages/githubcli-archive-keyring.gpg \
+                && sudo install -o root -g root -m 0644 "$out" /etc/apt/keyrings/githubcli-archive-keyring.gpg \
+                && sudo mkdir -p -m 755 /etc/apt/sources.list.d \
+                && echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/githubcli-archive-keyring.gpg] https://cli.github.com/packages stable main" | sudo tee /etc/apt/sources.list.d/github-cli.list > /dev/null \
+                && sudo apt update \
+                && sudo apt install gh -y
             ;;
         dnf|yum)
             echo -e "${YELLOW}[BİLGİ]${NC} Fedora/CentOS/RHEL için GitHub CLI deposu ekleniyor..."

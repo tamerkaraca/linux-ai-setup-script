@@ -1,16 +1,13 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # Git yapılandırması
 configure_git() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Git Global Yapılandırması Başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
 
     if ! command -v git &> /dev/null; then
         echo -e "${RED}[HATA]${NC} 'git' komutu bulunamadı. Lütfen önce sistem güncellemesini çalıştırın."
@@ -27,10 +24,10 @@ configure_git() {
     echo -e "${CYAN}Not: Bu bilgiler commit atarken kullanılacaktır. (Mevcut değeri korumak için Enter'a basın)${NC}"
 
     # Yeni kullanıcı adını sor
-    read -r -p "Git Kullanıcı Adınız [${current_name:-örn: Tamer KARACA}]: " GIT_USER_NAME
+    read -r -p "Git Kullanıcı Adınız [${current_name:-örn: Tamer KARACA}]: " GIT_USER_NAME </dev/tty
     
     # Yeni e-postayı sor
-    read -r -p "Git E-posta Adresiniz [${current_email:-örn: tamer@smedyazilim.com}]: " GIT_USER_EMAIL
+    read -r -p "Git E-posta Adresiniz [${current_email:-örn: tamer@smedyazilim.com}]: " GIT_USER_EMAIL </dev/tty
 
     # Eğer yeni bir değer girildiyse güncelle
     if [ -n "$GIT_USER_NAME" ]; then

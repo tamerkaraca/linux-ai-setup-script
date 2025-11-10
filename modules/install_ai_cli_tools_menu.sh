@@ -4,21 +4,11 @@
 # shellcheck source=/dev/null
 source "./modules/utils.sh"
 
-# Script çalıştırma fonksiyonu (setup script'inden kopyalandı)
-run_module() {
-    local module_name="$1"
-    local module_url="$BASE_URL/$module_name.sh"
-    echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
-    if ! curl -fsSL "$module_url" | bash -s -- "${@:2}"; then
-        echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
-        return 1
-    fi
-    return 0
-}
+
 
 # AI CLI Araçları menüsü
 install_ai_cli_tools_menu() {
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     local install_all="${1:-}" # "all" parametresi gelirse hepsini kur
 
@@ -37,7 +27,7 @@ install_ai_cli_tools_menu() {
             echo -e "  ${GREEN}7${NC} GitHub Copilot CLI"
             echo -e "  ${GREEN}8${NC} Tümünü Kur"
             echo -e "  ${RED}0${NC} Ana Menü"
-            read -r -p "${YELLOW}Seçiminiz:${NC} " cli_choices
+            read -r -p "${YELLOW}Seçiminiz:${NC} " cli_choices </dev/tty
             if [ "$cli_choices" = "0" ] || [ -z "$cli_choices" ]; then
                 echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
                 break
@@ -77,7 +67,7 @@ install_ai_cli_tools_menu() {
             break
         fi
 
-        read -r -p "Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]: " continue_choice
+        read -r -p "Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]: " continue_choice </dev/tty
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi

@@ -116,7 +116,6 @@ mask_secret() {
         echo "$secret"
         return
     fi
-
     local prefix=${secret:0:4}
     local suffix=${secret: -4}
     local middle_length=$((length - 8))
@@ -274,7 +273,7 @@ install_pipx() {
                 echo "export PATH=\"$HOME/.local/bin:$PATH\"" >> "$rc_file"
             fi
         fi
-done
+    done
     
     reload_shell_configs
     

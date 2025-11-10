@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # SuperGemini kaldırma
 remove_supergemini() {
@@ -10,7 +9,7 @@ remove_supergemini() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     local pipx_removed=false
     local paths_removed=false

@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # Qwen CLI kurulumu
 install_qwen_cli() {
@@ -11,7 +10,7 @@ install_qwen_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} Qwen CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     npm install -g @qwen-code/qwen-code@latest
     
@@ -24,7 +23,7 @@ install_qwen_cli() {
         
         qwen login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
-        read -r -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..." </dev/tty
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}qwen login${NC}' komutunu çalıştırın."

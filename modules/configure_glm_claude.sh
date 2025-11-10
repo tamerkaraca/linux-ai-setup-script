@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # GLM-4.6 Claude Code yapılandırması
 configure_glm_claude() {
@@ -10,8 +9,6 @@ configure_glm_claude() {
     echo -e "${YELLOW}[BİLGİ]${NC} Claude Code için GLM-4.6 yapılandırması başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
-
     CLAUDE_DIR="$HOME/.claude"
     SETTINGS_FILE="$CLAUDE_DIR/settings.json"
     
@@ -56,7 +53,7 @@ configure_glm_claude() {
         masked_key_display=$(mask_secret "$current_api_key")
     fi
 
-    read -r -p "GLM API Key [${masked_key_display}]: " GLM_API_KEY
+    read -r -p "GLM API Key [${masked_key_display}]: " GLM_API_KEY </dev/tty
     
     if [ -z "$GLM_API_KEY" ]; then
         if [ -n "$current_api_key" ]; then
@@ -69,7 +66,7 @@ configure_glm_claude() {
     fi
     
     echo -e "\n${YELLOW}[BİLGİ]${NC} Base URL [Varsayılan: $current_base_url]"
-    read -r -p "Base URL: " GLM_BASE_URL
+    read -r -p "Base URL: " GLM_BASE_URL </dev/tty
     
     if [ -z "$GLM_BASE_URL" ]; then
         GLM_BASE_URL="$current_base_url"

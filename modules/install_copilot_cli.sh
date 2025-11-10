@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # GitHub Copilot CLI kurulumu
 install_copilot_cli() {
@@ -11,7 +10,7 @@ install_copilot_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu (https://github.com/github/copilot-cli talimatları) başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     if ! npm install -g @github/copilot; then
         echo -e "${RED}[HATA]${NC} 'npm install -g @githubnext/github-copilot-cli' komutu başarısız oldu."
@@ -36,7 +35,7 @@ install_copilot_cli() {
 
 
 
-        read -r -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..." </dev/tty
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen '${GREEN}copilot auth login${NC}' ve '${GREEN}copilot auth activate${NC}' komutlarını daha sonra çalıştırın."

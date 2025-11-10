@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # SuperClaude Framework kurulumu (Pipx ile)
 install_superclaude() {
@@ -10,7 +9,7 @@ install_superclaude() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude Framework (Pipx) kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     if ! command -v pipx &> /dev/null; then
         echo -e "${YELLOW}[UYARI]${NC} SuperClaude için önce Pipx kuruluyor..."

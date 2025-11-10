@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # Script çalıştırma fonksiyonu (setup script'inden kopyalandı)
 run_module() {
@@ -18,7 +17,7 @@ run_module() {
 
 # AI Frameworks menüsü
 install_ai_frameworks_menu() {
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
     
     local install_all="${1:-}" # "all" parametresi gelirse hepsini kur
 
@@ -35,7 +34,7 @@ install_ai_frameworks_menu() {
             echo -e "  ${RED}0${NC} - Ana Menüye Dön"
             echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2)"
 
-            read -r -p "Seçiminiz: " framework_choices
+            read -r -p "Seçiminiz: " framework_choices </dev/tty
             if [ "$framework_choices" = "0" ] || [ -z "$framework_choices" ]; then
                 echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
                 break
@@ -77,7 +76,7 @@ install_ai_frameworks_menu() {
             break
         fi
 
-        read -r -p "Başka bir AI Framework kurmak ister misiniz? (e/h) [h]: " continue_choice
+        read -r -p "Başka bir AI Framework kurmak ister misiniz? (e/h) [h]: " continue_choice </dev/tty
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi

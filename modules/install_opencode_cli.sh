@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # OpenCode CLI kurulumu
 install_opencode_cli() {
@@ -11,7 +10,7 @@ install_opencode_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} OpenCode CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     npm i -g opencode-ai
     
@@ -25,7 +24,7 @@ install_opencode_cli() {
         opencode login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
         echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -r -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..." </dev/tty
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}opencode login${NC}' komutunu çalıştırın."

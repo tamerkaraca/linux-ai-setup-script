@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # Gemini CLI kurulumu
 install_gemini_cli() {
@@ -11,7 +10,7 @@ install_gemini_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} Gemini CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     npm install -g @google/gemini-cli
     
@@ -25,7 +24,7 @@ install_gemini_cli() {
         gemini auth 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
         echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -r -p "Devam etmek için Enter'a basın..."
+        read -r -p "Devam etmek için Enter'a basın..." </dev/tty
     else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}gemini auth${NC}' komutunu çalıştırın."

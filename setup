@@ -29,7 +29,8 @@ run_module() {
     local module_name="$1"
     local module_url="$BASE_URL/$module_name.sh"
     echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
-    if ! curl -fsSL "$module_url" | bash -s -- "${@:2}"; then
+    # PKG_MANAGER, UPDATE_CMD, INSTALL_CMD değişkenlerini alt sürece aktar
+    if ! curl -fsSL "$module_url" | PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash -s -- "${@:2}"; then
         echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
         return 1
     fi
@@ -92,13 +93,13 @@ main_menu() {
                 run_module "install_ai_cli_tools_menu" "all" # "all" parametresi ile tüm CLI araçlarını kur
                 run_module "configure_git"
                 run_module "configure_glm_claude"
+                run_module "install_github_cli"
                 # Ask user if they want to install PHP and Composer
                 echo -e "\n${YELLOW}PHP ve Composer kurulsun mu? (e/h)${NC}"
                 read -r install_php_choice </dev/tty
                 if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
                     run_module "install_php_composer"
                 fi
-                run_module "install_github_cli"
                 ;;
             0)
                 echo -e "${GREEN}[BİLGİ]${NC} Çıkılıyor. Güle güle!"

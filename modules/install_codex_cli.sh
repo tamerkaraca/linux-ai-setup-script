@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # OpenAI Codex CLI kurulumu
 install_codex_cli() {
@@ -11,7 +10,7 @@ install_codex_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} OpenAI Codex CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     npm install -g @openai/codex
     
@@ -34,7 +33,7 @@ install_codex_cli() {
         echo -e "  ${GREEN}1${NC} - ChatGPT hesabı ile giriş (Önerilen)"
         echo -e "  ${GREEN}2${NC} - OpenAI API Key ile giriş"
         echo -e "  ${GREEN}3${NC} - Manuel olarak daha sonra yapacağım"
-        read -r -p "Seçiminiz (1/2/3): " auth_choice
+        read -r -p "Seçiminiz (1/2/3): " auth_choice </dev/tty
         
         case $auth_choice in
             1)
@@ -45,7 +44,7 @@ install_codex_cli() {
                 ;;
             2)
                 echo -e "\n${YELLOW}[BİLGİ]${NC} OpenAI API Key girişi"
-                read -r -p "OpenAI API Key'inizi girin: " OPENAI_KEY
+                read -r -p "OpenAI API Key'inizi girin: " OPENAI_KEY </dev/tty
                 
                 if [ -n "$OPENAI_KEY" ]; then
                     for rc_file in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do

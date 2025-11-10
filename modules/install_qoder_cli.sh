@@ -2,8 +2,7 @@
 set -euo pipefail
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 ensure_npm_available() {
     if ! command -v npm &> /dev/null; then

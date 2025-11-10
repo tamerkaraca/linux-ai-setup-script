@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # SuperGemini Framework kurulumu (Pipx ile)
 install_supergemini() {
@@ -10,7 +9,7 @@ install_supergemini() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini Framework (Pipx) kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
     
     if ! command -v pipx &> /dev/null; then
         echo -e "${YELLOW}[UYARI]${NC} SuperGemini için önce Pipx kuruluyor..."
@@ -43,7 +42,7 @@ install_supergemini() {
     echo -e "  ${GREEN}1${NC} - Express (Önerilen, hızlı kurulum)"
     echo -e "  ${GREEN}2${NC} - Minimal (Sadece çekirdek, en hızlı)"
     echo -e "  ${GREEN}3${NC} - Full (Tüm özellikler)"
-    read -r -p "Seçiminiz (1/2/3) [Varsayılan: 1]: " setup_choice
+    read -r -p "Seçiminiz (1/2/3) [Varsayılan: 1]: " setup_choice </dev/tty
     
     SETUP_CMD=""
     case $setup_choice in

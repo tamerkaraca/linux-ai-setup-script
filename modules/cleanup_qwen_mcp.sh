@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # SuperQwen MCP Sunucu Temizleme
 cleanup_qwen_mcp() {
@@ -10,8 +9,6 @@ cleanup_qwen_mcp() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen MCP Sunucu Yapılandırması Temizleme..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
-
     SETTINGS_FILE="$HOME/.qwen/settings.json"
     
     if ! command -v jq &> /dev/null; then
@@ -46,7 +43,7 @@ cleanup_qwen_mcp() {
     echo -e "  ${RED}0${NC} - İptal"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
 
-    read -r -p "Seçiminiz: " choices
+    read -r -p "Seçiminiz: " choices </dev/tty
     if [ "$choices" = "0" ] || [ -z "$choices" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Temizleme işlemi iptal edildi."
         return 0

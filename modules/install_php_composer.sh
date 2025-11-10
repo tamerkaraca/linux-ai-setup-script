@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # PHP sürüm listeleri
 PHP_SUPPORTED_VERSIONS=("7.4" "8.1" "8.2" "8.3" "8.4" "8.5")
@@ -10,7 +9,6 @@ PHP_EXTENSION_PACKAGES=("mbstring" "zip" "gd" "tokenizer" "curl" "xml" "bcmath" 
 
 # PHP deposu ve bağımlılık hazırlığı
 ensure_php_repository() {
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
 
     if [ "$PKG_MANAGER" = "apt" ]; then
         echo -e "\n${YELLOW}[BİLGİ]${NC} PHP için Ondřej Surý deposu kontrol ediliyor..."
@@ -274,7 +272,7 @@ install_php_version() {
 
 # Ana kurulum akışı
 main() {
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} PHP ve Composer Kurulumu Başlatılıyor..."

@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # Claude Code kurulumu
 install_claude_code() {
@@ -11,7 +10,7 @@ install_claude_code() {
     echo -e "${YELLOW}[BİLGİ]${NC} Claude Code kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     npm install -g @anthropic-ai/claude-code
     
@@ -25,7 +24,7 @@ install_claude_code() {
                 claude login
         
                 echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-                read -r -p "Devam etmek için Enter'a basın..."    else
+                read -r -p "Devam etmek için Enter'a basın..." </dev/tty    else
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}claude login${NC}' komutunu çalıştırın."
     fi

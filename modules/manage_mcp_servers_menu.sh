@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # Script çalıştırma fonksiyonu (setup script'inden kopyalandı)
 run_module() {
@@ -18,7 +17,7 @@ run_module() {
 
 # MCP Sunucu Yönetimi menüsü
 manage_mcp_servers_menu() {
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
+
 
     while true; do
         clear
@@ -32,7 +31,7 @@ manage_mcp_servers_menu() {
         echo -e "  ${RED}0${NC} - Ana Menüye Dön"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2)"
 
-        read -r -p "Seçiminiz: " mcp_choices
+        read -r -p "Seçiminiz: " mcp_choices </dev/tty
         if [ "$mcp_choices" = "0" ] || [ -z "$mcp_choices" ]; then
             echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
             break
@@ -61,7 +60,7 @@ manage_mcp_servers_menu() {
             break
         fi
 
-        read -r -p "Başka bir sunucu yönetmek ister misiniz? (e/h) [h]: " continue_choice
+        read -r -p "Başka bir sunucu yönetmek ister misiniz? (e/h) [h]: " continue_choice </dev/tty
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi

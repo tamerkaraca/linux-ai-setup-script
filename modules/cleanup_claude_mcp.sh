@@ -1,8 +1,7 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
+
 
 # SuperClaude MCP Sunucu Temizleme
 cleanup_claude_mcp() {
@@ -10,8 +9,6 @@ cleanup_claude_mcp() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude MCP Sunucu Yapılandırması Temizleme..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
-
     SETTINGS_FILE="$HOME/.claude/settings.json"
     
     if ! command -v jq &> /dev/null; then
@@ -43,7 +40,7 @@ cleanup_claude_mcp() {
         echo -e "  ${GREEN}${index}${NC} - ${server}"
         index=$((index + 1))
     done
-    read -r -p "Seçiminiz: " choices
+    read -r -p "Seçiminiz: " choices </dev/tty
     if [ "$choices" = "0" ] || [ -z "$choices" ]; then
         echo -e "${YELLOW}[BİLGİ]${NC} Temizleme işlemi iptal edildi."
         return 0

@@ -56,7 +56,7 @@
 - Within sub-menus, typing `0` returns to the previous screen. Prompts default to the safest option if you simply press `Enter`.
 
 ### Usage Details & Tips
-- **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api. GitHub Copilot CLI flows follow https://github.com/github/copilot-cli (`npm install -g @githubnext/github-copilot-cli`, `github-copilot-cli auth login`, `github-copilot-cli auth activate`, and `eval "$(github-copilot-cli alias -- bash|zsh)"`), with the script auto-adding the alias to your shell RC.
+- **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api. GitHub Copilot CLI flows follow https://github.com/github/copilot-cli (`npm install -g @github/copilot`, then manually run `copilot auth login` and `copilot auth activate`), with the script auto-adding the alias (`eval "$(copilot alias -- bash|zsh)"`) to your shell RC.
 - **Privileges:** Package installations run via `sudo`; review the prompts before confirming. System upgrades may take several minutes.
 - **Environment updates:** The script appends PATH exports for Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`), and Bun (`~/.bun/bin`) to `~/.bashrc`, `~/.zshrc`, and `~/.profile` when present. Restart your shell or `source ~/.bashrc` afterwards.
 - **Idempotent behavior:** Re-running the script is safe; existing tools are detected, and missing components are installed. Use targeted menu selections for incremental updates (e.g., rerun option `11` to refresh AI CLIs).
@@ -77,7 +77,7 @@
 - Paket yöneticisi tespiti, renkli günlükler ve CRLF otomatik düzeltmesi ile sürüm kontrolünde güvenli kullanım.
 - Sistem güncellemesi + temel geliştirici araçları (curl, wget, git, jq, zip/unzip, derleme araçları).
 - Python ekosistemi (python3, pip, pipx, UV) ve JavaScript çalıştırıcıları (NVM ile Node.js, Bun).
-- AI CLI kurulumları: Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI.
+- AI CLI kurulumları: Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, GitHub Copilot CLI.
 - Pipx üzerinden SuperGemini, SuperQwen, SuperClaude kurulum menüsü ve anahtar istemleri.
 - SuperGemini/SuperQwen/SuperClaude için temiz kaldırma menüsü ve yapılandırma temizliği.
 - PHP 7.4/8.x kurulumu, Laravel eklentileri, Composer kurulumu ve sürüm değiştirme menüsü.
@@ -117,7 +117,7 @@
 - Alt menülerde `0` yazarak geri dönebilir, `Enter` ile varsayılan yanıtları kabul edebilirsiniz.
 
 ### Kullanım Detayları
-- **API anahtarları:** SuperGemini/SuperQwen/SuperClaude kurulumlarında Gemini, Anthropic, OpenAI vb. anahtarlar istenir. GLM yapılandırması için https://z.ai/model-api adresinden alınan anahtar gereklidir.
+- **API anahtarları:** SuperGemini/SuperQwen/SuperClaude kurulumlarında Gemini, Anthropic, OpenAI vb. anahtarlar istenir. GLM yapılandırması için https://z.ai/model-api adresinden alınan anahtar gereklidir. GitHub Copilot CLI akışları https://github.com/github/copilot-cli adresini takip eder (`npm install -g @github/copilot`, ardından `copilot auth login` ve `copilot auth activate` komutlarını manuel olarak çalıştırın), script otomatik olarak alias'ı (`eval "$(copilot alias -- bash|zsh)"`) shell RC dosyanıza ekler.
 - **Yetkiler:** Paket kurulumları `sudo` ile yapılır; yükseltilmiş komutları onaylamadan önce inceleyin. Sistem güncellemeleri birkaç dakika sürebilir.
 - **Ortam değişkenleri:** Script; Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`) ve Bun (`~/.bun/bin`) yollarını `~/.bashrc`, `~/.zshrc`, `~/.profile` dosyalarınıza ekler. İşlem sonrası terminalinizi yeniden başlatın veya `source ~/.bashrc` çalıştırın.
 - **Tekrar çalıştırma:** Script idem-potent çalışır; eksik bileşenleri tamamlamak veya belirli menüleri (örn. sadece AI CLI’ları) yeniden kurmak için tekrar çalıştırabilirsiniz.

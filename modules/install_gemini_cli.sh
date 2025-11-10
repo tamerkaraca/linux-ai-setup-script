@@ -2,7 +2,7 @@
 
 # Ortak yardımcı fonksiyonları yükle
 # shellcheck source=/dev/null
-source "/mnt/d/ai/modules/utils.sh"
+source "./modules/utils.sh"
 
 # Gemini CLI kurulumu
 install_gemini_cli() {

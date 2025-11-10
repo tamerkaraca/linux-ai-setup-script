@@ -2,7 +2,7 @@
 
 # Ortak yardımcı fonksiyonları yükle
 # shellcheck source=/dev/null
-source "/mnt/d/ai/modules/utils.sh"
+source "./modules/utils.sh"
 
 # GLM-4.6 Claude Code yapılandırması
 configure_glm_claude() {

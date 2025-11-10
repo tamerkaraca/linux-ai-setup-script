@@ -2,7 +2,7 @@
 
 # Ortak yardımcı fonksiyonları yükle
 # shellcheck source=/dev/null
-source "/mnt/d/ai/modules/utils.sh"
+source "./modules/utils.sh"
 
 # SuperClaude MCP Sunucu Temizleme
 cleanup_claude_mcp() {

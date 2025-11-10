@@ -2,7 +2,7 @@
 
 # Ortak yardımcı fonksiyonları yükle
 # shellcheck source=/dev/null
-source "/mnt/d/ai/modules/utils.sh"
+source "./modules/utils.sh"
 
 # GitHub'daki scriptlerin temel URL'si (setup script'inden kopyalandı)
 BASE_URL="https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules"

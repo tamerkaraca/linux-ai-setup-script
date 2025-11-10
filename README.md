@@ -61,6 +61,7 @@
 - **Troubleshooting:** If a CLI remains unavailable after installation, ensure your shell has the updated PATH entries and reopen the terminal. Logs are color-coded (`[BİLGİ]`, `[UYARI]`, `[HATA]`) to highlight the current step.
 - **Composer availability:** Installing any PHP version automatically downloads Composer (signature-verified) into `/usr/local/bin/composer`, so Laravel or other PHP projects can start immediately.
 - **GLM credentials:** Menu option `13` shows your existing GLM API key in masked form (`abcd***wxyz`). Press `Enter` to keep it or type a new key to overwrite; the base URL prompt behaves the same way.
+- **Auto-sourcing:** Whenever PATH or toolchain exports are updated, the script reloads your shell config (`~/.bashrc`, `~/.zshrc`, or `~/.profile`) automatically and prints a notice so follow-up commands in the same run can see the changes.
 - **Testing:** Before submitting changes, run `shellcheck linux-ai-setup-script.sh` and `bash -n linux-ai-setup-script.sh`. For smoke tests, you can set `PKG_MANAGER=apt ./linux-ai-setup-script.sh --dry-run` once the flag is implemented.
 
 ---
@@ -119,4 +120,5 @@
 - **Sorun giderme:** Kurulumdan sonra komut bulunamıyorsa PATH güncellemelerinin yüklendiğinden emin olun ve terminali kapatıp açın. `[BİLGİ]`, `[UYARI]`, `[HATA]` etiketleri hangi adımda olduğunuzu gösterir.
 - **Composer kullanımı:** Herhangi bir PHP sürümü kurduğunuzda script otomatik olarak imza doğrulamalı Composer'i `/usr/local/bin/composer` yoluna ekler; Laravel projelerine hemen başlayabilirsiniz.
 - **GLM bilgileri:** `13` numaralı menüde mevcut GLM API key maskeleme ile (`abcd***wxyz`) gösterilir. Enter'a bastığınızda değer korunur, yeni key girerseniz eskisiyle değiştirilir; Base URL için de aynı mantık geçerlidir.
+- **Otomatik source:** PATH veya ortam değişikliklerinde script uygun shell dosyasını (`~/.bashrc`, `~/.zshrc`, `~/.profile`) otomatik olarak `source` eder ve bilgi mesajı gösterir; böylece aynı oturumda komutlar güncel yolu görür.
 - **Test önerisi:** Değişiklik yapıyorsanız `shellcheck linux-ai-setup-script.sh` ve `bash -n linux-ai-setup-script.sh` çalıştırın; ayrıca uygun olduğunda `PKG_MANAGER=apt ./linux-ai-setup-script.sh --dry-run` gibi duman testleri planlayın.

@@ -28,6 +28,43 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+reload_shell_configs() {
+    local mode="${1:-verbose}"
+    local candidates=()
+    local shell_name
+    shell_name=$(basename "${SHELL:-}")
+
+    case "$shell_name" in
+        zsh)
+            candidates=("$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.profile")
+            ;;
+        bash)
+            candidates=("$HOME/.bashrc" "$HOME/.profile" "$HOME/.zshrc")
+            ;;
+        *)
+            candidates=("$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile")
+            ;;
+    esac
+
+    local sourced_file=""
+    for rc_file in "${candidates[@]}"; do
+        if [ -f "$rc_file" ]; then
+            # shellcheck source=/dev/null
+            . "$rc_file" && sourced_file="$rc_file" && break
+        fi
+    done
+
+    if [ "$mode" = "silent" ]; then
+        return
+    fi
+
+    if [ -n "$sourced_file" ]; then
+        echo -e "${GREEN}[BİLGİ]${NC} Shell yapılandırmaları otomatik olarak yüklendi (${sourced_file})."
+    else
+        echo -e "${YELLOW}[UYARI]${NC} Shell yapılandırma dosyaları bulunamadı; gerekirse terminalinizi yeniden başlatın."
+    fi
+}
+
 # PHP sürüm listeleri
 PHP_SUPPORTED_VERSIONS=("7.4" "8.1" "8.2" "8.3" "8.4" "8.5")
 PHP_EXTENSION_PACKAGES=("mbstring" "zip" "gd" "tokenizer" "curl" "xml" "bcmath" "intl" "sqlite3" "pgsql" "mysql" "fpm")
@@ -232,7 +269,7 @@ install_pipx() {
         fi
     done
     
-    source "$HOME/.bashrc" 2>/dev/null || source "$HOME/.zshrc" 2>/dev/null || true
+    reload_shell_configs
     
     if command -v pipx &> /dev/null; then
         echo -e "${GREEN}[BAŞARILI]${NC} Pipx kurulumu tamamlandı: $(pipx --version 2>/dev/null || echo 'kuruldu')"
@@ -337,7 +374,7 @@ install_bun() {
         fi
     done
     
-    source "$HOME/.bashrc" 2>/dev/null || source "$HOME/.zshrc" 2>/dev/null || true
+    reload_shell_configs
 
     if command -v bun &> /dev/null; then
         echo -e "${GREEN}[BAŞARILI]${NC} Bun.js kurulumu tamamlandı: $(bun --version)"
@@ -367,7 +404,7 @@ install_supergemini() {
         fi
     fi
     
-    source "$HOME/.bashrc" 2>/dev/null || source "$HOME/.zshrc" 2>/dev/null || true
+    reload_shell_configs
     export PATH="$HOME/.local/bin:$PATH"
 
     echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini indiriliyor ve kuruluyor (pipx)..."
@@ -458,7 +495,7 @@ install_superqwen() {
         fi
     fi
     
-    source "$HOME/.bashrc" 2>/dev/null || source "$HOME/.zshrc" 2>/dev/null || true
+    reload_shell_configs
     export PATH="$HOME/.local/bin:$PATH"
 
     echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen indiriliyor ve kuruluyor (pipx)..."
@@ -515,7 +552,7 @@ install_superclaude() {
         fi
     fi
     
-    source "$HOME/.bashrc" 2>/dev/null || source "$HOME/.zshrc" 2>/dev/null || true
+    reload_shell_configs
     export PATH="$HOME/.local/bin:$PATH"
 
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude indiriliyor ve kuruluyor (pipx)..."
@@ -1935,8 +1972,8 @@ main() {
             echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
             echo -e "${GREEN}[TAMAMLANDI]${NC} İşlemler tamamlandı! Ana menüye dönülüyor..."
             echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-            echo -e "${YELLOW}[BİLGİ]${NC} Değişikliklerin etkin olması için terminal oturumunuzu yenileyin:"
-            echo -e "        ${GREEN}source ~/.bashrc${NC} veya ${GREEN}source ~/.zshrc${NC}\n"
+            echo -e "${YELLOW}[BİLGİ]${NC} Ortam değişiklikleri otomatik olarak shell yapılandırma dosyalarından yüklendi."
+            echo -e "${YELLOW}[BİLGİ]${NC} Gerekirse yeni bir terminal açarak değişiklikleri doğrulayabilirsiniz.\n"
         fi
     done
 }

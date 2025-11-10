@@ -1469,11 +1469,6 @@ main() {
                 NVM_INSTALLED=true
                 install_bun
                 
-                # AI Frameworks
-                install_supergemini
-                install_superqwen
-                install_superclaude
-                
                 # AI CLI araçları
                 install_claude_code
                 install_gemini_cli
@@ -1481,6 +1476,11 @@ main() {
                 install_qoder_cli
                 install_qwen_cli
                 install_codex_cli
+
+                # AI Frameworks
+                install_supergemini
+                install_superqwen
+                install_superclaude
                 
                 # Yapılandırmalar
                 configure_git

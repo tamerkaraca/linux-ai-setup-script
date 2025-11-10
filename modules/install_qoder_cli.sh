@@ -2,13 +2,70 @@
 set -euo pipefail
 
 # Ortak yardımcı fonksiyonları yükle
+UTILS_PATH="./modules/utils.sh"
+if [ ! -f "$UTILS_PATH" ] && [ -n "${BASH_SOURCE[0]:-}" ]; then
+    UTILS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils.sh"
+fi
+# shellcheck source=/dev/null
+[ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
+# Renk değişkenleri yoksa tanımla (uzaktan çalıştırmalarda set -u güvenli)
+: "${RED:=$'\033[0;31m'}"
+: "${GREEN:=$'\033[0;32m'}"
+: "${YELLOW:=$'\033[1;33m'}"
+: "${BLUE:=$'\033[0;34m'}"
+: "${CYAN:=$'\033[0;36m'}"
+: "${NC:=$'\033[0m'}"
+
+MIN_NPM_VERSION="${MIN_NPM_VERSION:-9.0.0}"
+
+# Basit semver karşılaştırması (a >= b)
+semver_ge() {
+    local version_a="$1"
+    local version_b="$2"
+    if [ "$version_a" = "$version_b" ]; then
+        return 0
+    fi
+    if [ "$(printf '%s\n%s\n' "$version_a" "$version_b" | sort -V | head -n1)" = "$version_b" ]; then
+        return 0
+    fi
+    return 1
+}
 
 ensure_npm_available() {
     if ! command -v npm &> /dev/null; then
         echo -e "${RED}[HATA]${NC} npm bulunamadı. Lütfen Node.js ve npm'i kurun (Ana Menü -> 3. Node.js ve İlgili Araçları Kur)."
         return 1
     fi
+}
+
+ensure_modern_npm() {
+    local dry_run="${1:-false}"
+    local current_version
+    current_version=$(npm -v 2>/dev/null | tr -d '[:space:]')
+    if [ -z "$current_version" ]; then
+        echo -e "${RED}[HATA]${NC} npm sürümü okunamadı."
+        return 1
+    fi
+
+    if semver_ge "$current_version" "$MIN_NPM_VERSION"; then
+        return 0
+    fi
+
+    echo -e "${YELLOW}[UYARI]${NC} Mevcut npm sürümü (${current_version}) minimum gereksinim (${MIN_NPM_VERSION}) altında."
+    if [ "$dry_run" = true ]; then
+        echo -e "${YELLOW}[DRY-RUN]${NC} sudo npm install -g npm@latest"
+        return 0
+    fi
+
+    echo -e "${YELLOW}[BİLGİ]${NC} npm güncelleniyor..."
+    if sudo npm install -g npm@latest; then
+        echo -e "${GREEN}[BAŞARILI]${NC} npm sürümü güncellendi: $(npm -v 2>/dev/null)"
+        return 0
+    fi
+
+    echo -e "${RED}[HATA]${NC} npm güncellemesi başarısız oldu."
+    return 1
 }
 
 install_npm_cli() {
@@ -27,6 +84,7 @@ install_npm_cli() {
     fi
 
     ensure_npm_available || return 1
+    ensure_modern_npm "$dry_run" || return 1
 
     if [ "$dry_run" = true ]; then
         echo -e "${YELLOW}[DRY-RUN]${NC} sudo npm install -g ${npm_package}"

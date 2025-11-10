@@ -3,6 +3,14 @@ set -euo pipefail
 
 # Bu modül, Claude Code CLI'ı kurar ve etkileşimli oturum açma için TTY erişimini doğrular.
 
+# Renk değişkenlerini tanımla (set -u altında güvenli)
+: "${RED:=$'\033[0;31m'}"
+: "${GREEN:=$'\033[0;32m'}"
+: "${YELLOW:=$'\033[1;33m'}"
+: "${BLUE:=$'\033[0;34m'}"
+: "${CYAN:=$'\033[0;36m'}"
+: "${NC:=$'\033[0m'}"
+
 # Claude CLI'nın TTY gereksinimi için yardımcılar
 supporting_tty() {
     if [[ -t 0 || -t 1 || -t 2 ]]; then

@@ -809,17 +809,17 @@ configure_glm_claude() {
     echo -e "${YELLOW}[BİLGİ]${NC} settings.json dosyası oluşturuluyor..."
     
     cat > "$SETTINGS_FILE" << EOF
-{
-  "env": {
-      "ANTHROPIC_AUTH_TOKEN": "${GLM_API_KEY}",
-      "ANTHROPIC_BASE_URL": "${GLM_BASE_URL}",
-      "API_TIMEOUT_MS": "3000000",
-      "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-4.6",
-      "ANTHROPIC_DEFAULT_SONNET_MODEL": "GLM-4.6",
-      "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-4.5-Air"
-  }
-}
-EOF
+        {
+            "env": {
+                "ANTHROPIC_AUTH_TOKEN": "${GLM_API_KEY}",
+                "ANTHROPIC_BASE_URL": "${GLM_BASE_URL}",
+                "API_TIMEOUT_MS": "3000000",
+                "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-4.6",
+                "ANTHROPIC_DEFAULT_SONNET_MODEL": "GLM-4.6",
+                "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-4.5-Air"
+            }
+        }
+    EOF
     
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}[BAŞARILI]${NC} GLM-4.6 yapılandırması tamamlandı!"
@@ -1465,8 +1465,7 @@ main() {
         case $choice in
             1)
                 # Hazırlık
-                update_system
-                configure_git
+                prepare_and_configure_git
 
                 # Python araçları
                 install_python

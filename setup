@@ -73,7 +73,7 @@ main_menu() {
         echo -e "  ${GREEN}A${NC} - Hepsini Kur (Sırayla)"
         echo -e "  ${RED}0${NC} - Çıkış"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Seçiminiz: "
-        read -r choice
+        read -r choice </dev/tty
 
         case "$choice" in
             1) update_system ;;
@@ -95,7 +95,12 @@ main_menu() {
                 run_module "install_ai_cli_tools_menu" "all" # "all" parametresi ile tüm CLI araçlarını kur
                 run_module "configure_git"
                 run_module "configure_glm_claude"
-                run_module "install_php_composer"
+                # Ask user if they want to install PHP and Composer
+                echo -e "\n${YELLOW}PHP ve Composer kurulsun mu? (e/h)${NC}"
+                read -r install_php_choice </dev/tty
+                if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
+                    run_module "install_php_composer"
+                fi
                 run_module "install_github_cli"
                 ;;
             0)
@@ -108,83 +113,7 @@ main_menu() {
                 ;;
         esac
         echo -e "\n${YELLOW}Devam etmek için Enter'a basın...${NC}"
-        read -r
-    done
-}
-
-# Script başladığında ana menüyü çağır
-main_menu
-
-# Ana menü
-main_menu() {
-    detect_package_manager # Paket yöneticisini başta tespit et
-    
-    while true; do
-        clear
-        echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        echo -e "${BLUE}║   AI CLI Araçları Otomatik Kurulum Script     ║${NC}"
-        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-        echo -e "${CYAN}╔══════════════════════════════════════════════════════════════════════╗${NC}"
-        echo -e "${CYAN}║                           Script Bilgileri                           ║${NC}"
-        echo -e "${CYAN}╠══════════════════════════════════════════════════════════════════════╣${NC}"
-        echo -e "${CYAN}║ Geliştirici: Tamer KARACA                                            ║${NC}"
-        echo -e "${CYAN}║ Versiyon: 1.0.0                                                      ║${NC}"
-        echo -e "${CYAN}║ GitHub Repo: https://github.com/tamerkaraca/linux-ai-setup-script    ║${NC}"
-        echo -e "${CYAN}╚══════════════════════════════════════════════════════════════════════╝${NC}\n"
-        
-        echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        echo -e "${BLUE}║                 ANA KURULUM MENÜSÜ            ║${NC}"
-        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-        echo -e "  ${GREEN}1${NC} - Sistemi Güncelle ve Temel Paketleri Kur"
-        echo -e "  ${GREEN}2${NC} - Python ve İlgili Araçları Kur (Pip, Pipx, UV)"
-        echo -e "  ${GREEN}3${NC} - Node.js ve İlgili Araçları Kur (NVM, Bun.js)"
-        echo -e "  ${GREEN}4${NC} - AI Frameworklerini Kur (SuperGemini, SuperQwen, SuperClaude)"
-        echo -e "  ${GREEN}5${NC} - AI CLI Araçlarını Kur (Claude Code, Gemini CLI, vb.)"
-        echo -e "  ${GREEN}6${NC} - Git Yapılandırması"
-        echo -e "  ${GREEN}7${NC} - GLM-4.6 Claude Code Yapılandırması"
-        echo -e "  ${GREEN}8${NC} - PHP ve Composer Kurulumu"
-        echo -e "  ${GREEN}9${NC} - GitHub CLI Kurulumu"
-        echo -e "  ${GREEN}10${NC} - AI Frameworklerini Kaldır"
-        echo -e "  ${GREEN}11${NC} - MCP Sunucu Yönetimi"
-        echo -e "  ${GREEN}A${NC} - Hepsini Kur (Sırayla)"
-        echo -e "  ${RED}0${NC} - Çıkış"
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Seçiminiz: "
-        read -r choice
-
-        case "$choice" in
-            1) update_system ;; 
-            2) run_module "install_python_tools" ;; # Bu modül Python, Pip, Pipx, UV kuracak
-            3) run_module "install_nodejs_tools" ;; # Bu modül NVM, Bun.js kuracak
-            4) run_module "install_ai_frameworks_menu" ;; 
-            5) run_module "install_ai_cli_tools_menu" ;; 
-            6) run_module "configure_git" ;; 
-            7) run_module "configure_glm_claude" ;; 
-            8) run_module "install_php_composer" ;; # Bu modül PHP ve Composer kuracak
-            9) run_module "install_github_cli" ;; 
-            10) run_module "remove_ai_frameworks_menu" ;; 
-            11) run_module "manage_mcp_servers_menu" ;; 
-            A|a)
-                update_system
-                run_module "install_python_tools"
-                run_module "install_nodejs_tools"
-                run_module "install_ai_frameworks_menu" "all" # "all" parametresi ile tüm frameworkleri kur
-                run_module "install_ai_cli_tools_menu" "all" # "all" parametresi ile tüm CLI araçlarını kur
-                run_module "configure_git"
-                run_module "configure_glm_claude"
-                run_module "install_php_composer"
-                run_module "install_github_cli"
-                ;; 
-            0)
-                echo -e "${GREEN}[BİLGİ]${NC} Çıkılıyor. Güle güle!"
-                exit 0
-                ;;
-            *)
-                echo -e "${RED}[HATA]${NC} Geçersiz seçim, lütfen tekrar deneyin."
-                sleep 2
-                ;;
-        esac
-        echo -e "\n${YELLOW}Devam etmek için Enter'a basın...${NC}"
-        read -r
+        read -r </dev/tty
     done
 }
 

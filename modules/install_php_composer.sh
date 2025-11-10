@@ -289,7 +289,7 @@ main() {
             i=$((i+1))
         done
         echo -e "  ${RED}0${NC} - İptal"
-        read -r -p "Seçiminiz (1-${#PHP_SUPPORTED_VERSIONS[@]}, veya 0): " choice
+        read -r -p "Seçiminiz (1-${#PHP_SUPPORTED_VERSIONS[@]}, veya 0): " choice </dev/tty
 
         if [ "$choice" = "0" ]; then
             echo -e "${YELLOW}[BİLGİ]${NC} PHP ve Composer kurulumu iptal edildi."

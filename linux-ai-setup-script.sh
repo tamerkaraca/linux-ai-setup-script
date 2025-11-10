@@ -837,7 +837,7 @@ EOF
     
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} GLM Coding Plan hakkında:"
-    echo -e "  ${GREEN}•${NC} \$3/aydan başlayan fiyatlarla premium kodlama deneyimi"
+    echo -e "  ${GREEN}•${NC} $3/aydan başlayan fiyatlarla premium kodlama deneyimi"
     echo -e "  ${GREEN}•${NC} PRO ve üzeri planlarda Vision ve Web Search MCP desteği"
     echo -e "  ${GREEN}•${NC} Daha fazla bilgi: https://z.ai/subscribe"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -1414,8 +1414,8 @@ show_menu() {
     echo -e "${BLUE}║   Kurmak istediğiniz araçları seçin:         ║${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
     echo -e "${CYAN}=== Temel Kurulum ===${NC}"
-    echo -e "  ${GREEN}1${NC}  - Kurulum Hazırlığı (Sistem Güncelleme, Temel Araçlar ve Git)"
-    echo -e "  ${GREEN}2${NC}  - Tümünü kur (Tüm araçlar)"
+    echo -e "  ${GREEN}1${NC}  - Tümünü kur (Tüm araçlar)"
+    echo -e "  ${GREEN}2${NC}  - Kurulum Hazırlığı (Sistem Güncelleme, Temel Araçlar ve Git)"
     echo -e "\n${CYAN}=== Python Araçları ===${NC}"
     echo -e "  ${GREEN}3${NC}  - Python3 kurulumu"
     echo -e "  ${GREEN}4${NC}  - Pip (Python package manager)"
@@ -1465,9 +1465,6 @@ main() {
         
         case $choice in
             1)
-                prepare_and_configure_git
-                ;;
-            2)
                 # Hazırlık
                 update_system
                 configure_git
@@ -1499,6 +1496,9 @@ main() {
                 
                 # Diğer Yapılandırmalar
                 configure_glm_claude
+                ;;
+            2)
+                prepare_and_configure_git
                 ;;
             3)
                 install_python

@@ -1399,7 +1399,7 @@ switch_php_version_menu() {
     php -v | head -n 2
 }
 
-hazirlik_ve_git_kurulumu() {
+prepare_and_configure_git() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Kurulum Hazırlığı Başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
@@ -1465,7 +1465,7 @@ main() {
         
         case $choice in
             1)
-                hazirlik_ve_git_kurulumu
+                prepare_and_configure_git
                 ;;
             2)
                 # Hazırlık

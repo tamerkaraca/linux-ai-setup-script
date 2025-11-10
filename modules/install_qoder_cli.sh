@@ -4,39 +4,38 @@
 # shellcheck source=/dev/null
 source "/mnt/d/ai/modules/utils.sh"
 
-# Qoder CLI kurulumu
 install_qoder_cli() {
-    local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Qoder CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-    
-    detect_package_manager # Ensure PKG_MANAGER, INSTALL_CMD are set
 
-    npm install -g @qoder-ai/qodercli
-    
-    echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI sürümü: $(qodercli --version)"
-    
-    if [ "$interactive_mode" = true ]; then
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi Qoder CLI'ya giriş yapmanız gerekiyor."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'qodercli login' veya ilgili oturum açma komutunu çalıştırın."
-        echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
-        
-        qodercli login 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
-        
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -r -p "Devam etmek için Enter'a basın..."
-    else
-        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}qodercli login${NC}' komutunu çalıştırın."
+    if command -v qoder &> /dev/null; then
+        echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI zaten kurulu: $(qoder --version 2>/dev/null)"
+        return 0
     fi
-    
-    echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI kurulumu tamamlandı!"
+
+    echo -e "${YELLOW}[BİLGİ]${NC} Qoder CLI indiriliyor ve kuruluyor..."
+    if curl -fsSL https://qoder.com/install.sh | bash; then
+        echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI kurulumu tamamlandı."
+        # Qoder CLI'ın PATH'e eklenmesi gerekebilir, genellikle installer bunu yapar.
+        # Eğer yapmazsa, burada PATH'i güncellemek gerekebilir.
+        # Şimdilik varsayalım ki installer PATH'i günlüyor veya ~/.local/bin gibi bir yere kuruyor.
+        reload_shell_configs silent # PATH güncellemelerini uygulamak için
+    else
+        echo -e "${RED}[HATA]${NC} Qoder CLI kurulumu başarısız oldu."
+        return 1
+    fi
+
+    if command -v qoder &> /dev/null; then
+        echo -e "${GREEN}[BAŞARILI]${NC} Qoder CLI başarıyla kuruldu: $(qoder --version 2>/dev/null)"
+    else
+        echo -e "${RED}[HATA]${NC} Qoder CLI kuruldu ancak 'qoder' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
+        return 1
+    fi
 }
 
-# Ana kurulum akışı
 main() {
-    install_qoder_cli "$@"
+    install_qoder_cli
 }
 
 main

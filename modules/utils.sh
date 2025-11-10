@@ -155,15 +155,42 @@ install_pip() {
     if ! command -v python3 &> /dev/null; then
         echo -e "${YELLOW}[UYARI]${NC} Python kurulu değil, önce Python kuruluyor..."
         install_python
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}[HATA]${NC} Python kurulumu başarısız oldu, Pip kurulamıyor."
+            return 1
+        fi
     fi
     
     echo -e "${YELLOW}[BİLGİ]${NC} Pip güncelleniyor..."
     
-    if python3 -m pip install --upgrade pip 2>&1 | grep -q "externally-managed-environment"; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
-        python3 -m pip install --upgrade pip --break-system-packages
+    local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
+    local pip_install_fallback_cmd="curl -sS https://bootstrap.pypa.io/get-pip.py | python3"
+
+    # İlk deneme: python3 -m pip ile güncelleme
+    if ! $pip_upgrade_cmd 2>&1 | grep -q "externally-managed-environment"; then
+        # Başarılı veya başka bir hata, externally-managed-environment değil
+        $pip_upgrade_cmd
     else
-        python3 -m pip install --upgrade pip
+        # externally-managed-environment hatası, --break-system-packages ile dene
+        echo -e "${YELLOW}[BİLGİ]${NC} Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
+        $pip_upgrade_cmd --break-system-packages
+    fi
+
+    # Eğer pip hala çalışmıyorsa veya güncelleme başarısız olursa, get-pip.py ile yeniden kur
+    if [ $? -ne 0 ] || ! python3 -m pip --version &> /dev/null; then
+        echo -e "${YELLOW}[UYARI]${NC} Pip güncellemesi başarısız oldu veya pip bulunamadı. get-pip.py ile yeniden kurulum deneniyor..."
+        if $pip_install_fallback_cmd; then
+            echo -e "${GREEN}[BAŞARILI]${NC} Pip, get-pip.py ile kuruldu. Tekrar güncelleme deneniyor..."
+            if ! $pip_upgrade_cmd 2>&1 | grep -q "externally-managed-environment"; then
+                $pip_upgrade_cmd
+            else
+                echo -e "${YELLOW}[BİLGİ]${NC} Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
+                $pip_upgrade_cmd --break-system-packages
+            fi
+        else
+            echo -e "${RED}[HATA]${NC} get-pip.py ile Pip kurulumu başarısız!"
+            return 1
+        fi
     fi
     
     if [ $? -eq 0 ]; then

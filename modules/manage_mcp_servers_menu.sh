@@ -1,16 +1,28 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
+# shellcheck source=/dev/null
+source "./modules/utils.sh"
 
-
-# Script çalıştırma fonksiyonu (setup script'inden kopyalandı)
+# Script çalıştırma fonksiyonu (setup script'indeki ile aynı)
 run_module() {
     local module_name="$1"
+    local local_path="./modules/${module_name}.sh"
     local module_url="$BASE_URL/$module_name.sh"
-    echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
-    if ! curl -fsSL "$module_url" | bash -s -- "${@:2}"; then
-        echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
-        return 1
+    shift
+
+    if [ -f "$local_path" ]; then
+        echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
+        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash "$local_path" "$@"; then
+            echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            return 1
+        fi
+    else
+        echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
+        if ! curl -fsSL "$module_url" | PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash -s -- "$@"; then
+            echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            return 1
+        fi
     fi
     return 0
 }

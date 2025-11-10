@@ -1,2 +1,7 @@
 GEMINI.md
-AGENTS.md.qoder/
+AGENTS.md
+.qoder/
+.claude/
+.serena/
+.qwen/
+.codex/

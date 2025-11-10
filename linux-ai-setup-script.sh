@@ -35,8 +35,17 @@ PHP_EXTENSION_PACKAGES=("mbstring" "zip" "gd" "tokenizer" "curl" "xml" "bcmath" 
 # Başlık
 clear
 echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-echo -e "${BLUE}║   AI CLI Araçları Otomatik Kurulum Script    ║${NC}"
+echo -e "${BLUE}║   AI CLI Araçları Otomatik Kurulum Script     ║${NC}"
 echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+
+# Script Bilgileri
+echo -e "${CYAN}╔══════════════════════════════════════════════════════════════════════╗${NC}"
+echo -e "${CYAN}║                           Script Bilgileri                           ║${NC}"
+echo -e "${CYAN}╠══════════════════════════════════════════════════════════════════════╣${NC}"
+echo -e "${CYAN}║ Geliştirici: Tamer KARACA                                            ║${NC}"
+echo -e "${CYAN}║ Versiyon: 1.0.0                                                      ║${NC}"
+echo -e "${CYAN}║ GitHub Repo: https://github.com/tamerkaraca/linux-ai-setup-script    ║${NC}"
+echo -e "${CYAN}╚══════════════════════════════════════════════════════════════════════╝${NC}\n"
 
 # İşletim sistemi ve paket yöneticisi tespiti
 detect_package_manager() {
@@ -1410,7 +1419,7 @@ prepare_and_configure_git() {
 # Ana menü
 show_menu() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║   Kurmak istediğiniz araçları seçin:         ║${NC}"
+    echo -e "${BLUE}║   Kurmak istediğiniz araçları seçin:          ║${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
     echo -e "${CYAN}=== Temel Kurulum ===${NC}"
     echo -e "  ${GREEN}1${NC}  - Tümünü kur (Tüm araçlar)"

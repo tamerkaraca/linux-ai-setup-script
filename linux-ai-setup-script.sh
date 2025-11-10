@@ -809,17 +809,17 @@ configure_glm_claude() {
     echo -e "${YELLOW}[BİLGİ]${NC} settings.json dosyası oluşturuluyor..."
     
     cat > "$SETTINGS_FILE" << EOF
-        {
-            "env": {
-                "ANTHROPIC_AUTH_TOKEN": "${GLM_API_KEY}",
-                "ANTHROPIC_BASE_URL": "${GLM_BASE_URL}",
-                "API_TIMEOUT_MS": "3000000",
-                "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-4.6",
-                "ANTHROPIC_DEFAULT_SONNET_MODEL": "GLM-4.6",
-                "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-4.5-Air"
-            }
-        }
-    EOF
+{
+  "env": {
+      "ANTHROPIC_AUTH_TOKEN": "${GLM_API_KEY}",
+      "ANTHROPIC_BASE_URL": "${GLM_BASE_URL}",
+      "API_TIMEOUT_MS": "3000000",
+      "ANTHROPIC_DEFAULT_OPUS_MODEL": "GLM-4.6",
+      "ANTHROPIC_DEFAULT_SONNET_MODEL": "GLM-4.6",
+      "ANTHROPIC_DEFAULT_HAIKU_MODEL": "GLM-4.5-Air"
+  }
+}
+EOF
     
     if [ $? -eq 0 ]; then
         echo -e "${GREEN}[BAŞARILI]${NC} GLM-4.6 yapılandırması tamamlandı!"
@@ -1216,7 +1216,7 @@ install_php_version() {
                         pkg_name="php${version}-${ext}"
                         ;;
                 esac
-                pkg_map["$pkg_name"] = 1
+                pkg_map["$pkg_name"]=1
             done
             ;;
         dnf|yum)

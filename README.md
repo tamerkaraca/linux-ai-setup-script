@@ -23,9 +23,7 @@ This script automates the setup of a complete AI development environment on Linu
     ```bash
     ./linux-ai-setup-script.sh
     ```
-4.  Follow the interactive menu to select the tools you want to install.
-
-**⚠️ İnteraktif Komutlar ve İpuçları:** Kurulum sırasında script veya kurulan CLI araçları sizden girdi isteyebilir. Script'in kendi soruları için genellikle `Enter` tuşuna basarak devam edebilirsiniz. Bazı CLI araçları interaktif moda geçebilir; bu durumda, aracı sonlandırmak ve script'in bir sonraki adıma geçmesini sağlamak için `CTRL + C` kullanmanız gerekebilir.
+**⚠️ Interactive Commands and Tips:** During installation, the script or the installed CLI tools may ask for your input. For the script's own questions, you can usually press `Enter` to continue. Some CLI tools may enter interactive mode; in this case, you may need to use `CTRL + C` to terminate the tool and allow the script to proceed to the next step.
 
 ---
 

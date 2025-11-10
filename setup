@@ -20,9 +20,6 @@ if [ -f "$0" ]; then
     fi
 fi
 
-# GitHub'daki scriptlerin temel URL'si
-BASE_URL="https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules" # Bu URL'yi kendi repo'nuzla değiştirin
-
 # Ortak yardımcı fonksiyonları yükle
 # shellcheck source=/dev/null
 source "./modules/utils.sh"

@@ -8,6 +8,9 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# Modül indirmeleri için temel URL (ortak kullanılır, gerekirse dışarıdan BASE_URL override edilebilir)
+BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules}"
+
 # Ortak yardımcı fonksiyonlar
 reload_shell_configs() {
     local mode="${1:-verbose}"

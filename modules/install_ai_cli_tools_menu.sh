@@ -4,9 +4,6 @@
 # shellcheck source=/dev/null
 source "./modules/utils.sh"
 
-# GitHub'daki scriptlerin temel URL'si (setup script'inden kopyalandı)
-BASE_URL="https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules"
-
 # Script çalıştırma fonksiyonu (setup script'inden kopyalandı)
 run_module() {
     local module_name="$1"
@@ -26,30 +23,27 @@ install_ai_cli_tools_menu() {
     local install_all="${1:-}" # "all" parametresi gelirse hepsini kur
 
     while true; do
+        clear
         if [ -z "$install_all" ]; then
-            clear
-            echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            echo -e "${BLUE}║           AI CLI Araçları Kurulum Menüsü        ║${NC}"
-            echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-            echo -e "  ${GREEN}1${NC} - Claude Code CLI"
-            echo -e "  ${GREEN}2${NC} - Gemini CLI"
-            echo -e "  ${GREEN}3${NC} - OpenCode CLI"
-            echo -e "  ${GREEN}4${NC} - Qoder CLI"
-            echo -e "  ${GREEN}5${NC} - Coder CLI"
-            echo -e "  ${GREEN}6${NC} - Qwen CLI"
-            echo -e "  ${GREEN}7${NC} - OpenAI Codex CLI"
-            echo -e "  ${GREEN}8${NC} - GitHub Copilot CLI"
-            echo -e "  ${GREEN}9${NC} - Tüm AI CLI Araçları"
-            echo -e "  ${RED}0${NC} - Ana Menüye Dön"
-            echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
-
-            read -r -p "Seçiminiz: " cli_choices
+            echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+            echo -e "${BLUE}║        AI CLI Araçları Kurulum Menüsü         ║${NC}"
+            echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+            echo -e "  ${GREEN}1${NC} Claude Code CLI"
+            echo -e "  ${GREEN}2${NC} Gemini CLI"
+            echo -e "  ${GREEN}3${NC} OpenCode CLI"
+            echo -e "  ${GREEN}4${NC} Qoder CLI"
+            echo -e "  ${GREEN}5${NC} Qwen CLI"
+            echo -e "  ${GREEN}6${NC} OpenAI Codex CLI"
+            echo -e "  ${GREEN}7${NC} GitHub Copilot CLI"
+            echo -e "  ${GREEN}8${NC} Tümünü Kur"
+            echo -e "  ${RED}0${NC} Ana Menü"
+            read -r -p "${YELLOW}Seçiminiz:${NC} " cli_choices
             if [ "$cli_choices" = "0" ] || [ -z "$cli_choices" ]; then
                 echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
                 break
             fi
         else
-            cli_choices="9" # "all" parametresi gelirse tümünü seç
+            cli_choices="8"
         fi
 
         local all_installed=false
@@ -62,16 +56,14 @@ install_ai_cli_tools_menu() {
                 2) run_module "install_gemini_cli" "false" ;;
                 3) run_module "install_opencode_cli" "false" ;;
                 4) run_module "install_qoder_cli" "false" "--tool" "qoder" ;;
-                5) run_module "install_qoder_cli" "false" "--tool" "coder" ;;
-                6) run_module "install_qwen_cli" "false" ;;
-                7) run_module "install_codex_cli" "false" ;;
-                8) run_module "install_copilot_cli" "false" ;;
-                9)
+                5) run_module "install_qwen_cli" "false" ;;
+                6) run_module "install_codex_cli" "false" ;;
+                7) run_module "install_copilot_cli" "false" ;;
+                8)
                     run_module "install_claude_code" "false"
                     run_module "install_gemini_cli" "false"
                     run_module "install_opencode_cli" "false"
                     run_module "install_qoder_cli" "false" "--tool" "qoder"
-                    run_module "install_qoder_cli" "false" "--tool" "coder"
                     run_module "install_qwen_cli" "false"
                     run_module "install_codex_cli" "false"
                     run_module "install_copilot_cli" "false"

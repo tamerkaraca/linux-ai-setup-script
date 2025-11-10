@@ -12,7 +12,7 @@ The `setup` script automates preparing a Linux workstation for AI development. I
 - Automatic package-manager detection, colored logging, and CRLF self-healing.
 - System upgrade + essential developer tooling (curl, wget, git, jq, zip/unzip, build toolchains).
 - Full Python toolchain (python3, pip, pipx, UV) and JavaScript runtimes (NVM-managed Node.js, Bun).
-- AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, **Coder CLI**, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI, plus GitHub CLI.
+- AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI, plus GitHub CLI.
 - AI framework menu for SuperGemini, SuperQwen, SuperClaude with guided API-key prompts.
 - Removal menu to undo SuperGemini/SuperQwen/SuperClaude installs and purge their configs in one go.
 - PHP installer with selectable versions, Laravel-friendly extension packs, automatic Composer bootstrap, and version switcher.
@@ -60,7 +60,7 @@ If you prefer to inspect the code or contribute, you can clone the repository:
   - `2` – Install Python and Related Tools (Pip, Pipx, UV)
   - `3` – Install Node.js and Related Tools (NVM, Bun.js)
   - `4` – Install AI Frameworks (SuperGemini, SuperQwen, SuperClaude) - *This opens a sub-menu.*
-  - `5` – Install AI CLI Tools (Claude Code, Gemini CLI, OpenCode, Qoder, **Coder**, Qwen, OpenAI Codex, GitHub Copilot CLI) - *This opens a sub-menu.*
+  - `5` – Install AI CLI Tools (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) - *This opens a sub-menu.*
   - `6` – Git Configuration
   - `7` – GLM-4.6 Claude Code Configuration
   - `8` – PHP and Composer Installation
@@ -137,7 +137,7 @@ Kodu incelemeyi veya katkıda bulunmayı tercih ediyorsanız, depoyu klonlayabil
   - `2` – Python ve İlgili Araçları Kur (Pip, Pipx, UV)
   - `3` – Node.js ve İlgili Araçları Kur (NVM, Bun.js)
   - `4` – AI Frameworklerini Kur (SuperGemini, SuperQwen, SuperClaude) - *Bu bir alt menü açar.*
-  - `5` – AI CLI Araçlarını Kur (Claude Code, Gemini CLI, OpenCode, Qoder, **Coder**, Qwen, OpenAI Codex, GitHub Copilot CLI) - *Bu bir alt menü açar.*
+  - `5` – AI CLI Araçlarını Kur (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) - *Bu bir alt menü açar.*
   - `6` – Git Yapılandırması
   - `7` – GLM-4.6 Claude Code Yapılandırması
   - `8` – PHP ve Composer Kurulumu

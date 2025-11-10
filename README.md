@@ -41,7 +41,7 @@
 ### Usage
 - Launching the script opens an interactive menu. You may enter a single number or comma-separated choices to perform multiple operations in one run (e.g., `1,7,11`).
 - Menu overview:
-  - `1` – Install everything (system prep, runtimes, CLIs, frameworks, configs).
+  - `1` – Install everything: updates the OS, configures Git, installs Python+pip+pipx+UV, sets up NVM/Node.js/Bun, installs all AI CLIs, runs the AI frameworks menu, configures GLM-4.6, and opens the MCP management menu.
   - `2` – System prep + Git configuration only.
   - `3-6` – Python stack: Python3, Pip, Pipx, UV.
   - `7-8` – JavaScript runtimes: NVM/Node.js and Bun.
@@ -100,7 +100,7 @@
 ### Kullanım
 - Script açıldığında etkileşimli bir menü görürsünüz. Tek bir seçenek girebilir veya virgülle ayırarak birden fazla işlemi aynı anda tetikleyebilirsiniz (örn. `1,7,11`).
 - Menü özeti:
-  - `1` – Her şeyi kur (sistem hazırlığı, runtime’lar, CLI’lar, framework’ler, yapılandırmalar).
+  - `1` – Her şeyi kurar: sistemi günceller, Git’i ayarlar, Python+pip+pipx+UV yükler, NVM/Node.js/Bun kurar, tüm AI CLI araçlarını kurar, AI framework menüsünü çalıştırır, GLM-4.6 yapılandırmasını yapar ve MCP yönetim menüsünü açar.
   - `2` – Sadece sistem hazırlığı + Git ayarları.
   - `3-6` – Python araçları: Python3, Pip, Pipx, UV.
   - `7-8` – JavaScript araçları: NVM/Node.js ve Bun.

@@ -1399,50 +1399,58 @@ switch_php_version_menu() {
     php -v | head -n 2
 }
 
+hazirlik_ve_git_kurulumu() {
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} Kurulum Hazırlığı Başlatılıyor..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+    update_system
+    configure_git
+    echo -e "\n${GREEN}[BAŞARILI]${NC} Kurulum hazırlığı tamamlandı!"
+}
+
 # Ana menü
 show_menu() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${BLUE}║   Kurmak istediğiniz araçları seçin:         ║${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-    echo -e "${CYAN}=== Hızlı Kurulum ===${NC}"
-    echo -e "  ${GREEN}1${NC}  - Tümünü kur (Tüm araçlar)"
+    echo -e "${CYAN}=== Temel Kurulum ===${NC}"
+    echo -e "  ${GREEN}1${NC}  - Kurulum Hazırlığı (Sistem Güncelleme, Temel Araçlar ve Git)"
+    echo -e "  ${GREEN}2${NC}  - Tümünü kur (Tüm araçlar)"
     echo -e "\n${CYAN}=== Python Araçları ===${NC}"
-    echo -e "  ${GREEN}2${NC}  - Python3 kurulumu"
-    echo -e "  ${GREEN}3${NC}  - Pip (Python package manager)"
-    echo -e "  ${GREEN}4${NC}  - Pipx (Isolated Python apps)"
-    echo -e "  ${GREEN}5${NC}  - UV (Ultra-fast Python installer)"
+    echo -e "  ${GREEN}3${NC}  - Python3 kurulumu"
+    echo -e "  ${GREEN}4${NC}  - Pip (Python package manager)"
+    echo -e "  ${GREEN}5${NC}  - Pipx (Isolated Python apps)"
+    echo -e "  ${GREEN}6${NC}  - UV (Ultra-fast Python installer)"
     echo -e "\n${CYAN}=== Node.js & JS Araçları ===${NC}"
-    echo -e "  ${GREEN}6${NC}  - NVM ve Node.js kurulumu"
-    echo -e "  ${GREEN}7${NC}  - Bun.js (JS Toolkit)"
+    echo -e "  ${GREEN}7${NC}  - NVM ve Node.js kurulumu"
+    echo -e "  ${GREEN}8${NC}  - Bun.js (JS Toolkit)"
     echo -e "\n${CYAN}=== PHP Araçları ===${NC}"
-    echo -e "  ${GREEN}8${NC} - PHP (7.4/8.x) kurulumu + Laravel eklentileri"
-    echo -e "  ${GREEN}9${NC} - Kurulu PHP sürümleri arasında geçiş"
+    echo -e "  ${GREEN}9${NC} - PHP (7.4/8.x) kurulumu + Laravel eklentileri"
+    echo -e "  ${GREEN}10${NC} - Kurulu PHP sürümleri arasında geçiş"
     echo -e "\n${CYAN}=== AI Frameworks ===${NC}"
-    echo -e "  ${GREEN}10${NC}  - SuperGemini Framework (Pipx ile)"
-    echo -e "  ${GREEN}11${NC}  - SuperQwen Framework (Pipx ile)"
-    echo -e "  ${GREEN}12${NC}  - SuperClaude Framework (Pipx ile)"
+    echo -e "  ${GREEN}11${NC}  - SuperGemini Framework (Pipx ile)"
+    echo -e "  ${GREEN}12${NC}  - SuperQwen Framework (Pipx ile)"
+    echo -e "  ${GREEN}13${NC}  - SuperClaude Framework (Pipx ile)"
     echo -e "\n${CYAN}=== AI CLI Araçları ===${NC}"
-    echo -e "  ${GREEN}13${NC} - Claude Code CLI"
-    echo -e "  ${GREEN}14${NC} - Gemini CLI"
-    echo -e "  ${GREEN}15${NC} - OpenCode CLI"
-    echo -e "  ${GREEN}16${NC} - Qoder CLI"
-    echo -e "  ${GREEN}17${NC} - Qwen CLI"
-    echo -e "  ${GREEN}18${NC} - OpenAI Codex CLI"
+    echo -e "  ${GREEN}14${NC} - Claude Code CLI"
+    echo -e "  ${GREEN}15${NC} - Gemini CLI"
+    echo -e "  ${GREEN}16${NC} - OpenCode CLI"
+    echo -e "  ${GREEN}17${NC} - Qoder CLI"
+    echo -e "  ${GREEN}18${NC} - Qwen CLI"
+    echo -e "  ${GREEN}19${NC} - OpenAI Codex CLI"
     echo -e "\n${CYAN}=== Yapılandırma & Araçlar ===${NC}"
-    echo -e "  ${GREEN}19${NC} - Git Global Yapılandırması (Kullanıcı Adı/E-posta)"
     echo -e "  ${GREEN}20${NC} - Claude Code için GLM-4.6 yapılandırması"
     echo -e "  ${GREEN}21${NC} - SuperGemini MCP Sunucu Yönetimi"
     echo -e "  ${GREEN}22${NC} - SuperQwen MCP Sunucu Yönetimi"
     echo -e "  ${GREEN}23${NC} - SuperClaude MCP Sunucu Yönetimi"
     echo -e "  ${RED}0${NC}  - Çıkış\n"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 2,3,4)"
-    echo -e "${YELLOW}[BİLGİ]${NC} Python araçları için Python (2), Node.js araçları için NVM (6) gereklidir!\n"
+    echo -e "${YELLOW}[BİLGİ]${NC} Python araçları için Python (3), Node.js araçları için NVM (7) gereklidir!\n"
 }
 
 # Ana program
 main() {
     detect_package_manager
-    update_system
     
     show_menu
     read -p "Seçiminiz: " choices
@@ -1457,6 +1465,13 @@ main() {
         
         case $choice in
             1)
+                hazirlik_ve_git_kurulumu
+                ;;
+            2)
+                # Hazırlık
+                update_system
+                configure_git
+
                 # Python araçları
                 install_python
                 PYTHON_INSTALLED=true
@@ -1482,15 +1497,14 @@ main() {
                 install_superqwen
                 install_superclaude
                 
-                # Yapılandırmalar
-                configure_git
+                # Diğer Yapılandırmalar
                 configure_glm_claude
                 ;;
-            2)
+            3)
                 install_python
                 PYTHON_INSTALLED=true
                 ;;
-            3)
+            4)
                 if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} Pip için önce Python kurulumu yapılıyor..."
                     install_python
@@ -1498,7 +1512,7 @@ main() {
                 fi
                 install_pip
                 ;;
-            4)
+            5)
                 if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
                     install_python
@@ -1506,25 +1520,25 @@ main() {
                 fi
                 install_pipx
                 ;;
-            5)
+            6)
                 install_uv
                 ;;
-            6)
+            7)
                 if [ "$NVM_INSTALLED" = false ]; then
                     install_nvm
                     NVM_INSTALLED=true
                 fi
                 ;;
-            7)
+            8)
                 install_bun
                 ;;
-            8)
+            9)
                 install_php_version_menu
                 ;;
-            9)
+            10)
                 switch_php_version_menu
                 ;;
-            10)
+            11)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperGemini için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1536,7 +1550,7 @@ main() {
                 fi
                 install_supergemini
                 ;;
-            11)
+            12)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperQwen için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1548,7 +1562,7 @@ main() {
                 fi
                 install_superqwen
                 ;;
-            12)
+            13)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperClaude için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1560,7 +1574,7 @@ main() {
                 fi
                 install_superclaude
                 ;;
-            13)
+            14)
                 if [ "$NVM_INSTALLED" = false ]; then
                     echo -e "${YELLOW}[UYARI]${NC} Claude Code için önce NVM kurulumu yapılıyor..."
                     install_nvm
@@ -1568,7 +1582,7 @@ main() {
                 fi
                 install_claude_code
                 ;;
-            14)
+            15)
                 if [ "$NVM_INSTALLED" = false ]; then
                     echo -e "${YELLOW}[UYARI]${NC} Gemini CLI için önce NVM kurulumu yapılıyor..."
                     install_nvm
@@ -1576,7 +1590,7 @@ main() {
                 fi
                 install_gemini_cli
                 ;;
-            15)
+            16)
                 if [ "$NVM_INSTALLED" = false ]; then
                     echo -e "${YELLOW}[UYARI]${NC} OpenCode CLI için önce NVM kurulumu yapılıyor..."
                     install_nvm
@@ -1584,7 +1598,7 @@ main() {
                 fi
                 install_opencode_cli
                 ;;
-            16)
+            17)
                 if [ "$NVM_INSTALLED" = false ]; then
                     echo -e "${YELLOW}[UYARI]${NC} Qoder CLI için önce NVM kurulumu yapılıyor..."
                     install_nvm
@@ -1592,7 +1606,7 @@ main() {
                 fi
                 install_qoder_cli
                 ;;
-            17)
+            18)
                 if [ "$NVM_INSTALLED" = false ]; then
                     echo -e "${YELLOW}[UYARI]${NC} Qwen CLI için önce NVM kurulumu yapılıyor..."
                     install_nvm
@@ -1600,16 +1614,13 @@ main() {
                 fi
                 install_qwen_cli
                 ;;
-            18)
+            19)
                 if [ "$NVM_INSTALLED" = false ]; then
                     echo -e "${YELLOW}[UYARI]${NC} Codex CLI için önce NVM kurulumu yapılıyor..."
                     install_nvm
                     NVM_INSTALLED=true
                 fi
                 install_codex_cli
-                ;;
-            19)
-                configure_git
                 ;;
             20)
                 configure_glm_claude

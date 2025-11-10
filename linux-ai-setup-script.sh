@@ -881,6 +881,52 @@ install_qwen_cli() {
     echo -e "${GREEN}[BAŞARILI]${NC} Qwen CLI kurulumu tamamlandı!"
 }
 
+# GitHub Copilot CLI kurulumu
+install_copilot_cli() {
+    local interactive_mode=${1:-true}
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu başlatılıyor..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    npm install -g @githubnext/github-copilot-cli
+
+    if command -v github-copilot-cli &> /dev/null; then
+        echo -e "${GREEN}[BAŞARILI]${NC} GitHub Copilot CLI sürümü: $(github-copilot-cli --version)"
+    else
+        echo -e "${RED}[HATA]${NC} GitHub Copilot CLI komutu bulunamadı. Kurulum adımlarını kontrol edin."
+        return 1
+    fi
+
+    if [ "$interactive_mode" = true ]; then
+        echo -e "\n${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
+        echo -e "${YELLOW}   GitHub Copilot CLI Kimlik Doğrulama Adımları:${NC}"
+        echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
+        echo -e "  ${GREEN}1.${NC} ${GREEN}github-copilot-cli auth login${NC} komutunu çalıştırın."
+        echo -e "  ${GREEN}2.${NC} Tarayıcıda açılan GitHub sayfasından Copilot erişimini onaylayın."
+        echo -e "  ${GREEN}3.${NC} ${GREEN}github-copilot-cli auth activate${NC} ile kabuk entegrasyonunu tamamlayın."
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi oturum açma adımlarını başlatıyoruz. Tamamlandığında bu pencereye dönün.\n"
+
+        github-copilot-cli auth login || echo -e "${YELLOW}[UYARI]${NC} Otomatik oturum açma başarısız olduysa komutu manuel olarak tekrarlayın."
+        github-copilot-cli auth activate || echo -e "${YELLOW}[UYARI]${NC} Shell entegrasyonu daha sonra manuel yapılabilir."
+
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Devam etmek için Enter'a basabilirsiniz."
+        read -r -p "Devam etmek için Enter'a basın..." _
+    else
+        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra '${GREEN}github-copilot-cli auth login${NC}' ve '${GREEN}github-copilot-cli auth activate${NC}' komutlarını çalıştırın."
+    fi
+
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI Kullanım İpuçları:"
+    echo -e "  ${GREEN}•${NC} Doğal dil ile kod üretimi: ${GREEN}github-copilot-cli suggest \"read a csv\"${NC}"
+    echo -e "  ${GREEN}•${NC} Terminal komutu oluşturma: ${GREEN}github-copilot-cli explain \"what does ls -la do\"${NC}"
+    echo -e "  ${GREEN}•${NC} Shell entegrasyonu: ${GREEN}eval \"$(github-copilot-cli alias -- \"bash\")\"${NC}"
+    echo -e "  ${GREEN}•${NC} Daha fazla bilgi: https://github.com/github/copilot-cli${NC}"
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    echo -e "\n${GREEN}[BAŞARILI]${NC} GitHub Copilot CLI kurulumu tamamlandı!"
+}
+
 # OpenAI Codex CLI kurulumu
 install_codex_cli() {
     local interactive_mode=${1:-true}
@@ -1083,7 +1129,8 @@ install_ai_cli_tools_menu() {
         echo -e "  ${GREEN}4${NC} - Qoder CLI"
         echo -e "  ${GREEN}5${NC} - Qwen CLI"
         echo -e "  ${GREEN}6${NC} - OpenAI Codex CLI"
-        echo -e "  ${GREEN}7${NC} - Tüm AI CLI Araçları"
+        echo -e "  ${GREEN}7${NC} - GitHub Copilot CLI"
+        echo -e "  ${GREEN}8${NC} - Tüm AI CLI Araçları"
         echo -e "  ${RED}0${NC} - Ana Menüye Dön"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
 
@@ -1105,13 +1152,16 @@ install_ai_cli_tools_menu() {
                 4) install_qoder_cli ;;
                 5) install_qwen_cli ;;
                 6) install_codex_cli ;;
-                7)
+                7) install_copilot_cli ;;
+                8)
                     install_claude_code false
                     install_gemini_cli false
                     install_opencode_cli false
                     install_qoder_cli false
                     install_qwen_cli false
                     install_codex_cli false
+                    install_copilot_cli false
+                    install_copilot_cli false
                     all_installed=true
                     ;;
                 *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;

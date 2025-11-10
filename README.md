@@ -5,13 +5,13 @@
 ## 🇬🇧 English Guide
 
 ### Overview
-`linux-ai-setup-script.sh` automates preparing a Linux workstation for AI development. It corrects accidental Windows CRLF endings, detects the system's package manager (`apt`, `dnf`, `yum`, `pacman`), upgrades the OS, and installs all required runtimes (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5). On top of that it bootstraps frequently used AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex) and Pipx-based AI frameworks (SuperGemini/SuperQwen/SuperClaude), plus helpers for Git, GLM-4.6 credentials, and MCP server cleanup.
+`linux-ai-setup-script.sh` automates preparing a Linux workstation for AI development. It corrects accidental Windows CRLF endings, detects the system's package manager (`apt`, `dnf`, `yum`, `pacman`), upgrades the OS, and installs all required runtimes (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5). On top of that it bootstraps frequently used AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) and Pipx-based AI frameworks (SuperGemini/SuperQwen/SuperClaude), plus helpers for Git, GLM-4.6 credentials, and MCP server cleanup.
 
 ### Features
 - Automatic package-manager detection, colored logging, and CRLF self-healing so the script can be checked into Git safely.
 - System upgrade + essential developer tooling (curl, wget, git, jq, zip/unzip, build toolchains).
 - Full Python toolchain (python3, pip, pipx, UV) and JavaScript runtimes (NVM-managed Node.js, Bun).
-- AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, and OpenAI Codex CLI.
+- AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI.
 - AI framework menu for SuperGemini, SuperQwen, SuperClaude with guided API-key prompts.
 - Removal menu to undo SuperGemini/SuperQwen/SuperClaude installs and purge their configs in one go.
 - PHP installer with selectable versions, Laravel-friendly extension packs, automatic Composer bootstrap, and version switcher.
@@ -47,7 +47,7 @@
   - `3-6` – Python stack: Python3, Pip, Pipx, UV.
   - `7-8` – JavaScript runtimes: NVM/Node.js and Bun.
   - `9-10` – PHP installer (7.4/8.x + extensions + Composer) and version switcher.
-  - `11` – AI CLI Tools menu (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex; choose individually or all).
+  - `11` – AI CLI Tools menu (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI; choose individually or all).
   - `12` – AI Frameworks menu (SuperGemini, SuperQwen, SuperClaude; installs via Pipx).
   - `13` – AI Framework removal menu (SuperGemini, SuperQwen, SuperClaude; uninstall + config cleanup).
   - `14` – Configure GLM-4.6 endpoint/key for Claude Code.
@@ -56,7 +56,7 @@
 - Within sub-menus, typing `0` returns to the previous screen. Prompts default to the safest option if you simply press `Enter`.
 
 ### Usage Details & Tips
-- **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api.
+- **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api. GitHub Copilot CLI opens your browser for `github-copilot-cli auth login` and supports shell aliases via `github-copilot-cli alias`.
 - **Privileges:** Package installations run via `sudo`; review the prompts before confirming. System upgrades may take several minutes.
 - **Environment updates:** The script appends PATH exports for Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`), and Bun (`~/.bun/bin`) to `~/.bashrc`, `~/.zshrc`, and `~/.profile` when present. Restart your shell or `source ~/.bashrc` afterwards.
 - **Idempotent behavior:** Re-running the script is safe; existing tools are detected, and missing components are installed. Use targeted menu selections for incremental updates (e.g., rerun option `11` to refresh AI CLIs).

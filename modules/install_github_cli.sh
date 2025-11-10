@@ -6,7 +6,7 @@
 # GitHub CLI kurulumu
 install_github_cli() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} GitHub CLI (gh) kurulumu başlatılıyor (https://github.com/cli/cli)...
+    echo -e "${YELLOW}[BİLGİ]${NC} GitHub CLI (gh) kurulumu başlatılıyor (referans: https://github.com/cli/cli)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if command -v gh &> /dev/null; then

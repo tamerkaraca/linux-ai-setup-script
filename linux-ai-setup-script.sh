@@ -1181,7 +1181,6 @@ register_php_alternative() {
     if command -v update-alternatives &> /dev/null; then
         sudo update-alternatives --install /usr/bin/php php "$binary_path" "$priority" >/dev/null 2>&1
     else
-        echo -e "${YELLOW}[UYARI]${NC} update-alternatives bulunamadı, varsayılan php symlink'i güncelleniyor."
         sudo ln -sf "$binary_path" /usr/bin/php
     fi
 }
@@ -1217,7 +1216,7 @@ install_php_version() {
                         pkg_name="php${version}-${ext}"
                         ;;
                 esac
-                pkg_map["$pkg_name"]=1
+                pkg_map["$pkg_name"] = 1
             done
             ;;
         dnf|yum)
@@ -1427,17 +1426,17 @@ show_menu() {
     echo -e "\n${CYAN}=== PHP Araçları ===${NC}"
     echo -e "  ${GREEN}9${NC} - PHP (7.4/8.x) kurulumu + Laravel eklentileri"
     echo -e "  ${GREEN}10${NC} - Kurulu PHP sürümleri arasında geçiş"
-    echo -e "\n${CYAN}=== AI Frameworks ===${NC}"
-    echo -e "  ${GREEN}11${NC}  - SuperGemini Framework (Pipx ile)"
-    echo -e "  ${GREEN}12${NC}  - SuperQwen Framework (Pipx ile)"
-    echo -e "  ${GREEN}13${NC}  - SuperClaude Framework (Pipx ile)"
     echo -e "\n${CYAN}=== AI CLI Araçları ===${NC}"
-    echo -e "  ${GREEN}14${NC} - Claude Code CLI"
-    echo -e "  ${GREEN}15${NC} - Gemini CLI"
-    echo -e "  ${GREEN}16${NC} - OpenCode CLI"
-    echo -e "  ${GREEN}17${NC} - Qoder CLI"
-    echo -e "  ${GREEN}18${NC} - Qwen CLI"
-    echo -e "  ${GREEN}19${NC} - OpenAI Codex CLI"
+    echo -e "  ${GREEN}11${NC} - Claude Code CLI"
+    echo -e "  ${GREEN}12${NC} - Gemini CLI"
+    echo -e "  ${GREEN}13${NC} - OpenCode CLI"
+    echo -e "  ${GREEN}14${NC} - Qoder CLI"
+    echo -e "  ${GREEN}15${NC} - Qwen CLI"
+    echo -e "  ${GREEN}16${NC} - OpenAI Codex CLI"
+    echo -e "\n${CYAN}=== AI Frameworks ===${NC}"
+    echo -e "  ${GREEN}17${NC}  - SuperGemini Framework (Pipx ile)"
+    echo -e "  ${GREEN}18${NC}  - SuperQwen Framework (Pipx ile)"
+    echo -e "  ${GREEN}19${NC}  - SuperClaude Framework (Pipx ile)"
     echo -e "\n${CYAN}=== Yapılandırma & Araçlar ===${NC}"
     echo -e "  ${GREEN}20${NC} - Claude Code için GLM-4.6 yapılandırması"
     echo -e "  ${GREEN}21${NC} - SuperGemini MCP Sunucu Yönetimi"
@@ -1539,6 +1538,54 @@ main() {
                 switch_php_version_menu
                 ;;
             11)
+                if [ "$NVM_INSTALLED" = false ]; then
+                    echo -e "${YELLOW}[UYARI]${NC} Claude Code için önce NVM kurulumu yapılıyor..."
+                    install_nvm
+                    NVM_INSTALLED=true
+                fi
+                install_claude_code
+                ;;
+            12)
+                if [ "$NVM_INSTALLED" = false ]; then
+                    echo -e "${YELLOW}[UYARI]${NC} Gemini CLI için önce NVM kurulumu yapılıyor..."
+                    install_nvm
+                    NVM_INSTALLED=true
+                fi
+                install_gemini_cli
+                ;;
+            13)
+                if [ "$NVM_INSTALLED" = false ]; then
+                    echo -e "${YELLOW}[UYARI]${NC} OpenCode CLI için önce NVM kurulumu yapılıyor..."
+                    install_nvm
+                    NVM_INSTALLED=true
+                fi
+                install_opencode_cli
+                ;;
+            14)
+                if [ "$NVM_INSTALLED" = false ]; then
+                    echo -e "${YELLOW}[UYARI]${NC} Qoder CLI için önce NVM kurulumu yapılıyor..."
+                    install_nvm
+                    NVM_INSTALLED=true
+                fi
+                install_qoder_cli
+                ;;
+            15)
+                if [ "$NVM_INSTALLED" = false ]; then
+                    echo -e "${YELLOW}[UYARI]${NC} Qwen CLI için önce NVM kurulumu yapılıyor..."
+                    install_nvm
+                    NVM_INSTALLED=true
+                fi
+                install_qwen_cli
+                ;;
+            16)
+                if [ "$NVM_INSTALLED" = false ]; then
+                    echo -e "${YELLOW}[UYARI]${NC} Codex CLI için önce NVM kurulumu yapılıyor..."
+                    install_nvm
+                    NVM_INSTALLED=true
+                fi
+                install_codex_cli
+                ;;
+            17)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperGemini için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1550,7 +1597,7 @@ main() {
                 fi
                 install_supergemini
                 ;;
-            12)
+            18)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperQwen için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1562,7 +1609,7 @@ main() {
                 fi
                 install_superqwen
                 ;;
-            13)
+            19)
                 if ! command -v pipx &> /dev/null; then
                     echo -e "${YELLOW}[UYARI]${NC} SuperClaude için önce Pipx kurulumu yapılıyor..."
                     if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
@@ -1573,54 +1620,6 @@ main() {
                     install_pipx
                 fi
                 install_superclaude
-                ;;
-            14)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Claude Code için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_claude_code
-                ;;
-            15)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Gemini CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_gemini_cli
-                ;;
-            16)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} OpenCode CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_opencode_cli
-                ;;
-            17)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Qoder CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_qoder_cli
-                ;;
-            18)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Qwen CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_qwen_cli
-                ;;
-            19)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    echo -e "${YELLOW}[UYARI]${NC} Codex CLI için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_codex_cli
                 ;;
             20)
                 configure_glm_claude

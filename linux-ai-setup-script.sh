@@ -594,6 +594,147 @@ install_superclaude() {
     echo -e "  ${GREEN}•${NC} Daha fazla bilgi: https://github.com/SuperClaude-Org/SuperClaude_Framework"
 }
 
+remove_supergemini() {
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini kaldırma işlemi başlatılıyor..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    local removal_performed=false
+
+    if command -v pipx &> /dev/null; then
+        if pipx list 2>/dev/null | grep -q "SuperGemini"; then
+            if pipx uninstall SuperGemini; then
+                echo -e "${GREEN}[BAŞARILI]${NC} SuperGemini pipx ortamından kaldırıldı."
+                removal_performed=true
+            else
+                echo -e "${RED}[HATA]${NC} SuperGemini pipx ortamından kaldırılamadı."
+            fi
+        else
+            echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini pipx ortamında bulunamadı."
+        fi
+    else
+        echo -e "${YELLOW}[UYARI]${NC} Pipx yüklü değil, doğrudan dosya temizliği yapılacak."
+    fi
+
+    local supergemini_paths=(
+        "$HOME/.config/SuperGemini"
+        "$HOME/.local/share/SuperGemini"
+        "$HOME/.cache/SuperGemini"
+        "$HOME/.SuperGemini"
+        "$HOME/.supergemini"
+    )
+
+    for path in "${supergemini_paths[@]}"; do
+        if [ -e "$path" ]; then
+            rm -rf "$path"
+            echo -e "${GREEN}[TEMİZLENDİ]${NC} $path"
+            removal_performed=true
+        fi
+    done
+
+    hash -r 2>/dev/null || true
+
+    if [ "$removal_performed" = true ]; then
+        echo -e "${GREEN}[BAŞARILI]${NC} SuperGemini kaldırma işlemi tamamlandı."
+    else
+        echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini için kaldırılacak bir bileşen bulunamadı."
+    fi
+}
+
+remove_superqwen() {
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen kaldırma işlemi başlatılıyor..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    local removal_performed=false
+
+    if command -v pipx &> /dev/null; then
+        if pipx list 2>/dev/null | grep -q "SuperQwen"; then
+            if pipx uninstall SuperQwen; then
+                echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen pipx ortamından kaldırıldı."
+                removal_performed=true
+            else
+                echo -e "${RED}[HATA]${NC} SuperQwen pipx ortamından kaldırılamadı."
+            fi
+        else
+            echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen pipx ortamında bulunamadı."
+        fi
+    else
+        echo -e "${YELLOW}[UYARI]${NC} Pipx yüklü değil, doğrudan dosya temizliği yapılacak."
+    fi
+
+    local superqwen_paths=(
+        "$HOME/.config/SuperQwen"
+        "$HOME/.local/share/SuperQwen"
+        "$HOME/.cache/SuperQwen"
+        "$HOME/.SuperQwen"
+        "$HOME/.superqwen"
+    )
+
+    for path in "${superqwen_paths[@]}"; do
+        if [ -e "$path" ]; then
+            rm -rf "$path"
+            echo -e "${GREEN}[TEMİZLENDİ]${NC} $path"
+            removal_performed=true
+        fi
+    done
+
+    hash -r 2>/dev/null || true
+
+    if [ "$removal_performed" = true ]; then
+        echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen kaldırma işlemi tamamlandı."
+    else
+        echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen için kaldırılacak bir bileşen bulunamadı."
+    fi
+}
+
+remove_superclaude() {
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude kaldırma işlemi başlatılıyor..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    local removal_performed=false
+
+    if command -v pipx &> /dev/null; then
+        if pipx list 2>/dev/null | grep -q "SuperClaude"; then
+            if pipx uninstall SuperClaude; then
+                echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude pipx ortamından kaldırıldı."
+                removal_performed=true
+            else
+                echo -e "${RED}[HATA]${NC} SuperClaude pipx ortamından kaldırılamadı."
+            fi
+        else
+            echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude pipx ortamında bulunamadı."
+        fi
+    else
+        echo -e "${YELLOW}[UYARI]${NC} Pipx yüklü değil, doğrudan dosya temizliği yapılacak."
+    fi
+
+    local superclaude_paths=(
+        "$HOME/.config/SuperClaude"
+        "$HOME/.local/share/SuperClaude"
+        "$HOME/.cache/SuperClaude"
+        "$HOME/.SuperClaude"
+        "$HOME/.superclaude"
+    )
+
+    for path in "${superclaude_paths[@]}"; do
+        if [ -e "$path" ]; then
+            rm -rf "$path"
+            echo -e "${GREEN}[TEMİZLENDİ]${NC} $path"
+            removal_performed=true
+        fi
+    done
+
+    hash -r 2>/dev/null || true
+
+    if [ "$removal_performed" = true ]; then
+        echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude kaldırma işlemi tamamlandı."
+    else
+        echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude için kaldırılacak bir bileşen bulunamadı."
+    fi
+}
+
 # Claude Code kurulumu
 install_claude_code() {
     local interactive_mode=${1:-true}
@@ -870,6 +1011,54 @@ install_ai_frameworks_menu() {
         fi
 
         read -p "Başka bir AI Framework kurmak ister misiniz? (e/h) [h]: " continue_choice
+        if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
+            break
+        fi
+    done
+}
+
+remove_ai_frameworks_menu() {
+    while true; do
+        echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║        AI Framework Kaldırma Menüsü           ║${NC}"
+        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+        echo -e "  ${GREEN}1${NC} - SuperGemini Framework'ü kaldır"
+        echo -e "  ${GREEN}2${NC} - SuperQwen Framework'ü kaldır"
+        echo -e "  ${GREEN}3${NC} - SuperClaude Framework'ü kaldır"
+        echo -e "  ${GREEN}4${NC} - Tüm AI Frameworklerini kaldır"
+        echo -e "  ${RED}0${NC} - Ana Menüye Dön"
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,3)"
+
+        read -p "Seçiminiz: " removal_choices
+        if [ "$removal_choices" = "0" ] || [ -z "$removal_choices" ]; then
+            echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
+            break
+        fi
+
+        local all_removed=false
+        IFS=',' read -ra SELECTED_REMOVE <<< "$removal_choices"
+
+        for choice in "${SELECTED_REMOVE[@]}"; do
+            choice=$(echo "$choice" | tr -d ' ')
+            case $choice in
+                1) remove_supergemini ;;
+                2) remove_superqwen ;;
+                3) remove_superclaude ;;
+                4)
+                    remove_supergemini
+                    remove_superqwen
+                    remove_superclaude
+                    all_removed=true
+                    ;;
+                *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;
+            esac
+        done
+
+        if [ "$all_removed" = true ]; then
+            break
+        fi
+
+        read -p "Başka bir AI Framework kaldırmak ister misiniz? (e/h) [h]: " continue_choice
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
         fi
@@ -1813,9 +2002,10 @@ show_menu() {
     echo -e "\n${CYAN}=== AI Araçları ve Frameworkler ===${NC}"
     echo -e "  ${GREEN}11${NC} - AI CLI Araçları Kurulum Menüsü"
     echo -e "  ${GREEN}12${NC} - AI Frameworks Kurulum Menüsü"
+    echo -e "  ${GREEN}13${NC} - AI Framework Kaldırma Menüsü"
     echo -e "\n${CYAN}=== Yapılandırma & Yönetim ===${NC}"
-    echo -e "  ${GREEN}13${NC} - Claude Code için GLM-4.6 yapılandırması"
-    echo -e "  ${GREEN}14${NC} - MCP Sunucu Yönetim Menüsü"
+    echo -e "  ${GREEN}14${NC} - Claude Code için GLM-4.6 yapılandırması"
+    echo -e "  ${GREEN}15${NC} - MCP Sunucu Yönetim Menüsü"
     echo -e "  ${RED}0${NC}  - Çıkış\n"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 2,3,4)"
     echo -e "${YELLOW}[BİLGİ]${NC} Python araçları için Python (3), Node.js araçları için NVM (7) gereklidir!\n"
@@ -1946,10 +2136,14 @@ main() {
                     action_performed=true
                     ;;
                 13)
-                    configure_glm_claude
+                    remove_ai_frameworks_menu
                     action_performed=true
                     ;;
                 14)
+                    configure_glm_claude
+                    action_performed=true
+                    ;;
+                15)
                     manage_mcp_servers_menu
                     action_performed=true
                     ;;

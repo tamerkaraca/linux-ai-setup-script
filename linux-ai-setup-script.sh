@@ -1787,125 +1787,158 @@ show_menu() {
 # Ana program
 main() {
     detect_package_manager
-    
-    show_menu
-    read -p "Seçiminiz: " choices
-    
-    NVM_INSTALLED=false
-    PYTHON_INSTALLED=false
-    
-    IFS=',' read -ra SELECTED <<< "$choices"
-    
-    for choice in "${SELECTED[@]}"; do
-        choice=$(echo "$choice" | tr -d ' ')
+
+    local NVM_INSTALLED=false
+    local PYTHON_INSTALLED=false
+
+    while true; do
+        show_menu
+        read -r -p "Seçiminiz: " choices
+
+        if [ -z "$choices" ]; then
+            echo -e "${YELLOW}[BİLGİ]${NC} Bir seçim yapmadınız. Lütfen tekrar deneyin."
+            continue
+        fi
+
+        local exit_requested=false
+        local action_performed=false
+        IFS=',' read -ra SELECTED <<< "$choices"
         
-        case $choice in
-            1)
-                # Hazırlık
-                prepare_and_configure_git
+        for choice in "${SELECTED[@]}"; do
+            choice=$(echo "$choice" | tr -d ' ')
+            if [ -z "$choice" ]; then
+                continue
+            fi
 
-                # Python araçları
-                install_python
-                PYTHON_INSTALLED=true
-                install_pip
-                install_pipx
-                install_uv
-                
-                # Node.js & JS Araçları
-                install_nvm
-                NVM_INSTALLED=true
-                install_bun
-                
-                # AI CLI araçları
-                install_claude_code false
-                install_gemini_cli false
-                install_opencode_cli false
-                install_qoder_cli false
-                install_qwen_cli false
-                install_codex_cli false
+            case $choice in
+                1)
+                    # Hazırlık
+                    prepare_and_configure_git
 
-                # AI Frameworks
-                install_ai_frameworks_menu
-                
-                # Diğer Yapılandırmalar
-                configure_glm_claude
-                
-                # MCP Yönetim
-                manage_mcp_servers_menu
-                ;;
-            2)
-                prepare_and_configure_git
-                ;;
-            3)
-                install_python
-                PYTHON_INSTALLED=true
-                ;;
-            4)
-                if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
-                    echo -e "${YELLOW}[UYARI]${NC} Pip için önce Python kurulumu yapılıyor..."
+                    # Python araçları
                     install_python
                     PYTHON_INSTALLED=true
-                fi
-                install_pip
-                ;;
-            5)
-                if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
-                    echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
+                    install_pip
+                    install_pipx
+                    install_uv
+                    
+                    # Node.js & JS Araçları
+                    install_nvm
+                    NVM_INSTALLED=true
+                    install_bun
+                    
+                    # AI CLI araçları
+                    install_claude_code false
+                    install_gemini_cli false
+                    install_opencode_cli false
+                    install_qoder_cli false
+                    install_qwen_cli false
+                    install_codex_cli false
+
+                    # AI Frameworks
+                    install_ai_frameworks_menu
+                    
+                    # Diğer Yapılandırmalar
+                    configure_glm_claude
+                    
+                    # MCP Yönetim
+                    manage_mcp_servers_menu
+                    action_performed=true
+                    ;;
+                2)
+                    prepare_and_configure_git
+                    action_performed=true
+                    ;;
+                3)
                     install_python
                     PYTHON_INSTALLED=true
-                fi
-                install_pipx
-                ;;
-            6)
-                install_uv
-                ;;
-            7)
-                if [ "$NVM_INSTALLED" = false ]; then
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                ;;
-            8)
-                install_bun
-                ;;
-            9)
-                install_php_version_menu
-                ;;
-            10)
-                switch_php_version_menu
-                ;;
-            11)
-                if [ "$NVM_INSTALLED" = false ] && ! command -v nvm &> /dev/null; then
-                    echo -e "${YELLOW}[UYARI]${NC} AI CLI araçları için önce NVM kurulumu yapılıyor..."
-                    install_nvm
-                    NVM_INSTALLED=true
-                fi
-                install_ai_cli_tools_menu
-                ;;
-            12)
-                install_ai_frameworks_menu
-                ;;
-            13)
-                configure_glm_claude
-                ;;
-            14)
-                manage_mcp_servers_menu
-                ;;
-            0)
-                echo -e "${RED}[ÇIKIŞ]${NC} Script sonlandırılıyor..."
-                exit 0
-                ;;
-            *)
-                echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice"
-                ;;
-        esac
+                    action_performed=true
+                    ;;
+                4)
+                    if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
+                        echo -e "${YELLOW}[UYARI]${NC} Pip için önce Python kurulumu yapılıyor..."
+                        install_python
+                        PYTHON_INSTALLED=true
+                    fi
+                    install_pip
+                    action_performed=true
+                    ;;
+                5)
+                    if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
+                        echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
+                        install_python
+                        PYTHON_INSTALLED=true
+                    fi
+                    install_pipx
+                    action_performed=true
+                    ;;
+                6)
+                    install_uv
+                    action_performed=true
+                    ;;
+                7)
+                    if [ "$NVM_INSTALLED" = false ]; then
+                        install_nvm
+                        NVM_INSTALLED=true
+                    fi
+                    action_performed=true
+                    ;;
+                8)
+                    install_bun
+                    action_performed=true
+                    ;;
+                9)
+                    install_php_version_menu
+                    action_performed=true
+                    ;;
+                10)
+                    switch_php_version_menu
+                    action_performed=true
+                    ;;
+                11)
+                    if [ "$NVM_INSTALLED" = false ] && ! command -v nvm &> /dev/null; then
+                        echo -e "${YELLOW}[UYARI]${NC} AI CLI araçları için önce NVM kurulumu yapılıyor..."
+                        install_nvm
+                        NVM_INSTALLED=true
+                    fi
+                    install_ai_cli_tools_menu
+                    action_performed=true
+                    ;;
+                12)
+                    install_ai_frameworks_menu
+                    action_performed=true
+                    ;;
+                13)
+                    configure_glm_claude
+                    action_performed=true
+                    ;;
+                14)
+                    manage_mcp_servers_menu
+                    action_performed=true
+                    ;;
+                0)
+                    exit_requested=true
+                    break
+                    ;;
+                *)
+                    echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice"
+                    ;;
+            esac
+        done
+
+        if [ "$exit_requested" = true ]; then
+            echo -e "${RED}[ÇIKIŞ]${NC} Script sonlandırılıyor..."
+            break
+        fi
+        
+        if [ "$action_performed" = true ]; then
+            echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+            echo -e "${GREEN}[TAMAMLANDI]${NC} İşlemler tamamlandı! Ana menüye dönülüyor..."
+            echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+            echo -e "${YELLOW}[BİLGİ]${NC} Değişikliklerin etkin olması için terminal oturumunuzu yenileyin:"
+            echo -e "        ${GREEN}source ~/.bashrc${NC} veya ${GREEN}source ~/.zshrc${NC}\n"
+        fi
     done
-    
-    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${GREEN}[TAMAMLANDI]${NC} Kurulum işlemleri tamamlandı!"
-    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-    echo -e "${YELLOW}[BİLGİ]${NC} Değişikliklerin etkin olması için terminal oturumunuzu yenileyin:"
-    echo -e "        ${GREEN}source ~/.bashrc${NC} veya ${GREEN}source ~/.zshrc${NC}\n"
 }
 
 main

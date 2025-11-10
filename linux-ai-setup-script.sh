@@ -1161,7 +1161,6 @@ install_ai_cli_tools_menu() {
                     install_qwen_cli false
                     install_codex_cli false
                     install_copilot_cli false
-                    install_copilot_cli false
                     all_installed=true
                     ;;
                 *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;
@@ -2117,6 +2116,7 @@ main() {
                     install_qoder_cli false
                     install_qwen_cli false
                     install_codex_cli false
+                    install_copilot_cli false
 
                     # AI Frameworks
                     install_ai_frameworks_menu

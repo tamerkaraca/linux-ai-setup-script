@@ -766,6 +766,7 @@ install_ai_cli_tools_menu() {
             break
         fi
 
+        local all_installed=false
         IFS=',' read -ra SELECTED_CLI <<< "$cli_choices"
 
         for choice in "${SELECTED_CLI[@]}"; do
@@ -784,11 +785,16 @@ install_ai_cli_tools_menu() {
                     install_qoder_cli
                     install_qwen_cli
                     install_codex_cli
+                    all_installed=true
                     ;;
                 *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;
             esac
         done
         
+        if [ "$all_installed" = true ]; then
+            break
+        fi
+
         read -p "Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]: " continue_choice
         if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
             break
@@ -807,24 +813,35 @@ configure_git() {
         return 1
     fi
 
+    # Mevcut değerleri al
+    local current_name
+    current_name=$(git config --global user.name)
+    local current_email
+    current_email=$(git config --global user.email)
+
     echo -e "${YELLOW}[BİLGİ]${NC} Lütfen global .gitconfig için bilgilerinizi girin."
-    echo -e "${CYAN}Not: Bu bilgiler commit atarken kullanılacaktır. (Boş bırakmak için Enter'a basın)${NC}"
+    echo -e "${CYAN}Not: Bu bilgiler commit atarken kullanılacaktır. (Mevcut değeri korumak için Enter'a basın)${NC}"
 
-    read -p "Git Kullanıcı Adınız (örn: Tamer KARACA): " GIT_USER_NAME
-    read -p "Git E-posta Adresiniz (örn: tamer@smedyazilim.com): " GIT_USER_EMAIL
+    # Yeni kullanıcı adını sor
+    read -p "Git Kullanıcı Adınız [${current_name:-örn: Tamer KARACA}]: " GIT_USER_NAME
+    
+    # Yeni e-postayı sor
+    read -p "Git E-posta Adresiniz [${current_email:-örn: tamer@smedyazilim.com}]: " GIT_USER_EMAIL
 
+    # Eğer yeni bir değer girildiyse güncelle
     if [ -n "$GIT_USER_NAME" ]; then
         git config --global user.name "$GIT_USER_NAME"
         echo -e "${GREEN}[BAŞARILI]${NC} Git kullanıcı adı ayarlandı: $GIT_USER_NAME"
     else
-        echo -e "${YELLOW}[BİLGİ]${NC} Kullanıcı adı boş bırakıldı, ayarlanmadı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Kullanıcı adı değiştirilmedi, mevcut değer korunuyor: ${current_name:-'Ayarlanmamış'}"
     fi
 
+    # Eğer yeni bir değer girildiyse güncelle
     if [ -n "$GIT_USER_EMAIL" ]; then
         git config --global user.email "$GIT_USER_EMAIL"
         echo -e "${GREEN}[BAŞARILI]${NC} Git e-posta adresi ayarlandı: $GIT_USER_EMAIL"
     else
-        echo -e "${YELLOW}[BİLGİ]${NC} E-posta adresi boş bırakıldı, ayarlanmadı."
+        echo -e "${YELLOW}[BİLGİ]${NC} E-posta adresi değiştirilmedi, mevcut değer korunuyor: ${current_email:-'Ayarlanmamış'}"
     fi
 
     echo -e "${GREEN}[BAŞARILI]${NC} Git yapılandırması tamamlandı."

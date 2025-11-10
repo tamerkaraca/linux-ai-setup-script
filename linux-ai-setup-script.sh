@@ -1797,7 +1797,7 @@ show_menu() {
     echo -e "${BLUE}║   Kurmak istediğiniz araçları seçin:          ║${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
     echo -e "${CYAN}=== Temel Kurulum ===${NC}"
-    echo -e "  ${GREEN}1${NC}  - Tümünü kur (Tüm araçlar)"
+    echo -e "  ${GREEN}1${NC}  - Tümünü kur (Sistem güncelleme, Git, Python/Pip/Pipx/UV, NVM/Node.js/Bun, AI CLI + Framework + GLM + MCP)"
     echo -e "  ${GREEN}2${NC}  - Kurulum Hazırlığı (Sistem Güncelleme, Temel Araçlar ve Git)"
     echo -e "\n${CYAN}=== Python Araçları ===${NC}"
     echo -e "  ${GREEN}3${NC}  - Python3 kurulumu"

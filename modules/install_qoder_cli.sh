@@ -75,7 +75,7 @@ install_npm_cli() {
     local dry_run="${4:-false}"
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} kurulumu https://docs.qoder.com/cli/quick-start rehberine göre başlatılıyor..."
+    echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} kurulumu başlatılıyor (referans: https://docs.qoder.com/cli/quick-start)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if command -v "$binary_name" &> /dev/null; then

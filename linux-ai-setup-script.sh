@@ -744,6 +744,65 @@ install_codex_cli() {
     echo -e "\n${GREEN}[BAŞARILI]${NC} OpenAI Codex CLI kurulumu tamamlandı!"
 }
 
+# AI Frameworks menüsü
+install_ai_frameworks_menu() {
+    while true; do
+        echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║          AI Frameworks Kurulum Menüsü         ║${NC}"
+        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+        echo -e "  ${GREEN}1${NC} - SuperGemini Framework"
+        echo -e "  ${GREEN}2${NC} - SuperQwen Framework"
+        echo -e "  ${GREEN}3${NC} - SuperClaude Framework"
+        echo -e "  ${GREEN}4${NC} - Tüm AI Frameworkleri"
+        echo -e "  ${RED}0${NC} - Ana Menüye Dön"
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2)"
+
+        read -p "Seçiminiz: " framework_choices
+        if [ "$framework_choices" = "0" ] || [ -z "$framework_choices" ]; then
+            echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
+            break
+        fi
+
+        # Pipx kontrolü
+        if ! command -v pipx &> /dev/null; then
+            echo -e "${YELLOW}[UYARI]${NC} AI Frameworks için önce Pipx kurulumu yapılıyor..."
+            if ! command -v python3 &> /dev/null; then
+                 echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
+                 install_python
+            fi
+            install_pipx
+        fi
+
+        local all_installed=false
+        IFS=',' read -ra SELECTED_FW <<< "$framework_choices"
+
+        for choice in "${SELECTED_FW[@]}"; do
+            choice=$(echo "$choice" | tr -d ' ')
+            case $choice in
+                1) install_supergemini ;;
+                2) install_superqwen ;;
+                3) install_superclaude ;;
+                4)
+                    install_supergemini
+                    install_superqwen
+                    install_superclaude
+                    all_installed=true
+                    ;;
+                *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;
+            esac
+        done
+        
+        if [ "$all_installed" = true ]; then
+            break
+        fi
+
+        read -p "Başka bir AI Framework kurmak ister misiniz? (e/h) [h]: " continue_choice
+        if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
+            break
+        fi
+    done
+}
+
 # AI CLI Araçları menüsü
 install_ai_cli_tools_menu() {
     while true; do
@@ -1506,14 +1565,12 @@ show_menu() {
     echo -e "  ${GREEN}10${NC} - Kurulu PHP sürümleri arasında geçiş"
     echo -e "\n${CYAN}=== AI Araçları ve Frameworkler ===${NC}"
     echo -e "  ${GREEN}11${NC} - AI CLI Araçları Kurulum Menüsü"
-    echo -e "  ${GREEN}12${NC} - SuperGemini Framework (Pipx ile)"
-    echo -e "  ${GREEN}13${NC} - SuperQwen Framework (Pipx ile)"
-    echo -e "  ${GREEN}14${NC} - SuperClaude Framework (Pipx ile)"
+    echo -e "  ${GREEN}12${NC} - AI Frameworks Kurulum Menüsü"
     echo -e "\n${CYAN}=== Yapılandırma & Yönetim ===${NC}"
-    echo -e "  ${GREEN}15${NC} - Claude Code için GLM-4.6 yapılandırması"
-    echo -e "  ${GREEN}16${NC} - SuperGemini MCP Sunucu Yönetimi"
-    echo -e "  ${GREEN}17${NC} - SuperQwen MCP Sunucu Yönetimi"
-    echo -e "  ${GREEN}18${NC} - SuperClaude MCP Sunucu Yönetimi"
+    echo -e "  ${GREEN}13${NC} - Claude Code için GLM-4.6 yapılandırması"
+    echo -e "  ${GREEN}14${NC} - SuperGemini MCP Sunucu Yönetimi"
+    echo -e "  ${GREEN}15${NC} - SuperQwen MCP Sunucu Yönetimi"
+    echo -e "  ${GREEN}16${NC} - SuperClaude MCP Sunucu Yönetimi"
     echo -e "  ${RED}0${NC}  - Çıkış\n"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 2,3,4)"
     echo -e "${YELLOW}[BİLGİ]${NC} Python araçları için Python (3), Node.js araçları için NVM (7) gereklidir!\n"
@@ -1555,9 +1612,7 @@ main() {
                 install_ai_cli_tools_menu
 
                 # AI Frameworks
-                install_supergemini
-                install_superqwen
-                install_superclaude
+                install_ai_frameworks_menu
                 
                 # Diğer Yapılandırmalar
                 configure_glm_claude
@@ -1612,51 +1667,18 @@ main() {
                 install_ai_cli_tools_menu
                 ;;
             12)
-                if ! command -v pipx &> /dev/null; then
-                    echo -e "${YELLOW}[UYARI]${NC} SuperGemini için önce Pipx kurulumu yapılıyor..."
-                    if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
-                         echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
-                         install_python
-                         PYTHON_INSTALLED=true
-                    fi
-                    install_pipx
-                fi
-                install_supergemini
+                install_ai_frameworks_menu
                 ;;
             13)
-                if ! command -v pipx &> /dev/null; then
-                    echo -e "${YELLOW}[UYARI]${NC} SuperQwen için önce Pipx kurulumu yapılıyor..."
-                    if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
-                         echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
-                         install_python
-                         PYTHON_INSTALLED=true
-                    fi
-                    install_pipx
-                fi
-                install_superqwen
-                ;;
-            14)
-                if ! command -v pipx &> /dev/null; then
-                    echo -e "${YELLOW}[UYARI]${NC} SuperClaude için önce Pipx kurulumu yapılıyor..."
-                    if [ "$PYTHON_INSTALLED" = false ] && ! command -v python3 &> /dev/null; then
-                         echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
-                         install_python
-                         PYTHON_INSTALLED=true
-                    fi
-                    install_pipx
-                fi
-                install_superclaude
-                ;;
-            15)
                 configure_glm_claude
                 ;;
-            16)
+            14)
                 cleanup_magic_mcp
                 ;;
-            17)
+            15)
                 cleanup_qwen_mcp
                 ;;
-            18)
+            16)
                 cleanup_claude_mcp
                 ;;
             0)

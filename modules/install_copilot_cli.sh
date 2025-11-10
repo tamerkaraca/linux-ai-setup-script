@@ -7,7 +7,7 @@
 install_copilot_cli() {
     local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu (https://github.com/github/copilot-cli talimatları) başlatılıyor..."
+    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu başlatılıyor (referans: https://github.com/github/copilot-cli)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if ! npm install -g @github/copilot; then

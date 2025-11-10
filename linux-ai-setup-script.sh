@@ -980,6 +980,55 @@ EOF
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 }
 
+# MCP Sunucu Yönetimi menüsü
+manage_mcp_servers_menu() {
+    while true; do
+        echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║            MCP Sunucu Yönetim Menüsü          ║${NC}"
+        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+        echo -e "  ${GREEN}1${NC} - SuperGemini MCP Sunucu Yönetimi"
+        echo -e "  ${GREEN}2${NC} - SuperQwen MCP Sunucu Yönetimi"
+        echo -e "  ${GREEN}3${NC} - SuperClaude MCP Sunucu Yönetimi"
+        echo -e "  ${GREEN}4${NC} - Tüm Sunucuları Yönet"
+        echo -e "  ${RED}0${NC} - Ana Menüye Dön"
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2)"
+
+        read -p "Seçiminiz: " mcp_choices
+        if [ "$mcp_choices" = "0" ] || [ -z "$mcp_choices" ]; then
+            echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
+            break
+        fi
+
+        local all_managed=false
+        IFS=',' read -ra SELECTED_MCP <<< "$mcp_choices"
+
+        for choice in "${SELECTED_MCP[@]}"; do
+            choice=$(echo "$choice" | tr -d ' ')
+            case $choice in
+                1) cleanup_magic_mcp ;;
+                2) cleanup_qwen_mcp ;;
+                3) cleanup_claude_mcp ;;
+                4)
+                    cleanup_magic_mcp
+                    cleanup_qwen_mcp
+                    cleanup_claude_mcp
+                    all_managed=true
+                    ;;
+                *) echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice" ;;
+            esac
+        done
+        
+        if [ "$all_managed" = true ]; then
+            break
+        fi
+
+        read -p "Başka bir sunucu yönetmek ister misiniz? (e/h) [h]: " continue_choice
+        if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
+            break
+        fi
+    done
+}
+
 # SuperGemini MCP Sunucu Temizleme
 cleanup_magic_mcp() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
@@ -1568,9 +1617,7 @@ show_menu() {
     echo -e "  ${GREEN}12${NC} - AI Frameworks Kurulum Menüsü"
     echo -e "\n${CYAN}=== Yapılandırma & Yönetim ===${NC}"
     echo -e "  ${GREEN}13${NC} - Claude Code için GLM-4.6 yapılandırması"
-    echo -e "  ${GREEN}14${NC} - SuperGemini MCP Sunucu Yönetimi"
-    echo -e "  ${GREEN}15${NC} - SuperQwen MCP Sunucu Yönetimi"
-    echo -e "  ${GREEN}16${NC} - SuperClaude MCP Sunucu Yönetimi"
+    echo -e "  ${GREEN}14${NC} - MCP Sunucu Yönetim Menüsü"
     echo -e "  ${RED}0${NC}  - Çıkış\n"
     echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 2,3,4)"
     echo -e "${YELLOW}[BİLGİ]${NC} Python araçları için Python (3), Node.js araçları için NVM (7) gereklidir!\n"
@@ -1616,6 +1663,9 @@ main() {
                 
                 # Diğer Yapılandırmalar
                 configure_glm_claude
+                
+                # MCP Yönetim
+                manage_mcp_servers_menu
                 ;;
             2)
                 prepare_and_configure_git
@@ -1673,13 +1723,7 @@ main() {
                 configure_glm_claude
                 ;;
             14)
-                cleanup_magic_mcp
-                ;;
-            15)
-                cleanup_qwen_mcp
-                ;;
-            16)
-                cleanup_claude_mcp
+                manage_mcp_servers_menu
                 ;;
             0)
                 echo -e "${RED}[ÇIKIŞ]${NC} Script sonlandırılıyor..."

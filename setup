@@ -36,6 +36,7 @@ run_module() {
     fi
     return 0
 }
+export -f run_module
 
 # Ana menü
 main_menu() {

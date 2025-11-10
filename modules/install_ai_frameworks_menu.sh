@@ -18,7 +18,6 @@ run_module() {
 # AI Frameworks menüsü
 install_ai_frameworks_menu() {
 
-    
     local install_all="${1:-}" # "all" parametresi gelirse hepsini kur
 
     while true; do

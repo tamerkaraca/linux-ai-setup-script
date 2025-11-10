@@ -8,8 +8,6 @@ source "./modules/utils.sh"
 
 # AI CLI Araçları menüsü
 install_ai_cli_tools_menu() {
-
-
     local install_all="${1:-}" # "all" parametresi gelirse hepsini kur
 
     while true; do

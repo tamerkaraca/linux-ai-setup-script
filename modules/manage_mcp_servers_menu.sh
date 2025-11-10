@@ -74,7 +74,8 @@ print_mcp_servers() {
 list_all_mcp_servers() {
     local any_listed=false
     for entry in "${MCP_TARGETS[@]}"; do
-        IFS=':::' read -r label file <<< "$entry"
+        local label="${entry%%:::*}"
+        local file="${entry#*:::}"
         if print_mcp_servers "$label" "$file"; then
             any_listed=true
         fi

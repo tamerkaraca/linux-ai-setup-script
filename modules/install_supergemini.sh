@@ -1,7 +1,20 @@
 #!/bin/bash
+set -euo pipefail
 
 # Ortak yardımcı fonksiyonları yükle
+UTILS_PATH="./modules/utils.sh"
+if [ ! -f "$UTILS_PATH" ] && [ -n "${BASH_SOURCE[0]:-}" ]; then
+    UTILS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils.sh"
+fi
+# shellcheck source=/dev/null
+[ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
+: "${RED:=$'\033[0;31m'}"
+: "${GREEN:=$'\033[0;32m'}"
+: "${YELLOW:=$'\033[1;33m'}"
+: "${BLUE:=$'\033[0;34m'}"
+: "${CYAN:=$'\033[0;36m'}"
+: "${NC:=$'\033[0m'}"
 
 # SuperGemini Framework kurulumu (Pipx ile)
 install_supergemini() {
@@ -18,7 +31,7 @@ install_supergemini() {
         fi
     fi
     
-    reload_shell_configs
+    reload_shell_configs silent
     export PATH="$HOME/.local/bin:$PATH"
 
     echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini indiriliyor ve kuruluyor (pipx)..."
@@ -61,15 +74,22 @@ install_supergemini() {
     echo -e "${YELLOW}[BİLGİ]${NC} $SETUP_CMD komutu çalıştırılıyor..."
     echo -e "${YELLOW}[BİLGİ]${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
     
+    local install_success="true"
     if [ "$setup_choice" = "2" ]; then
-        SuperGemini install --profile minimal --yes
+        if ! SuperGemini install --profile minimal --yes; then
+            install_success="false"
+        fi
     elif [ "$setup_choice" = "3" ]; then
-        SuperGemini install --profile full --yes
+        if ! SuperGemini install --profile full --yes; then
+            install_success="false"
+        fi
     else
-        SuperGemini install --yes
+        if ! SuperGemini install --yes; then
+            install_success="false"
+        fi
     fi
     
-    if [ $? -ne 0 ]; then
+    if [ "$install_success" != "true" ]; then
         echo -e "${RED}[HATA]${NC} SuperGemini 'install' komutu başarısız!"
         echo -e "${YELLOW}[BİLGİ]${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperGemini install${NC}' komutuyla yapılandırabilirsiniz."
     else

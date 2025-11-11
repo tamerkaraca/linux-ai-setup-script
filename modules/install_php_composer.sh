@@ -380,30 +380,52 @@ main() {
                     break
                     ;;
                 1)
-                    local php_version_choice
-                    while true; do
-                        echo -e "\n${YELLOW}Kurmak istediğiniz PHP sürümünü seçin:${NC}"
+                local selected_versions=()
+                while true; do
+                    echo -e "\n${YELLOW}Kurmak istediğiniz PHP sürümünü seçin:${NC}"
                     local i=1
                     for ver in "${PHP_SUPPORTED_VERSIONS[@]}"; do
                         echo -e "  ${GREEN}${i}${NC} - PHP ${ver}"
                         i=$((i+1))
                     done
                     echo -e "  ${RED}0${NC} - İptal"
-                    read -r -p "Seçiminiz (1-${#PHP_SUPPORTED_VERSIONS[@]}, veya 0): " choice </dev/tty
+                    read -r -p "Seçiminiz (örn: 1 veya 1,3,5): " choice </dev/tty
 
                     if [ "$choice" = "0" ]; then
-                        php_version_choice=""
+                        selected_versions=()
                         break
-                    elif [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#PHP_SUPPORTED_VERSIONS[@]}" ]; then
-                        php_version_choice="${PHP_SUPPORTED_VERSIONS[$((choice-1))]}"
+                    fi
+
+                    if [ -z "$(echo "$choice" | tr -d '[:space:]')" ]; then
+                        echo -e "${YELLOW}[UYARI]${NC} Bir seçim yapmadınız."
+                        continue
+                    fi
+
+                    IFS=',' read -ra VERSION_CHOICES <<< "$choice"
+                    local valid=true
+                    local tmp_versions=()
+                    for c in "${VERSION_CHOICES[@]}"; do
+                        c=$(echo "$c" | tr -d '[:space:]')
+                        if ! [[ "$c" =~ ^[0-9]+$ ]] || [ "$c" -lt 1 ] || [ "$c" -gt "${#PHP_SUPPORTED_VERSIONS[@]}" ]; then
+                            echo -e "${RED}[HATA]${NC} Geçersiz seçim: $c"
+                            valid=false
+                            break
+                        fi
+                        tmp_versions+=("${PHP_SUPPORTED_VERSIONS[$((c-1))]}")
+                    done
+
+                    if [ "$valid" = true ] && [ "${#tmp_versions[@]}" -gt 0 ]; then
+                        selected_versions=("${tmp_versions[@]}")
                         break
-                    else
-                        echo -e "${RED}[HATA]${NC} Geçersiz seçim. Lütfen tekrar deneyin."
                     fi
                 done
 
-                if [ -n "$php_version_choice" ]; then
-                    install_php_version "$php_version_choice" && install_composer && reload_shell_configs
+                if [ "${#selected_versions[@]}" -gt 0 ]; then
+                    for php_version_choice in "${selected_versions[@]}"; do
+                        install_php_version "$php_version_choice" || continue
+                    done
+                    install_composer
+                    reload_shell_configs
                 fi
                 ;;
                 2)

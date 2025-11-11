@@ -357,18 +357,32 @@ main() {
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     while true; do
-        echo -e "\n${YELLOW}Bir işlem seçin:${NC}"
+        echo -e "\n${YELLOW}Bir işlem seçin (virgülle çoklu seçim mümkün, örn: 1,3):${NC}"
         echo -e "  ${GREEN}1${NC} - PHP sürümü kur"
         echo -e "  ${GREEN}2${NC} - Kurulu PHP sürümünü değiştir"
         echo -e "  ${GREEN}3${NC} - Composer durumunu denetle"
         echo -e "  ${RED}0${NC} - Ana menüye dön"
         read -r -p "Seçiminiz: " menu_choice </dev/tty
 
-        case "$menu_choice" in
-            1)
-                local php_version_choice
-                while true; do
-                    echo -e "\n${YELLOW}Kurmak istediğiniz PHP sürümünü seçin:${NC}"
+        if [ -z "$(echo "$menu_choice" | tr -d '[:space:]')" ]; then
+            echo -e "${YELLOW}[UYARI]${NC} Bir seçim yapmadınız."
+            continue
+        fi
+
+        IFS=',' read -ra MENU_CHOICES <<< "$menu_choice"
+        local exit_menu=false
+
+        for raw_choice in "${MENU_CHOICES[@]}"; do
+            choice=$(echo "$raw_choice" | tr -d '[:space:]')
+            case "${choice^^}" in
+                0)
+                    exit_menu=true
+                    break
+                    ;;
+                1)
+                    local php_version_choice
+                    while true; do
+                        echo -e "\n${YELLOW}Kurmak istediğiniz PHP sürümünü seçin:${NC}"
                     local i=1
                     for ver in "${PHP_SUPPORTED_VERSIONS[@]}"; do
                         echo -e "  ${GREEN}${i}${NC} - PHP ${ver}"
@@ -392,20 +406,22 @@ main() {
                     install_php_version "$php_version_choice" && install_composer && reload_shell_configs
                 fi
                 ;;
-            2)
-                switch_php_version
+                2)
+                    switch_php_version
                 ;;
-            3)
-                install_composer
+                3)
+                    install_composer
                 ;;
-            0)
-                echo -e "${YELLOW}[BİLGİ]${NC} PHP menüsünden çıkılıyor."
-                break
-                ;;
-            *)
-                echo -e "${RED}[HATA]${NC} Geçersiz seçim."
-                ;;
-        esac
+                *)
+                    echo -e "${RED}[HATA]${NC} Geçersiz seçim: $raw_choice"
+                    ;;
+            esac
+        done
+
+        if [ "$exit_menu" = true ]; then
+            echo -e "${YELLOW}[BİLGİ]${NC} PHP menüsünden çıkılıyor."
+            break
+        fi
     done
 }
 

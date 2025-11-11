@@ -75,6 +75,86 @@ resolve_php_binary_path() {
     return 1
 }
 
+list_installed_php_versions() {
+    declare -A installed=()
+    for ver in "${PHP_SUPPORTED_VERSIONS[@]}"; do
+        local path
+        path=$(resolve_php_binary_path "$ver") || true
+        if [ -n "$path" ]; then
+            installed["$ver"]="$path"
+        fi
+    done
+    if [ "${#installed[@]}" -eq 0 ]; then
+        return 1
+    fi
+    for ver in "${!installed[@]}"; do
+        printf "%s:::%s\n" "$ver" "${installed[$ver]}"
+    done | sort -t: -k1
+    return 0
+}
+
+switch_php_version() {
+    mapfile -t INSTALLED_PHP < <(list_installed_php_versions 2>/dev/null)
+    if [ "${#INSTALLED_PHP[@]}" -eq 0 ]; then
+        echo -e "${YELLOW}[BİLGİ]${NC} Sistemde kayıtlı PHP sürümü bulunamadı. Önce kurulum yapın."
+        return 1
+    fi
+    if [ "${#INSTALLED_PHP[@]}" -eq 1 ]; then
+        local only_ver only_path
+        IFS=':::' read -r only_ver only_path <<< "${INSTALLED_PHP[0]}"
+        echo -e "${YELLOW}[BİLGİ]${NC} Yalnızca PHP ${only_ver} (${only_path}) bulundu; varsayılan zaten bu sürüm."
+        return 0
+    fi
+
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} Aktif PHP sürümünü değiştirmek için seçim yapın:"
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    local idx=1
+    for entry in "${INSTALLED_PHP[@]}"; do
+        IFS=':::' read -r ver path <<< "$entry"
+        echo -e "  ${GREEN}${idx}${NC} - PHP ${ver} (${path})"
+        idx=$((idx + 1))
+    done
+    echo -e "  ${RED}0${NC} - İptal"
+
+    local selection
+    read -r -p "Seçiminiz: " selection </dev/tty
+
+    if [ "$selection" = "0" ] || [ -z "$selection" ]; then
+        echo -e "${YELLOW}[BİLGİ]${NC} PHP sürüm değiştirme iptal edildi."
+        return 0
+    fi
+    if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt "${#INSTALLED_PHP[@]}" ]; then
+        echo -e "${RED}[HATA]${NC} Geçersiz seçim."
+        return 1
+    fi
+
+    local chosen
+    chosen="${INSTALLED_PHP[$((selection-1))]}"
+    IFS=':::' read -r chosen_ver chosen_path <<< "$chosen"
+
+    register_php_alternative "$chosen_ver" "$chosen_path"
+
+    if command -v update-alternatives &> /dev/null; then
+        if sudo update-alternatives --set php "$chosen_path" >/dev/null 2>&1; then
+            echo -e "${GREEN}[BAŞARILI]${NC} PHP varsayılanı PHP ${chosen_ver} olarak güncellendi."
+        else
+            echo -e "${YELLOW}[UYARI]${NC} update-alternatives başarısız oldu, sembolik bağ güncelleniyor."
+            sudo ln -sf "$chosen_path" /usr/bin/php
+        fi
+    else
+        sudo ln -sf "$chosen_path" /usr/bin/php
+        echo -e "${GREEN}[BİLGİ]${NC} /usr/bin/php -> ${chosen_path} olarak güncellendi."
+    fi
+
+    if command -v php &> /dev/null; then
+        local active
+        active=$(php -v 2>/dev/null | head -n1)
+        echo -e "${CYAN}[BİLGİ]${NC} Güncel PHP çıktısı: ${GREEN}${active}${NC}"
+    fi
+}
+
 register_php_alternative() {
     local version="$1"
     local binary_path="$2"
@@ -272,38 +352,61 @@ install_php_version() {
 
 # Ana kurulum akışı
 main() {
-
-
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} PHP ve Composer Kurulumu Başlatılıyor..."
+    echo -e "${YELLOW}[BİLGİ]${NC} PHP ve Composer Kurulum Menüsü"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    local php_version_choice
     while true; do
-        echo -e "\n${YELLOW}Kurmak istediğiniz PHP sürümünü seçin:${NC}"
-        local i=1
-        for ver in "${PHP_SUPPORTED_VERSIONS[@]}"; do
-            echo -e "  ${GREEN}${i}${NC} - PHP ${ver}"
-            i=$((i+1))
-        done
-        echo -e "  ${RED}0${NC} - İptal"
-        read -r -p "Seçiminiz (1-${#PHP_SUPPORTED_VERSIONS[@]}, veya 0): " choice </dev/tty
+        echo -e "\n${YELLOW}Bir işlem seçin:${NC}"
+        echo -e "  ${GREEN}1${NC} - PHP sürümü kur"
+        echo -e "  ${GREEN}2${NC} - Kurulu PHP sürümünü değiştir"
+        echo -e "  ${GREEN}3${NC} - Composer durumunu denetle"
+        echo -e "  ${RED}0${NC} - Ana menüye dön"
+        read -r -p "Seçiminiz: " menu_choice </dev/tty
 
-        if [ "$choice" = "0" ]; then
-            echo -e "${YELLOW}[BİLGİ]${NC} PHP ve Composer kurulumu iptal edildi."
-            return 0
-        elif [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#PHP_SUPPORTED_VERSIONS[@]}" ]; then
-            php_version_choice="${PHP_SUPPORTED_VERSIONS[$((choice-1))]}"
-            break
-        else
-            echo -e "${RED}[HATA]${NC} Geçersiz seçim. Lütfen tekrar deneyin."
-        fi
+        case "$menu_choice" in
+            1)
+                local php_version_choice
+                while true; do
+                    echo -e "\n${YELLOW}Kurmak istediğiniz PHP sürümünü seçin:${NC}"
+                    local i=1
+                    for ver in "${PHP_SUPPORTED_VERSIONS[@]}"; do
+                        echo -e "  ${GREEN}${i}${NC} - PHP ${ver}"
+                        i=$((i+1))
+                    done
+                    echo -e "  ${RED}0${NC} - İptal"
+                    read -r -p "Seçiminiz (1-${#PHP_SUPPORTED_VERSIONS[@]}, veya 0): " choice </dev/tty
+
+                    if [ "$choice" = "0" ]; then
+                        php_version_choice=""
+                        break
+                    elif [[ "$choice" =~ ^[0-9]+$ ]] && [ "$choice" -ge 1 ] && [ "$choice" -le "${#PHP_SUPPORTED_VERSIONS[@]}" ]; then
+                        php_version_choice="${PHP_SUPPORTED_VERSIONS[$((choice-1))]}"
+                        break
+                    else
+                        echo -e "${RED}[HATA]${NC} Geçersiz seçim. Lütfen tekrar deneyin."
+                    fi
+                done
+
+                if [ -n "$php_version_choice" ]; then
+                    install_php_version "$php_version_choice" && install_composer && reload_shell_configs
+                fi
+                ;;
+            2)
+                switch_php_version
+                ;;
+            3)
+                install_composer
+                ;;
+            0)
+                echo -e "${YELLOW}[BİLGİ]${NC} PHP menüsünden çıkılıyor."
+                break
+                ;;
+            *)
+                echo -e "${RED}[HATA]${NC} Geçersiz seçim."
+                ;;
+        esac
     done
-
-    install_php_version "$php_version_choice"
-    install_composer
-    reload_shell_configs
-    echo -e "${GREEN}[BAŞARILI]${NC} PHP ve Composer kurulumu tamamlandı!"
 }
 
 main

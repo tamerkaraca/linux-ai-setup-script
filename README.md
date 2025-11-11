@@ -118,6 +118,83 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or an `11` shortcut th
 | `10` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
 | `11` | Install every CLI | Runs options `1-10` in batch mode (logins skipped, summary printed at the end). |
 
+##### Claude Code CLI
+Anthropic’s Claude Code CLI (https://github.com/anthropics/claude-code) ships the same Ink-based workflow you see in the Claude desktop app. The installer attaches `/dev/tty` before launching `claude login`, preventing “Raw mode is not supported” errors when you run the script remotely. Sample usage:
+
+```bash
+claude login
+claude run --model claude-3-5-sonnet-latest
+claude chat src/index.ts
+```
+
+The CLI respects `ANTHROPIC_API_KEY` and `CLAUDE_API_KEY`, so you can preload them in non-interactive environments.
+
+##### Gemini CLI
+Google’s Gemini CLI (https://github.com/google-gemini/gemini-cli) drives all Gemini API workflows from a single binary. We require Node.js ≥ 20 per Google’s guidance, install the `@google/gemini-cli` package via npm with fallback prefixes, and run `gemini auth` only when interactive. Popular commands:
+
+```bash
+gemini auth
+gemini generate --model gemini-1.5-pro "Summarize docs/ADR.md"
+gemini chat my-session
+```
+
+The CLI stores credentials in `~/.config/gemini`, which the installer highlights if you need to copy tokens between machines.
+
+##### OpenCode CLI
+OpenCode (https://github.com/opencode-ai/opencode) offers a community-driven set of automations for building and shipping AI assistants. Our installer downloads the latest npm package, prints `opencode login` reminders, and notes that you can set `OPENAI_API_KEY`/`ANTHROPIC_API_KEY` to bypass login prompts. Example:
+
+```bash
+opencode login
+opencode agent create --template turbo-docs
+opencode agent run turbo-docs
+```
+
+Because OpenCode frequently publishes beta builds, the installer honors `NPM_CONFIG_REGISTRY` if you mirror packages internally.
+
+##### Qoder CLI
+Qoder’s CLI (https://docs.qoder.com/cli/quick-start) lets you scaffold and manage “Qoder Agents.” The installer tries several npm scopes (`@qoderhq/qoder`, `@qoderhq/cli`, etc.), or you can specify `QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--package`, or `--bundle` to pin a particular artifact. Interactive runs still call `qoder login`, but batch runs just emit reminders:
+
+```bash
+qoder login
+qoder project create --template agent-proto
+qoder project deploy my-agent
+```
+
+Each successful install prints the resolved npm package name so you can track which scope worked on your mirror.
+
+##### Qwen CLI
+Qwen’s official CLI (https://github.com/QwenLM/qwen-code) exposes the Qwen Code models and Qwen Agents from any terminal. We enforce Node.js ≥ 18, bootstrap Node when missing, and run `qwen login` through `/dev/tty` so QR-code prompts display correctly. Sample usage:
+
+```bash
+qwen login
+qwen run --model qwen2.5-coder:latest "Explain the diff in utils.sh"
+qwen history list
+```
+
+Air-gapped installs can pass `--package <tarball>` or `QWEN_NPM_PACKAGE` to point at an internal registry.
+
+##### OpenAI Codex CLI
+OpenAI’s Codex CLI (https://github.com/openai/codex) provides the “codex”, “suggest”, and “auto edit” flows from the Codex Labs preview. Our installer installs `@openai/codex`, then offers a guided login flow: either “Sign in with ChatGPT” or `OPENAI_API_KEY`. Typical commands:
+
+```bash
+codex --suggest --file index.js
+codex --auto-edit --model o3-mini
+OPENAI_API_KEY=sk-... codex
+```
+
+If you store API keys in shell rc files, the installer appends the `export OPENAI_API_KEY=...` line for you.
+
+##### GitHub Copilot CLI
+GitHub’s Copilot CLI (https://github.com/github/copilot-cli?locale=en-US) lets you run `copilot explain`, `copilot tests`, and `copilot helm` in your terminal. The installer uses npm to install `@githubnext/github-copilot-cli`, prints both `copilot auth login` and `copilot auth activate`, and reminds you that certain commands require `gh` scopes. Example:
+
+```bash
+copilot auth login
+copilot explain src/main.rs
+copilot tests src/api/*
+```
+
+Credentials are stored under `~/.config/github-copilot-cli`, so you can copy them between machines if needed.
+
 ##### Cursor Agent CLI
 Cursor’s official CLI exposes the editor’s “AI pair-programmer” features inside any terminal session. The installer enforces Node.js ≥ 18, falls back to npm’s user prefix when the global prefix is read-only, and reloads your shell so `cursor-agent` is immediately available. During interactive runs it opens `/dev/tty` and launches `cursor-agent login`; in batch mode it skips the login and prints a reminder so pipelines never block. Example flows:
 
@@ -284,6 +361,83 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `11` kısayolu
 | `9` | Aider CLI | Pipx üzerinden `aider-chat` paketini kurar (Node.js ≥ 18 kontrolü sonrası) ve API anahtarlarını export etmeniz gerektiğini hatırlatır. |
 | `10` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
 | `11` | Hepsini Kur | `1-10` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+
+##### Claude Code CLI
+Anthropic’in Claude Code CLI aracı (https://github.com/anthropics/claude-code), Claude masaüstündeki Ink tabanlı deneyimi terminale taşır. Kurulum sırasında `/dev/tty` bağlandığı için “Raw mode is not supported” hatası alınmaz ve `claude login` komutu uzaktan bile sorunsuz çalışır:
+
+```bash
+claude login
+claude run --model claude-3-5-sonnet-latest
+claude chat src/index.ts
+```
+
+`ANTHROPIC_API_KEY` veya `CLAUDE_API_KEY` değişkenlerini önceden ayarlarsanız, toplu kurulumlarda giriş adımını atlayabilirsiniz.
+
+##### Gemini CLI
+Google Gemini CLI (https://github.com/google-gemini/gemini-cli) tüm Gemini API iş akışlarını tek bir komutla yönetmenizi sağlar. Google’ın önerisi doğrultusunda Node.js ≥ 20 şartı aranır, `@google/gemini-cli` npm paketi fallback prefix desteği ile kurulur ve `gemini auth` sadece etkileşimli oturumda çalıştırılır:
+
+```bash
+gemini auth
+gemini generate --model gemini-1.5-pro "docs/ADR.md dosyasını özetle"
+gemini chat ekip-oturumu
+```
+
+Kimlik doğrulama bilgileri `~/.config/gemini` dizinine kaydedilir; kurulum çıktısı bu klasörü vurgular.
+
+##### OpenCode CLI
+OpenCode (https://github.com/opencode-ai/opencode) topluluk odaklı ajan şablonları sağlar. Installer en güncel npm paketini kurar, `opencode login` hatırlatması yapar ve gerekiyorsa `OPENAI_API_KEY`/`ANTHROPIC_API_KEY` değişkenleri ile girişin otomatik yapılabileceğini belirtir:
+
+```bash
+opencode login
+opencode agent create --template turbo-docs
+opencode agent run turbo-docs
+```
+
+Kurumsal aynalar kullanıyorsanız `NPM_CONFIG_REGISTRY` değişkeni desteklenir.
+
+##### Qoder CLI
+Qoder CLI (https://docs.qoder.com/cli/quick-start) ile “Qoder Agents” projeleri oluşturup yönetebilirsiniz. Installer çeşitli npm scope’larını dener; gerekirse `QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--package` veya `--bundle` parametreleriyle paket adı sabitlenebilir. Örnek komutlar:
+
+```bash
+qoder login
+qoder project create --template agent-proto
+qoder project deploy my-agent
+```
+
+Kurulum sonunda hangi npm paketinden kurulum yapıldığı yazdırılır.
+
+##### Qwen CLI
+Qwen Code CLI (https://github.com/QwenLM/qwen-code), Qwen modellerini terminalden kullanmanıza olanak tanır. Node.js ≥ 18 kontrol edilir, eksikse Node kurulumu tetiklenir ve `qwen login` komutu `/dev/tty` üzerinden çalıştırılır:
+
+```bash
+qwen login
+qwen run --model qwen2.5-coder:latest "utils.sh değişikliklerini açıkla"
+qwen history list
+```
+
+Kapalı ağlarda `--package <tarball>` veya `QWEN_NPM_PACKAGE` ile iç registry kullanılabilir.
+
+##### OpenAI Codex CLI
+OpenAI Codex CLI (https://github.com/openai/codex) “codex”, “suggest” ve “auto edit” modlarını sunar. Installer `@openai/codex` paketini kurar ve iki kimlik yöntemi sağlar: “Sign in with ChatGPT” veya `OPENAI_API_KEY`. Örnek:
+
+```bash
+codex --suggest --file index.js
+codex --auto-edit --model o3-mini
+OPENAI_API_KEY=sk-... codex
+```
+
+İstenirse API anahtarı otomatik olarak shell rc dosyalarına eklenir.
+
+##### GitHub Copilot CLI
+GitHub Copilot CLI (https://github.com/github/copilot-cli?locale=en-US) terminalden `copilot explain`, `copilot tests` gibi komutları çalıştırmanızı sağlar. Installer npm üzerinden `@githubnext/github-copilot-cli` paketini kurar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır:
+
+```bash
+copilot auth login
+copilot explain src/main.rs
+copilot tests src/api/*
+```
+
+Kimlik bilgilerinin `~/.config/github-copilot-cli` altında tutulduğunu da loglarda belirtiyoruz.
 
 ##### Cursor Agent CLI
 Cursor’un resmi terminal aracı, editördeki “AI pair-programmer” deneyimini komut satırına taşır. Kurulum Node.js ≥ 18 kontrolü yapar, gerekirse npm kullanıcı prefix’ine düşer ve shell yeniden yüklendiği için `cursor-agent` komutu anında kullanılabilir. Etkileşimli modda `/dev/tty` üzerinden `cursor-agent login` çalıştırılır; toplu kurulumlar ise giriş adımını atlayıp kullanıcıyı bilgilendirir. Örnek kullanım:

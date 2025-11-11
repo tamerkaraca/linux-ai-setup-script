@@ -4,6 +4,14 @@
 
 
 # SuperClaude Framework kurulumu (Pipx ile)
+attach_tty_and_run() {
+    if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+        "$@" </dev/tty
+    else
+        "$@"
+    fi
+}
+
 install_superclaude() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude Framework (Pipx) kurulumu başlatılıyor..."
@@ -41,13 +49,11 @@ install_superclaude() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude install komutu çalıştırılıyor..."
     echo -e "${YELLOW}[BİLGİ]${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
 
-    SuperClaude install
-    
-    if [ $? -ne 0 ]; then
+    if attach_tty_and_run SuperClaude install; then
+        echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude yapılandırması tamamlandı!"
+    else
         echo -e "${RED}[HATA]${NC} SuperClaude 'install' komutu başarısız!"
         echo -e "${YELLOW}[BİLGİ]${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperClaude install${NC}' komutuyla yapılandırabilirsiniz."
-    else
-        echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude yapılandırması tamamlandı!"
     fi
 
     echo -e "\n${CYAN}╔═══════════════════════════════════════════════╗${NC}"

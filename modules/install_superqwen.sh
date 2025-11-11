@@ -4,6 +4,14 @@
 
 
 # SuperQwen Framework kurulumu (Pipx ile)
+attach_tty_and_run() {
+    if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+        "$@" </dev/tty
+    else
+        "$@"
+    fi
+}
+
 install_superqwen() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen Framework (Pipx) kurulumu başlatılıyor..."
@@ -41,13 +49,11 @@ install_superqwen() {
     echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen install komutu çalıştırılıyor..."
     echo -e "${YELLOW}[BİLGİ]${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
 
-    SuperQwen install
-    
-    if [ $? -ne 0 ]; then
+    if attach_tty_and_run SuperQwen install; then
+        echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen yapılandırması tamamlandı!"
+    else
         echo -e "${RED}[HATA]${NC} SuperQwen 'install' komutu başarısız!"
         echo -e "${YELLOW}[BİLGİ]${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperQwen install${NC}' komutuyla yapılandırabilirsiniz."
-    else
-        echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen yapılandırması tamamlandı!"
     fi
 
     echo -e "\n${CYAN}╔═══════════════════════════════════════════════╗${NC}"

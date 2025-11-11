@@ -1,6 +1,16 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
+# shellcheck source=/dev/null
+if [ -f "./modules/utils.sh" ]; then
+    source "./modules/utils.sh"
+else
+    BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules}"
+    if command -v curl &> /dev/null; then
+        # shellcheck disable=SC1090
+        source <(curl -fsSL "$BASE_URL/utils.sh") || true
+    fi
+fi
 
 
 # PHP sürüm listeleri

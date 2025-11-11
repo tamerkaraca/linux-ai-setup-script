@@ -70,8 +70,8 @@ render_setup_banner() {
     local version="$1"
     local repo="$2"
     if ensure_toilet; then
-        toilet -f small "AI CLI ARACLARI KURULUMU" --gay
-        toilet -f small "TAMER KARACA" --metal
+        toilet -f mini "AI CLI ARACLARI KURULUMU" --gay
+        toilet -f mini "TAMER KARACA" --metal
     else
         print_banner_block BANNER_AI
         print_banner_block BANNER_AUTHOR

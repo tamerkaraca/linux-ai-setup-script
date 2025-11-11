@@ -21,6 +21,7 @@ if [ -f "$0" ]; then
 fi
 
 SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main}"
+export SCRIPT_BASE_URL
 
 source_module() {
     local local_path="$1"

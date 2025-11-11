@@ -81,12 +81,8 @@ configure_glm_provider() {
         fi
     fi
     
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Base URL [Varsayılan: $current_base_url]"
-    read -r -p "Base URL: " GLM_BASE_URL </dev/tty
-    
-    if [ -z "$GLM_BASE_URL" ]; then
-        GLM_BASE_URL="$current_base_url"
-    fi
+    local GLM_BASE_URL
+    GLM_BASE_URL=$(select_base_url "GLM-4.6 (z.ai)" "$default_base_url" "$current_base_url")
     
     echo -e "${YELLOW}[BİLGİ]${NC} settings.json dosyası oluşturuluyor..."
     
@@ -180,11 +176,8 @@ configure_kimi_provider() {
         fi
     fi
 
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Moonshot taban URL'si [Varsayılan: ${current_base_url}]"
-    read -r -p "Base URL: " MOONSHOT_BASE_URL </dev/tty
-    if [ -z "$MOONSHOT_BASE_URL" ]; then
-        MOONSHOT_BASE_URL="$current_base_url"
-    fi
+    local MOONSHOT_BASE_URL
+    MOONSHOT_BASE_URL=$(select_base_url "Moonshot (kimi-k2)" "$default_base_url" "$current_base_url")
 
     echo -e "\n${YELLOW}[BİLGİ]${NC} Kullanmak istediğiniz modeli seçin:"
     echo -e "  ${GREEN}1${NC} kimi-k2-0711-preview (önerilen)"
@@ -260,3 +253,53 @@ main() {
 }
 
 main
+select_base_url() {
+    local provider_label="$1"
+    local default_url="$2"
+    local previous_url="$3"
+    local has_previous="false"
+    if [ -n "$previous_url" ] && [ "$previous_url" != "$default_url" ]; then
+        has_previous="true"
+    else
+        previous_url=""
+    fi
+
+    echo -e "\n${YELLOW}[BİLGİ]${NC} ${provider_label} için base URL seçin:"
+    echo -e "  ${GREEN}1${NC} Varsayılan (${default_url})"
+    if [ "$has_previous" = "true" ]; then
+        echo -e "  ${GREEN}2${NC} Mevcut değer (${previous_url})"
+        echo -e "  ${GREEN}3${NC} Özel base URL gir"
+    else
+        echo -e "  ${GREEN}2${NC} Özel base URL gir"
+    fi
+
+    read -r -p "Seçiminiz [1]: " selection </dev/tty || true
+    case "${selection:-1}" in
+        1)
+            echo "$default_url"
+            ;;
+        2)
+            if [ "$has_previous" = "true" ]; then
+                echo "$previous_url"
+            else
+                read -r -p "Base URL: " custom_url </dev/tty || true
+                if [ -z "$custom_url" ]; then
+                    echo "$default_url"
+                else
+                    echo "$custom_url"
+                fi
+            fi
+            ;;
+        3)
+            read -r -p "Base URL: " custom_url </dev/tty || true
+            if [ -z "$custom_url" ]; then
+                echo "$default_url"
+            else
+                echo "$custom_url"
+            fi
+            ;;
+        *)
+            echo "$default_url"
+            ;;
+    esac
+}

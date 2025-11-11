@@ -20,11 +20,30 @@ if [ -f "$0" ]; then
     fi
 fi
 
-# Ortak yardımcı fonksiyonları yükle
-# shellcheck source=/dev/null
-source "./modules/utils.sh"
-# shellcheck source=/dev/null
-source "./modules/banner.sh"
+SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main}"
+
+source_module() {
+    local local_path="$1"
+    local remote_rel_path="$2"
+    if [ -f "$local_path" ]; then
+        # shellcheck source=/dev/null
+        source "$local_path"
+    else
+        if ! command -v curl &> /dev/null; then
+            echo "[HATA] 'curl' komutu bulunamadı; $remote_rel_path dosyası yüklenemiyor."
+            exit 1
+        fi
+        local remote_url="${SCRIPT_BASE_URL}/${remote_rel_path}"
+        # shellcheck disable=SC1090
+        source <(curl -fsSL "$remote_url") || {
+            echo "[HATA] $remote_url dosyası yüklenemedi."
+            exit 1
+        }
+    fi
+}
+
+source_module "./modules/utils.sh" "modules/utils.sh"
+source_module "./modules/banner.sh" "modules/banner.sh"
 
 # Script çalıştırma fonksiyonu
 run_module() {

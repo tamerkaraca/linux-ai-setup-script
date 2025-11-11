@@ -101,6 +101,8 @@ run_module() {
     return 0
 }
 export -f run_module
+export -f prepare_remote_module_dir
+export -f cleanup_remote_modules
 
 # Ana menü
 main_menu() {

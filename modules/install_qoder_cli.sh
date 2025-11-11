@@ -2,6 +2,13 @@
 set -euo pipefail
 
 : "${NPM_LAST_INSTALL_PREFIX:=}"
+: "${QODER_NPM_PACKAGE:=}"
+: "${QODER_CLI_BUNDLE:=}"
+: "${QODER_SKIP_NPM_PROBE:=false}"
+
+QODER_PACKAGE_OVERRIDE="${QODER_NPM_PACKAGE}"
+QODER_BUNDLE_OVERRIDE="${QODER_CLI_BUNDLE}"
+QODER_SKIP_PACKAGE_PROBE="${QODER_SKIP_NPM_PROBE}"
 
 # Ortak yardımcı fonksiyonları yükle
 UTILS_PATH="./modules/utils.sh"
@@ -120,6 +127,8 @@ install_npm_cli() {
 resolve_qoder_package() {
     local -n resolved_ref=$1
     local dry_run="${2:-false}"
+    local explicit_package="${3:-}"
+    local skip_probe="${4:-false}"
     local -a candidates=(
         "@qoderhq/qoder"
         "@qoderhq/cli"
@@ -128,9 +137,22 @@ resolve_qoder_package() {
         "qoder"
     )
 
+    if [ -n "$explicit_package" ]; then
+        resolved_ref="$explicit_package"
+        echo -e "${YELLOW}[BİLGİ]${NC} Qoder CLI paketi override edildi: ${explicit_package}"
+        return 0
+    fi
+
     if [ "$dry_run" = true ]; then
         resolved_ref="${candidates[0]}"
         echo -e "${YELLOW}[DRY-RUN]${NC} Varsayılan npm paketi: ${resolved_ref}"
+        return 0
+    fi
+
+    if [ "$skip_probe" = "true" ]; then
+        resolved_ref="${candidates[0]}"
+        echo -e "${YELLOW}[UYARI]${NC} npm kayıt kontrolü atlandı. Varsayılan paket kullanılacak: ${resolved_ref}"
+        echo -e "${YELLOW}[BİLGİ]${NC} Özel bir paket belirtmek için 'QODER_NPM_PACKAGE' veya '--package' parametresini kullanabilirsiniz."
         return 0
     fi
 
@@ -143,8 +165,11 @@ resolve_qoder_package() {
         fi
     done
 
-    echo -e "${RED}[HATA]${NC} Qoder CLI için npm kaydında uygun paket bulunamadı. Lütfen https://docs.qoder.com/cli/quick-start rehberindeki manuel kurulum adımlarını uygulayın."
-    return 1
+    resolved_ref="${candidates[0]}"
+    echo -e "${YELLOW}[UYARI]${NC} npm kaydında doğrulanmış bir Qoder CLI paketi bulunamadı. Varsayılan paket kullanılacak: ${resolved_ref}"
+    echo -e "${YELLOW}[BİLGİ]${NC} Bilinen paket adını 'QODER_NPM_PACKAGE=\"<paket>\"' veya '--package <paket>' ile belirtebilirsiniz."
+    echo -e "${YELLOW}[BİLGİ]${NC} Güncel talimatlar için: https://docs.qoder.com/cli/quick-start"
+    return 0
 }
 
 install_qoder_cli() {
@@ -152,11 +177,26 @@ install_qoder_cli() {
     if [ "$dry_run" != true ]; then
         ensure_npm_available || return 1
     fi
-    local resolved_package=""
-    if ! resolve_qoder_package resolved_package "$dry_run"; then
-        return 1
+    local install_source=""
+    if [ -n "$QODER_BUNDLE_OVERRIDE" ]; then
+        if [ "$dry_run" = true ]; then
+            echo -e "${YELLOW}[DRY-RUN]${NC} Yerel Qoder CLI paketi kullanılacak: ${QODER_BUNDLE_OVERRIDE}"
+        else
+            if [ ! -e "$QODER_BUNDLE_OVERRIDE" ]; then
+                echo -e "${RED}[HATA]${NC} '--bundle' ile belirtilen dosya bulunamadı: ${QODER_BUNDLE_OVERRIDE}"
+                return 1
+            fi
+            echo -e "${YELLOW}[BİLGİ]${NC} Yerel Qoder CLI paketi kullanılıyor: ${QODER_BUNDLE_OVERRIDE}"
+        fi
+        install_source="$QODER_BUNDLE_OVERRIDE"
+    else
+        local resolved_package=""
+        if ! resolve_qoder_package resolved_package "$dry_run" "$QODER_PACKAGE_OVERRIDE" "$QODER_SKIP_PACKAGE_PROBE"; then
+            return 1
+        fi
+        install_source="$resolved_package"
     fi
-    install_npm_cli "Qoder CLI" "$resolved_package" "qoder" "$dry_run"
+    install_npm_cli "Qoder CLI" "$install_source" "qoder" "$dry_run"
 }
 
 install_coder_cli() {
@@ -179,6 +219,25 @@ main() {
             --tool)
                 target_cli="${2:-qoder}"
                 shift
+                ;;
+            --package)
+                if [ -z "${2:-}" ]; then
+                    echo -e "${RED}[HATA]${NC} '--package' seçeneği bir değer gerektirir."
+                    return 1
+                fi
+                QODER_PACKAGE_OVERRIDE="$2"
+                shift
+                ;;
+            --bundle|--from-file)
+                if [ -z "${2:-}" ]; then
+                    echo -e "${RED}[HATA]${NC} '--bundle' seçeneği bir dosya yolu gerektirir."
+                    return 1
+                fi
+                QODER_BUNDLE_OVERRIDE="$2"
+                shift
+                ;;
+            --skip-probe)
+                QODER_SKIP_PACKAGE_PROBE="true"
                 ;;
             --both|--all)
                 target_cli="both"

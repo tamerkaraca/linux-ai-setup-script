@@ -19,6 +19,17 @@
    - [Credits](#credits)
    - [License](#license)
 2. [Türkçe Rehber](#-türkçe-rehber)
+   - [Genel Bakış](#genel-bakış)
+   - [Mimari](#mimari)
+   - [Gereksinimler](#gereksinimler)
+   - [Kurulum](#kurulum)
+   - [Ana Menü Özeti](#ana-menü-özeti)
+   - [Alt Menü Detayları](#alt-menü-detayları)
+   - [Kullanım Notları](#kullanım-notları)
+   - [Sorun Giderme](#sorun-giderme)
+   - [Katkı](#katkı)
+   - [Emek Verenler](#emek-verenler)
+   - [Lisans](#lisans)
 
 ---
 
@@ -34,7 +45,7 @@
 |-----------|-------------|
 | **Self-healing launcher** | Detects CRLF, re-runs itself after fixing permissions/line endings. |
 | **Remote-safe modules** | When invoked via `bash -c "$(curl …)"`, `setup` downloads helper modules to a temp directory and exports helper functions so nested scripts operate as if run locally. |
-| **Banner system** | `modules/banner.sh` renders rainbow 3D headers using the `toilet` CLI (auto-installed if missing). |
+| **Banner system** | `modules/banner.sh` now renders wide box-drawing panels with pure Bash, so no external banner CLI has to be installed. |
 | **Menu runner** | `run_module` prefers local `./modules/*.sh`; otherwise downloads from GitHub and passes environment variables (`PKG_MANAGER`, `INSTALL_CMD` etc.) to sub-processes. |
 
 ### Requirements
@@ -44,7 +55,7 @@
 - `curl` (auto-installed when missing for remote runs).
 - Optional: `dos2unix`, `shellcheck`, `jq` (installed automatically when relevant).
 
-`setup` also installs `toilet` for the intro banner the first time it runs.
+The banner renderer ships with the repo, so no extra packages are fetched just to print headers.
 
 ### Installation
 
@@ -91,13 +102,28 @@ bash -n setup && shellcheck setup  # optional
 ### CLI & Framework Sub-menus
 
 #### AI CLI Menu
-- Multi-select (comma-separated) and “install all” options.
-- During batches, installers skip interactive logins and later print a summary reminding you which commands (`claude login`, `gemini auth`, `copilot auth login`, etc.) still need attention.
+The sub-menu accepts comma-separated selections (`1,3,7`) or an `8` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `copilot auth login`, etc.).
+
+| Option | Tool | Highlights |
+|--------|------|------------|
+| `1` | Claude Code CLI | Attaches to `/dev/tty` so Anthropic’s Ink prompts work even during remote runs. |
+| `2` | Gemini CLI | Requires Node.js ≥ 20, performs npm fallback installs, and reminds you to run `gemini auth`. |
+| `3` | OpenCode CLI | Handles remote-safe installs for the OpenCode beta tooling and prints `opencode login` hints. |
+| `4` | Qoder CLI | Probes several npm scopes and accepts overrides (`QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--skip-probe`) plus local bundle installs. |
+| `5` | Qwen CLI | Enforces Node.js ≥ 18, bootstraps Node when missing, and uses `/dev/tty` for `qwen login` prompts with a `--package` override. |
+| `6` | OpenAI Codex CLI | Installs Codex/Cursor helpers and points you to the ChatGPT or `OPENAI_API_KEY` auth flow. |
+| `7` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
+| `8` | Install every CLI | Runs options `1-7` in batch mode (logins skipped, summary printed at the end). |
 
 #### AI Framework Menu
-- Ensures Pipx exists.
-- Each framework uses `attach_tty_and_run` so pipx-installed binaries (SuperGemini/SuperQwen/SuperClaude) can prompt for API keys even when you launched via curl.
-- TTY fallback automatically reuses `/dev/tty` when available.
+The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
+
+| Option | Framework | Highlights |
+|--------|-----------|------------|
+| `1` | SuperGemini | Installs the Gemini-native workflow via `pipx`, including login hints and PATH refresh. |
+| `2` | SuperQwen | Wraps the official installer with `attach_tty_and_run` so Qwen credentials can be entered safely. |
+| `3` | SuperClaude | Provides the Anthropic toolkit with the same TTY safeguards and cleanup helpers. |
+| `4` | Install every framework | Sequentially installs all three frameworks (duplicate runs are skipped gracefully). |
 
 ### Usage Notes
 
@@ -105,6 +131,8 @@ bash -n setup && shellcheck setup  # optional
 - **Remote execution:** The menu structure, colorized logs, and sub-modules behave the same whether you cloned locally or piped via curl.
 - **API keys:** Super* installers guide you through provider portals (Gemini, Anthropic, OpenAI). GLM configuration masks existing keys (`abcd***wxyz`) and only replaces them if you supply a new value.
 - **TTY requirements:** The Claude Code, SuperQwen, and SuperClaude installers now route to `/dev/tty`, preventing Ink-based CLIs from exiting with “Raw mode is not supported”.
+- **Qoder CLI overrides:** When the npm registry is slow to publish a package, pass `QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--package`, `--bundle`, or `--skip-probe` so `install_qoder_cli` knows exactly what to install.
+- **Qwen CLI guardrails:** `install_qwen_cli` enforces Node.js ≥ 18, can bootstrap Node automatically, and exposes a `--package` override for air-gapped environments—all while keeping `/dev/tty` attached for `qwen login`.
 
 ### Troubleshooting
 
@@ -113,7 +141,8 @@ bash -n setup && shellcheck setup  # optional
 | `curl: (3) URL rejected: No host part` | Ensure you are on the latest `setup` (≥ `7d4ee0a`). The script now exports `SCRIPT_BASE_URL` and caches modules with fully qualified URLs. |
 | `mask_secret: command not found` | Pull latest changes; GLM config now sources `modules/utils.sh` even in remote runs. |
 | `SuperQwen install` aborts without prompting | Fixed by `attach_tty_and_run`; rerun option `5` → SuperQwen. |
-| `toilet` not found | The script installs it automatically; rerun option `1` or `setup`. |
+| Qoder CLI npm probe fails | Provide the package via `QODER_NPM_PACKAGE`, `install_qoder_cli --package @custom/cli`, or point to a local tarball with `--bundle /path/qoder.tgz`. |
+| Qwen CLI complains about Node.js | Run menu option `3` or let `install_qwen_cli` bootstrap Node; it requires Node.js ≥ 18 before running `npm install -g @qwen-code/qwen-code`. |
 | CLI still missing after install | Re-open the terminal or run `source ~/.bashrc`; confirm `$PATH` contains `~/.local/bin` and `~/.nvm`. |
 | `pip` errors about externally-managed environment | `install_pip` now falls back to `ensurepip`, distro packages, or `get-pip.py --break-system-packages`. Re-run option `2`. |
 
@@ -128,7 +157,7 @@ bash -n setup && shellcheck setup  # optional
 ### Credits
 
 - **Maintainer:** Tamer Karaca (@tamerkaraca)  
-- **ASCII & Banner Styling:** Inspired by `toilet` community themes.  
+- **ASCII & Banner Styling:** Custom box-drawing renderer baked into `modules/banner.sh`.  
 - **Framework Authors:** SuperGemini/SuperQwen/SuperClaude teams, Anthropic, Google, OpenAI, GitHub Copilot CLI contributors.
 
 ### License
@@ -149,7 +178,7 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 |---------|---------|
 | **Kendini onaran başlatıcı** | CRLF algılar, izin/dosya sorunlarını düzeltip script’i yeniden başlatır. |
 | **Uzaktan güvenli modüller** | `bash -c "$(curl …)"` yöntemiyle çalıştırıldığında yardımcı modülleri geçici dizine indirir ve alt süreçlerle paylaşır. |
-| **Banner sistemi** | `toilet` aracı ile gökkuşağı renkli 3B başlıklar oluşturur (eksikse otomatik kurulur). |
+| **Banner sistemi** | `modules/banner.sh`, kutu çizgileriyle geniş panoları doğrudan Bash içinde çizer; ek paket gerektirmez. |
 | **Menü çalıştırıcısı** | Önce yerel `./modules/*.sh` dosyalarını, yoksa GitHub sürümlerini kullanır. |
 
 ### Gereksinimler
@@ -157,7 +186,7 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 - `apt`, `dnf`, `yum` veya `pacman` içeren Linux dağıtımı.
 - `bash` 5+, `sudo` hakları, aktif internet bağlantısı.
 - `curl` (uzaktan kurulum için zorunlu).
-- `toilet` aracı script tarafından gerekirse otomatik kurulur.
+- Banner panelleri depo ile birlikte gelir; ekstra bir ASCII aracı kurmanıza gerek kalmaz.
 
 ### Kurulum
 
@@ -203,14 +232,37 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 
 ### Alt Menü Detayları
 
-- **AI CLI Menüsü:** Virgülle çoklu seçim yapabilirsiniz. Toplu kurulumda `claude login`, `gemini auth` vb. komutlar özet olarak yazdırılır.
-- **AI Framework Menüsü:** Pipx kontrolü yapar, API anahtar istemlerinde `/dev/tty` kullanır; böylece `SuperQwen install` gibi komutlar uzaktan bile bekleme ekranına düşer.
+#### AI CLI Menüsü
+Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `8` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `copilot auth login` vb.) özet olarak yazdırır.
+
+| Seçenek | Araç | Detaylar |
+|---------|------|----------|
+| `1` | Claude Code CLI | Anthropic’in Ink tabanlı arayüzünü `/dev/tty` üzerinden açar, uzaktan çalıştırmalarda bile kesinti olmaz. |
+| `2` | Gemini CLI | Node.js ≥ 20 gereksinimini kontrol eder, npm fallback kurulumları yapar ve `gemini auth` hatırlatması verir. |
+| `3` | OpenCode CLI | Beta OpenCode araçlarını uzaktan güvenli şekilde kurar ve `opencode login` komutunu hatırlatır. |
+| `4` | Qoder CLI | Birden çok npm paket adını dener; `QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--package`, `--bundle`, `--skip-probe` gibi override seçeneklerini destekler. |
+| `5` | Qwen CLI | Node.js ≥ 18 şartını uygular, gerekirse Node kurulumunu başlatır, `/dev/tty` ile `qwen login` akışını yönetir ve `--package` override’ını destekler. |
+| `6` | OpenAI Codex CLI | Codex/Cursor yardımcılarını yükler, ChatGPT veya `OPENAI_API_KEY` tabanlı giriş akışını açıklar. |
+| `7` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
+| `8` | Hepsini Kur | `1-7` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+
+#### AI Framework Menüsü
+Önce `pipx` ve gerekirse Python kurulumunu doğrular, ardından Super* framework’lerini tek tek veya toplu olarak kurar. API anahtar istemleri `/dev/tty` üzerinden aktığı için `curl | bash` senaryolarında bile güvenli şekilde giriş yapabilirsiniz.
+
+| Seçenek | Framework | Detaylar |
+|---------|-----------|----------|
+| `1` | SuperGemini | `pipx` ile kurulur, PATH güncellemesini ve gerekli login komutlarını otomatik özetler. |
+| `2` | SuperQwen | `attach_tty_and_run` ile sarıldığı için Qwen kimlik doğrulamaları kesintisiz ilerler. |
+| `3` | SuperClaude | Aynı TTY korumalarıyla Anthropic araçlarını kurar, gerekirse temizleme yordamları sağlar. |
+| `4` | Hepsini Kur | Tüm Super* framework’lerini arka arkaya kurar; daha önce kurulanlar atlanır veya güncellenir. |
 
 ### Kullanım Notları
 
 - **PATH güncellemeleri** script tarafından otomatik `source` edilir; yeni komutlar aynı terminalde erişilebilir.
 - **API anahtarları** maskelenerek gösterilir, boş bırakılırsa mevcut değer korunur.
 - **TTY gereksinimleri** `attach_tty_and_run` ile çözüldü; artık `Raw mode is not supported` hatası alınmaz.
+- **Qoder CLI override’ları** için `QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--package`, `--bundle` veya `--skip-probe` parametrelerini kullanarak doğru paketi/dosyayı seçebilirsiniz.
+- **Qwen CLI korumaları** Node.js ≥ 18 şartını uygular, gerekirse Node’u otomatik kurar ve kapalı ortamlarda `--package` ile özel bir npm paketi gösterebilirsiniz; `qwen login` istemleri `/dev/tty` üzerinden akar.
 - **Uzaktan çalışma** sırasında modüller geçici dizine alınır ve tekrar kullanılmak üzere önbelleğe atılır.
 
 ### Sorun Giderme
@@ -218,6 +270,8 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 - `curl: (3)` hatası: En güncel `setup` sürümünü kullanın; `SCRIPT_BASE_URL` artık her alt süreçte mevcut.
 - `mask_secret` hatası: GLM menüsü artık utils’i otomatik yüklüyor.
 - SuperQwen/SuperClaude menüsü girdi beklemiyorsa: Güncel sürüme geçin; `attach_tty_and_run` eklendi.
+- Qoder CLI paketi bulunamadı: `QODER_NPM_PACKAGE` değişkenini ayarlayın, `install_qoder_cli --package @custom/cli` veya `--bundle /yol/qoder.tgz` seçeneklerini kullanın.
+- Qwen CLI Node.js uyarısı veriyor: Menünün `3` numaralı seçeneğiyle Node.js kurun ya da `install_qwen_cli`’nin otomatik kurulumuna izin verin; işlem Node.js ≥ 18 gerektirir.
 - Komut bulunamıyorsa: Terminali kapatıp açın veya `source ~/.bashrc` çalıştırın.
 
 ### Katkı
@@ -231,7 +285,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 
 - **Geliştirici:** Tamer Karaca  
 - **Topluluk:** Super* framework ekipleri, açık kaynak katkıcıları.  
-- **Banner:** `toilet` projesi ve ASCII sanatçıları.
+- **Banner:** Yerleşik kutu çizgili başlık sistemi (`modules/banner.sh`).
 
 ### Lisans
 

@@ -99,7 +99,7 @@ list_installed_php_versions() {
     fi
     for ver in "${!installed[@]}"; do
         printf "%s:::%s\n" "$ver" "${installed[$ver]}"
-    done | sort -t: -k1
+    done | sort
     return 0
 }
 

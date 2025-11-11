@@ -58,11 +58,18 @@ print_banner_block() {
 print_info_panel() {
     local version="$1"
     local repo="$2"
+    local inner_width=66
+
+    panel_line() {
+        local content="$1"
+        printf "%s %-${inner_width}s %s\n" "${BLUE}║${NC}" "$content" "${BLUE}║${NC}"
+    }
+
     echo -e "${BLUE}╔══════════════════════════════════════════════════════════════════════╗${NC}"
-    printf "%s\n" "${BLUE}║${NC} ${BOLD}Script Bilgileri${NC}                                                       ${BLUE}║${NC}"
+    panel_line "${BOLD}Script Bilgileri${NC}"
     echo -e "${BLUE}╠══════════════════════════════════════════════════════════════════════╣${NC}"
-    printf "%s\n" "${BLUE}║${NC} Versiyon : ${GREEN}${version}${NC}                                                 ${BLUE}║${NC}"
-    printf "%s\n" "${BLUE}║${NC} GitHub   : ${CYAN}${repo}${NC} ${BLUE}║${NC}"
+    panel_line "Versiyon : ${GREEN}${version}${NC}"
+    panel_line "GitHub   : ${CYAN}${repo}${NC}"
     echo -e "${BLUE}╚══════════════════════════════════════════════════════════════════════╝${NC}"
 }
 

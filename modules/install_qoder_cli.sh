@@ -108,6 +108,9 @@ install_npm_cli() {
         echo -e "${GREEN}[BAŞARILI]${NC} ${display_name} başarıyla kuruldu: $("$binary_name" --version 2>/dev/null)"
     else
         echo -e "${RED}[HATA]${NC} ${display_name} kuruldu ancak '${binary_name}' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
+        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen terminalinizi yeniden başlatın veya aşağıdaki komutları çalıştırın:"
+        echo -e "${CYAN}  source ~/.bashrc${NC} (veya kullandığınız shell yapılandırma dosyası, örneğin ~/.zshrc)"
+        echo -e "${CYAN}  hash -r${NC} (shell'in komut önbelleğini temizlemek için)"
         return 1
     fi
 }
@@ -170,6 +173,9 @@ main() {
 
     if [ "$interactive_mode" != "false" ]; then
         echo -e "\n${YELLOW}[BİLGİ]${NC} ${target_cli} CLI kurulum adımları tamamlandı."
+        echo -e "${YELLOW}[BİLGİ]${NC} Kurulumun tam olarak etkili olması için lütfen terminalinizi yeniden başlatın veya aşağıdaki komutları çalıştırın:"
+        echo -e "${CYAN}  source ~/.bashrc${NC} (veya kullandığınız shell yapılandırma dosyası, örneğin ~/.zshrc)"
+        echo -e "${CYAN}  hash -r${NC} (shell'in komut önbelleğini temizlemek için)"
     fi
 }
 

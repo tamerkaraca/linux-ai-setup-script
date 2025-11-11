@@ -278,7 +278,6 @@ The framework menu ensures `pipx` exists (installing Python first if necessary),
 ### Credits
 
 - **Maintainer:** Tamer Karaca (@tamerkaraca)  
-- **ASCII & Banner Styling:** Custom box-drawing renderer baked into `modules/banner.sh`.  
 - **Framework Authors:** SuperGemini/SuperQwen/SuperClaude teams, Anthropic, Google, OpenAI, GitHub Copilot CLI contributors.
 
 ### License
@@ -533,8 +532,7 @@ Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut a
 ### Emek Verenler
 
 - **Geliştirici:** Tamer Karaca  
-- **Topluluk:** Super* framework ekipleri, açık kaynak katkıcıları.  
-- **Banner:** Yerleşik kutu çizgili başlık sistemi (`modules/banner.sh`).
+- **Topluluk:** Super* framework ekipleri, açık kaynak katkıcıları.
 
 ### Lisans
 

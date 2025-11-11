@@ -105,7 +105,7 @@ EOF
     
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} GLM Coding Plan hakkında:"
-    echo -e "  ${GREEN}•${NC} $3/aydan başlayan fiyatlarla premium kodlama deneyimi"
+    echo -e "  ${GREEN}•${NC} \$3/aydan başlayan fiyatlarla premium kodlama deneyimi"
     echo -e "  ${GREEN}•${NC} PRO ve üzeri planlarda Vision ve Web Search MCP desteği"
     echo -e "  ${GREEN}•${NC} Daha fazla bilgi: https://z.ai/subscribe"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"

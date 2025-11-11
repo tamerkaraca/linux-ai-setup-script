@@ -37,7 +37,7 @@
 
 ### Overview
 
-`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, Copilot CLI), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
+`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, OpenAI Codex, Copilot CLI), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
 
 ### Architecture
 
@@ -102,7 +102,7 @@ bash -n setup && shellcheck setup  # optional
 ### CLI & Framework Sub-menus
 
 #### AI CLI Menu
-The sub-menu accepts comma-separated selections (`1,3,7`) or an `8` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `copilot auth login`, etc.).
+The sub-menu accepts comma-separated selections (`1,3,7`) or a `9` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `copilot auth login`, etc.).
 
 | Option | Tool | Highlights |
 |--------|------|------------|
@@ -112,8 +112,9 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or an `8` shortcut tha
 | `4` | Qoder CLI | Probes several npm scopes and accepts overrides (`QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--skip-probe`) plus local bundle installs. |
 | `5` | Qwen CLI | Enforces Node.js ≥ 18, bootstraps Node when missing, and uses `/dev/tty` for `qwen login` prompts with a `--package` override. |
 | `6` | OpenAI Codex CLI | Installs Codex/Cursor helpers and points you to the ChatGPT or `OPENAI_API_KEY` auth flow. |
-| `7` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
-| `8` | Install every CLI | Runs options `1-7` in batch mode (logins skipped, summary printed at the end). |
+| `7` | Cursor Agent CLI | Requires Node.js ≥ 18, installs `cursor-agent` via npm, and reminds you to run `cursor-agent login` (interactive runs open `/dev/tty`). |
+| `8` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
+| `9` | Install every CLI | Runs options `1-8` in batch mode (logins skipped, summary printed at the end). |
 
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
@@ -233,7 +234,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 ### Alt Menü Detayları
 
 #### AI CLI Menüsü
-Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `8` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `copilot auth login` vb.) özet olarak yazdırır.
+Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `9` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `copilot auth login` vb.) özet olarak yazdırır.
 
 | Seçenek | Araç | Detaylar |
 |---------|------|----------|
@@ -243,8 +244,9 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `8` kısayolun
 | `4` | Qoder CLI | Birden çok npm paket adını dener; `QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--package`, `--bundle`, `--skip-probe` gibi override seçeneklerini destekler. |
 | `5` | Qwen CLI | Node.js ≥ 18 şartını uygular, gerekirse Node kurulumunu başlatır, `/dev/tty` ile `qwen login` akışını yönetir ve `--package` override’ını destekler. |
 | `6` | OpenAI Codex CLI | Codex/Cursor yardımcılarını yükler, ChatGPT veya `OPENAI_API_KEY` tabanlı giriş akışını açıklar. |
-| `7` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
-| `8` | Hepsini Kur | `1-7` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+| `7` | Cursor Agent CLI | Node.js ≥ 18 gerektirir, `cursor-agent` paketini npm ile kurar ve interaktif modda `/dev/tty` üzerinden `cursor-agent login` komutunu çalıştırır. |
+| `8` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
+| `9` | Hepsini Kur | `1-8` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 #### AI Framework Menüsü
 Önce `pipx` ve gerekirse Python kurulumunu doğrular, ardından Super* framework’lerini tek tek veya toplu olarak kurar. API anahtar istemleri `/dev/tty` üzerinden aktığı için `curl | bash` senaryolarında bile güvenli şekilde giriş yapabilirsiniz.

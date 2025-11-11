@@ -117,6 +117,26 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `10` shortcut tha
 | `9` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
 | `10` | Install every CLI | Runs options `1-9` in batch mode (logins skipped, summary printed at the end). |
 
+##### Cursor Agent CLI
+Cursor’s official CLI exposes the editor’s “AI pair-programmer” features inside any terminal session. The installer enforces Node.js ≥ 18, falls back to npm’s user prefix when the global prefix is read-only, and reloads your shell so `cursor-agent` is immediately available. During interactive runs it opens `/dev/tty` and launches `cursor-agent login`; in batch mode it skips the login and prints a reminder so pipelines never block. Example flows:
+
+```bash
+cursor-agent run --prompt "Refactor utils.sh for readability"
+cursor-agent status
+cursor-agent logout
+```
+
+All workspaces and rate limits match what you see at https://cursor.com/cli.
+
+##### Cline CLI
+Cline (https://cline.bot/cline-cli) provides a multi-agent coding workflow driven by the `@cline/cli` package. Our installer mirrors the Cursor flow: it checks Node.js ≥ 18 (bootstrapping Node automatically when possible), installs the CLI globally via `npm_install_global_with_fallback`, and only invokes `cline login` when stdin/stdout are attached to a TTY. Batch installs simply print `cline login` instructions at the end. After logging in you can spin up workspaces or chat-driven refactors:
+
+```bash
+cline init my-playground
+cline chat --prompt "Generate integration tests for payments.ts"
+cline upgrade
+```
+
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
 
@@ -249,6 +269,28 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `10` kısayolu
 | `8` | Cline CLI | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
 | `9` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
 | `10` | Hepsini Kur | `1-9` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+
+##### Cursor Agent CLI
+Cursor’un resmi terminal aracı, editördeki “AI pair-programmer” deneyimini komut satırına taşır. Kurulum Node.js ≥ 18 kontrolü yapar, gerekirse npm kullanıcı prefix’ine düşer ve shell yeniden yüklendiği için `cursor-agent` komutu anında kullanılabilir. Etkileşimli modda `/dev/tty` üzerinden `cursor-agent login` çalıştırılır; toplu kurulumlar ise giriş adımını atlayıp kullanıcıyı bilgilendirir. Örnek kullanım:
+
+```bash
+cursor-agent run --prompt "utils.sh dosyasını sadeleştir"
+cursor-agent status
+cursor-agent logout
+```
+
+Workspace ve kota limitleri https://cursor.com/cli üzerindeki hesapla aynıdır.
+
+##### Cline CLI
+Cline (https://cline.bot/cline-cli), çoklu ajan tabanlı kodlama akışlarını `@cline/cli` paketi ile sunar. Installer Node.js ≥ 18 şartını doğrular (mümkünse Node’u otomatik kurar), npm global kurulumunda fallback uygular ve yalnızca etkileşimli oturumlarda `cline login` komutunu tetikler. Toplu kurulumlar giriş adımını atlayarak `cline login` hatırlatması basar. Giriş yaptıktan sonra:
+
+```bash
+cline init proje-deneme
+cline chat --prompt "payments.ts için entegrasyon testleri yaz"
+cline upgrade
+```
+
+Böylece terminalden Cline agent’larını yönetebilir, sohbet tabanlı refaktör süreçleri başlatabilirsiniz.
 
 #### AI Framework Menüsü
 Önce `pipx` ve gerekirse Python kurulumunu doğrular, ardından Super* framework’lerini tek tek veya toplu olarak kurar. API anahtar istemleri `/dev/tty` üzerinden aktığı için `curl | bash` senaryolarında bile güvenli şekilde giriş yapabilirsiniz.

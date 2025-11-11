@@ -54,6 +54,12 @@
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
 ```
 
+or with `wget`:
+
+```bash
+bash -c "$(wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+```
+
 #### 2. Local Clone
 
 ```bash
@@ -159,6 +165,12 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+```
+
+veya `wget` ile:
+
+```bash
+bash -c "$(wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
 ```
 
 #### 2. Yerel Klon

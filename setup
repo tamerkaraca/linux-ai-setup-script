@@ -111,7 +111,7 @@ main_menu() {
     
     while true; do
         clear
-        render_setup_banner "1.0.0" "https://github.com/tamerkaraca/linux-ai-setup-script"
+        render_setup_banner "1.0.1" "https://github.com/tamerkaraca/linux-ai-setup-script"
         
         echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
         echo -e "${BLUE}║                 ANA KURULUM MENÜSÜ            ║${NC}"

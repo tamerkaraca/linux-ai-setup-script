@@ -1,6 +1,14 @@
 #!/bin/bash
 set -euo pipefail
 
+UTILS_PATH="./modules/utils.sh"
+if [ ! -f "$UTILS_PATH" ] && [ -n "${BASH_SOURCE[0]:-}" ]; then
+    UTILS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils.sh"
+fi
+# shellcheck source=/dev/null
+[ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
+: "${NPM_LAST_INSTALL_PREFIX:=}"
+
 # Bu modül, Claude Code CLI'ı kurar ve etkileşimli oturum açma için TTY erişimini doğrular.
 
 # Renk değişkenlerini tanımla (set -u altında güvenli)
@@ -20,26 +28,6 @@ supporting_tty() {
         return 0
     fi
     return 1
-}
-
-# Node.js sürümünü kontrol et ve gerekli talimatları göster
-ensure_node_version() {
-    if command -v node >/dev/null 2>&1; then
-        node_major=$(node -v | sed -E 's/^v([0-9]+).*/\1/')
-        if [ "${node_major:-0}" -lt 20 ]; then
-            echo -e "${YELLOW}[UYARI]${NC} Node.js v20 veya daha yeni bir sürüm gerekli. Mevcut: $(node -v)"
-            echo -e "${YELLOW}[BİLGİ]${NC} Önerilen çözüm: nvm kullanarak Node 20+ yükleyin. Örnek:
-  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-  source ~/.bashrc
-  nvm install 20
-  nvm use 20
-"
-            return 1
-        fi
-    else
-        echo -e "${YELLOW}[UYARI]${NC} Node.js yüklü değil. Lütfen Node.js v20+ yükleyin (örn. nvm)."
-        return 1
-    fi
 }
 
 run_claude_login() {
@@ -64,12 +52,23 @@ install_claude_code() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} Claude Code kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-    
-    # Hızlı kontrol: Node.js sürümü uygun mu?
-    ensure_node_version || return 1
 
-    npm install -g @anthropic-ai/claude-code
-    
+    require_node_version 20 "Claude Code CLI" || return 1
+
+    if ! command -v npm >/dev/null 2>&1; then
+        echo -e "${RED}[HATA]${NC} npm bulunamadı. Lütfen önce Node.js/NPM araçlarını kurun (Ana Menü -> 3)."
+        return 1
+    fi
+
+    if ! npm_install_global_with_fallback "@anthropic-ai/claude-code" "Claude Code CLI"; then
+        echo -e "${RED}[HATA]${NC} Claude Code npm paketinin kurulumu başarısız oldu."
+        return 1
+    fi
+
+    if [ -n "${NPM_LAST_INSTALL_PREFIX}" ]; then
+        echo -e "${YELLOW}[BİLGİ]${NC} Kurulum prefix'i: ${NPM_LAST_INSTALL_PREFIX}"
+    fi
+
     echo -e "${GREEN}[BAŞARILI]${NC} Claude Code sürümü: $(claude --version)"
     
     if [ "$interactive_mode" = true ]; then

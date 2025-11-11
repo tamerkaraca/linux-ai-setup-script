@@ -1,6 +1,8 @@
 #!/bin/bash
 set -euo pipefail
 
+: "${NPM_LAST_INSTALL_PREFIX:=}"
+
 # Ortak yardımcı fonksiyonları yükle
 UTILS_PATH="./modules/utils.sh"
 if [ ! -f "$UTILS_PATH" ] && [ -n "${BASH_SOURCE[0]:-}" ]; then
@@ -54,12 +56,12 @@ ensure_modern_npm() {
 
     echo -e "${YELLOW}[UYARI]${NC} Mevcut npm sürümü (${current_version}) minimum gereksinim (${MIN_NPM_VERSION}) altında."
     if [ "$dry_run" = true ]; then
-        echo -e "${YELLOW}[DRY-RUN]${NC} sudo npm install -g npm@latest"
+        echo -e "${YELLOW}[DRY-RUN]${NC} npm install -g npm@latest (kullanıcı prefix)"
         return 0
     fi
 
     echo -e "${YELLOW}[BİLGİ]${NC} npm güncelleniyor..."
-    if sudo npm install -g npm@latest; then
+    if npm_install_global_with_fallback "npm@latest" "npm" true; then
         echo -e "${GREEN}[BAŞARILI]${NC} npm sürümü güncellendi: $(npm -v 2>/dev/null)"
         return 0
     fi
@@ -87,10 +89,10 @@ install_npm_cli() {
     ensure_modern_npm "$dry_run" || return 1
 
     if [ "$dry_run" = true ]; then
-        echo -e "${YELLOW}[DRY-RUN]${NC} sudo npm install -g ${npm_package}"
+        echo -e "${YELLOW}[DRY-RUN]${NC} npm install -g ${npm_package}"
     else
         echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} npm ile kuruluyor..."
-        if sudo npm install -g "$npm_package"; then
+        if npm_install_global_with_fallback "$npm_package" "$display_name"; then
             echo -e "${GREEN}[BAŞARILI]${NC} ${display_name} kurulumu tamamlandı."
             reload_shell_configs silent
         else
@@ -115,9 +117,46 @@ install_npm_cli() {
     fi
 }
 
+resolve_qoder_package() {
+    local -n resolved_ref=$1
+    local dry_run="${2:-false}"
+    local -a candidates=(
+        "@qoderhq/qoder"
+        "@qoderhq/cli"
+        "@qoder/cli"
+        "qoder-cli"
+        "qoder"
+    )
+
+    if [ "$dry_run" = true ]; then
+        resolved_ref="${candidates[0]}"
+        echo -e "${YELLOW}[DRY-RUN]${NC} Varsayılan npm paketi: ${resolved_ref}"
+        return 0
+    fi
+
+    local candidate
+    for candidate in "${candidates[@]}"; do
+        if npm view "$candidate" version >/dev/null 2>&1; then
+            resolved_ref="$candidate"
+            echo -e "${YELLOW}[BİLGİ]${NC} npm paketi bulundu: ${candidate}"
+            return 0
+        fi
+    done
+
+    echo -e "${RED}[HATA]${NC} Qoder CLI için npm kaydında uygun paket bulunamadı. Lütfen https://docs.qoder.com/cli/quick-start rehberindeki manuel kurulum adımlarını uygulayın."
+    return 1
+}
+
 install_qoder_cli() {
     local dry_run="${1:-false}"
-    install_npm_cli "Qoder CLI" "qoder" "qoder" "$dry_run"
+    if [ "$dry_run" != true ]; then
+        ensure_npm_available || return 1
+    fi
+    local resolved_package=""
+    if ! resolve_qoder_package resolved_package "$dry_run"; then
+        return 1
+    fi
+    install_npm_cli "Qoder CLI" "$resolved_package" "qoder" "$dry_run"
 }
 
 install_coder_cli() {

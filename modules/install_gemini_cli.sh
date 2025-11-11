@@ -1,7 +1,20 @@
 #!/bin/bash
+set -euo pipefail
 
-# Ortak yardımcı fonksiyonları yükle
+UTILS_PATH="./modules/utils.sh"
+if [ ! -f "$UTILS_PATH" ] && [ -n "${BASH_SOURCE[0]:-}" ]; then
+    UTILS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils.sh"
+fi
+# shellcheck source=/dev/null
+[ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
+: "${NPM_LAST_INSTALL_PREFIX:=}"
 
+: "${RED:=$'\033[0;31m'}"
+: "${GREEN:=$'\033[0;32m'}"
+: "${YELLOW:=$'\033[1;33m'}"
+: "${BLUE:=$'\033[0;34m'}"
+: "${CYAN:=$'\033[0;36m'}"
+: "${NC:=$'\033[0m'}"
 
 # Gemini CLI kurulumu
 install_gemini_cli() {
@@ -10,30 +23,22 @@ install_gemini_cli() {
     echo -e "${YELLOW}[BİLGİ]${NC} Gemini CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    # Node.js sürümünü kontrol et; Gemini CLI ve bağımlılıkları genellikle Node >=20 gerektirir
-    ensure_node_version() {
-        if command -v node >/dev/null 2>&1; then
-            node_major=$(node -v | sed -E 's/^v([0-9]+).*/\1/')
-            if [ "${node_major:-0}" -lt 20 ]; then
-                echo -e "${YELLOW}[UYARI]${NC} Node.js v20 veya daha yeni bir sürüm gerekli. Mevcut: $(node -v)"
-                echo -e "${YELLOW}[BİLGİ]${NC} Önerilen çözüm: nvm kullanarak Node 20+ yükleyin. Örnek:
-  curl -fsSL https://raw.githubusercontent.com/nvm-sh/nvm/v0.39.5/install.sh | bash
-  source ~/.bashrc
-  nvm install 20
-  nvm use 20
-"
-                return 1
-            fi
-        else
-            echo -e "${YELLOW}[UYARI]${NC} Node.js yüklü değil. Lütfen Node.js v20+ yükleyin (örn. nvm)."
-            return 1
-        fi
-    }
+    require_node_version 20 "Gemini CLI" || return 1
 
-    ensure_node_version || return 1
+    if ! command -v npm >/dev/null 2>&1; then
+        echo -e "${RED}[HATA]${NC} npm komutu bulunamadı. Lütfen Node.js kurulumu sonrası 'npm' erişilebilir olsun."
+        return 1
+    fi
 
-    npm install -g @google/gemini-cli
-    
+    if ! npm_install_global_with_fallback "@google/gemini-cli" "Gemini CLI"; then
+        echo -e "${RED}[HATA]${NC} Gemini CLI npm paketinin kurulumu başarısız oldu."
+        return 1
+    fi
+
+    if [ -n "${NPM_LAST_INSTALL_PREFIX}" ]; then
+        echo -e "${YELLOW}[BİLGİ]${NC} Kurulum prefix'i: ${NPM_LAST_INSTALL_PREFIX}"
+    fi
+
     echo -e "${GREEN}[BAŞARILI]${NC} Gemini CLI sürümü: $(gemini --version)"
     
     if [ "$interactive_mode" = true ]; then
@@ -41,7 +46,7 @@ install_gemini_cli() {
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'gemini auth' veya ilgili oturum açma komutunu çalıştırın."
         echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
         
-        gemini auth 2>/dev/null || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
+        gemini auth </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
         
         echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
         read -r -p "Devam etmek için Enter'a basın..." </dev/tty
@@ -49,7 +54,7 @@ install_gemini_cli() {
         echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
         echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}gemini auth${NC}' komutunu çalıştırın."
     fi
-    
+
     echo -e "${GREEN}[BAŞARILI]${NC} Gemini CLI kurulumu tamamlandı!"
 }
 
@@ -58,4 +63,4 @@ main() {
     install_gemini_cli "$@"
 }
 
-main
+main "$@"

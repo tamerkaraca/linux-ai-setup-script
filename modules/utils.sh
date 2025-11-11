@@ -286,3 +286,163 @@ install_pipx() {
         return 1
     fi
 }
+
+# PATH yardımcıları ve npm kurulum fallback'i
+
+# Belirli bir dizinin PATH'e eklendiğinden emin olur ve gerekli durumda shell rc dosyalarını günceller.
+ensure_path_contains_dir() {
+    local target_dir="$1"
+    local reason="${2:-custom path entry}"
+    local updated_files=()
+
+    if [[ -z "${target_dir}" ]]; then
+        return 0
+    fi
+
+    if [[ ":$PATH:" != *":${target_dir}:"* ]]; then
+        export PATH="${target_dir}:$PATH"
+    fi
+
+    for rc_file in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
+        if [ -f "$rc_file" ] && ! grep -Fq "$target_dir" "$rc_file"; then
+            {
+                echo ""
+                echo "# Added by linux-ai-setup-script (${reason})"
+                echo "export PATH=\"${target_dir}:\$PATH\""
+            } >> "$rc_file"
+            updated_files+=("$rc_file")
+        fi
+    done
+
+    if [ ${#updated_files[@]} -gt 0 ]; then
+        echo -e "${YELLOW}[BİLGİ]${NC} '${target_dir}' PATH'e eklendi (${updated_files[*]}). Terminalinizi yeniden başlatın veya 'source ${updated_files[0]}' komutunu çalıştırın."
+    fi
+
+    hash -r 2>/dev/null || true
+}
+
+# Kullanıcı bazlı npm prefix dizinini hazırlar ve yolunu döner.
+npm_prepare_user_prefix() {
+    local prefix="${NPM_USER_PREFIX:-$HOME/.local}"
+    mkdir -p "${prefix}/bin" "${prefix}/lib/node_modules"
+    echo "$prefix"
+}
+
+# npm global kurulumları için /usr/local gibi yazılamayan dizinlerde kullanıcı bazlı prefix'e düşer.
+npm_install_global_with_fallback() {
+    local package="$1"
+    local display_name="${2:-$1}"
+    local prefer_user_prefix="${3:-false}"
+    local default_prefix=""
+    local fallback_prefix
+
+    NPM_LAST_INSTALL_PREFIX=""
+
+    if [ "$prefer_user_prefix" != "true" ]; then
+        default_prefix=$(npm config get prefix 2>/dev/null | tr -d '\r') || true
+        if [ -z "$default_prefix" ]; then
+            default_prefix=$(npm root -g 2>/dev/null | xargs dirname 2>/dev/null || true)
+        fi
+    fi
+
+    if [ -n "$default_prefix" ] && [ -d "$default_prefix" ] && [ -w "$default_prefix" ]; then
+        if npm install -g "$package"; then
+            NPM_LAST_INSTALL_PREFIX="$default_prefix"
+            return 0
+        fi
+        echo -e "${YELLOW}[UYARI]${NC} ${display_name} varsayılan prefixte kurulamadı. Kullanıcı dizinine düşülüyor..."
+    elif [ -n "$default_prefix" ]; then
+        echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} için varsayılan prefix (${default_prefix}) yazılamıyor; kullanıcı dizinine kurulacak."
+    fi
+
+    fallback_prefix=$(npm_prepare_user_prefix)
+    echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} kullanıcı prefixine kuruluyor: ${fallback_prefix}"
+    if npm install -g --prefix "$fallback_prefix" "$package"; then
+        NPM_LAST_INSTALL_PREFIX="$fallback_prefix"
+        ensure_path_contains_dir "${fallback_prefix}/bin" "npm user prefix"
+        return 0
+    fi
+
+    echo -e "${RED}[HATA]${NC} ${display_name} kullanıcı prefixine kurulamadı."
+    return 1
+}
+
+NPM_LAST_INSTALL_PREFIX="${NPM_LAST_INSTALL_PREFIX:-}"
+
+NODE_BOOTSTRAP_ATTEMPTED="${NODE_BOOTSTRAP_ATTEMPTED:-0}"
+
+find_module_script() {
+    local target="$1"
+    local -a candidates=("./modules/${target}")
+    if [ -n "${BASH_SOURCE[0]:-}" ]; then
+        local util_dir
+        util_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+        candidates+=("${util_dir}/${target}")
+    fi
+
+    local candidate
+    for candidate in "${candidates[@]}"; do
+        if [ -f "$candidate" ]; then
+            echo "$candidate"
+            return 0
+        fi
+    done
+
+    return 1
+}
+
+bootstrap_node_runtime() {
+    if [ "${NODE_BOOTSTRAP_ATTEMPTED}" = "1" ]; then
+        return 1
+    fi
+
+    local installer_path
+    if ! installer_path="$(find_module_script "install_nodejs_tools.sh")"; then
+        echo -e "${YELLOW}[UYARI]${NC} Node.js kurulumu için 'install_nodejs_tools.sh' bulunamadı."
+        NODE_BOOTSTRAP_ATTEMPTED=1
+        return 1
+    fi
+
+    NODE_BOOTSTRAP_ATTEMPTED=1
+    echo -e "${YELLOW}[BİLGİ]${NC} Node.js eksik; otomatik kurulum deneniyor (${installer_path})."
+    if bash "$installer_path" --node-only; then
+        reload_shell_configs silent
+        hash -r 2>/dev/null || true
+        return 0
+    fi
+
+    echo -e "${RED}[HATA]${NC} Node.js otomatik kurulumu başarısız oldu. Lütfen 'Ana Menü -> 3' seçeneğini manuel çalıştırın."
+    return 1
+}
+
+require_node_version() {
+    local min_major="${1:-18}"
+    local context_label="${2:-Node.js}"
+    local attempt_bootstrap="${3:-true}"
+
+    if command -v node >/dev/null 2>&1; then
+        local current_major
+        current_major=$(node -v | sed -E 's/^v([0-9]+).*/\1/')
+        if [ "${current_major:-0}" -ge "${min_major}" ]; then
+            return 0
+        fi
+        echo -e "${YELLOW}[UYARI]${NC} ${context_label} için Node.js v${min_major}+ gerekiyor, mevcut sürüm: $(node -v)."
+    else
+        echo -e "${YELLOW}[UYARI]${NC} ${context_label} için Node.js v${min_major}+ gerekiyor ancak sistemde Node.js bulunamadı."
+    fi
+
+    if [ "$attempt_bootstrap" = true ] && bootstrap_node_runtime; then
+        if command -v node >/dev/null 2>&1; then
+            local refreshed_major
+            refreshed_major=$(node -v | sed -E 's/^v([0-9]+).*/\1/')
+            if [ "${refreshed_major:-0}" -ge "${min_major}" ]; then
+                echo -e "${GREEN}[BAŞARILI]${NC} Node.js kurulumu tamamlandı: $(node -v)"
+                return 0
+            fi
+        fi
+        echo -e "${YELLOW}[UYARI]${NC} Node.js kuruldu ancak sürüm gereksinimini karşılamıyor."
+    fi
+
+    echo -e "${RED}[HATA]${NC} ${context_label} kurulumu Node.js ${min_major}+ olmadan devam edemez."
+    return 1
+}

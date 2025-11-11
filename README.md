@@ -91,7 +91,7 @@ bash -n setup && shellcheck setup  # optional
 | `4` | Install AI CLI tools (opens sub-menu). |
 | `5` | Install AI frameworks (opens sub-menu; handles Pipx, GLM prompts, tty-safe runs). |
 | `6` | Git configuration (name/email, signing, alias suggestions). |
-| `7` | GLM-4.6 Claude Code configuration (masked key display, base URL management). |
+| `7` | Claude Code provider menu (GLM-4.6 or Moonshot kimi-k2 with masked key + base URL helpers). |
 | `8` | PHP & Composer installer with selectable versions and Laravel-friendly extensions. |
 | `9` | GitHub CLI install with official repo keys. |
 | `10` | Remove AI frameworks (Super* uninstall + cleanup). |
@@ -228,6 +228,14 @@ OPENAI_API_KEY=sk-... aider --architect "Plan a plugin architecture"
 
 Because Aider is pipx-managed, upgrades are as easy as `pipx upgrade aider-chat`.
 
+##### Claude Code Providers (Option 7)
+Option `7` in the primary menu now opens a mini-menu that targets two officially documented workflows:
+
+- **GLM-4.6 via z.ai (https://z.ai/model-api):** The script creates `~/.claude/settings.json`, masks the existing `ANTHROPIC_AUTH_TOKEN`, and lets you override the default base URL (`https://api.z.ai/api/anthropic`). It pins `ANTHROPIC_DEFAULT_*` models to `GLM-4.6` / `GLM-4.5-Air`, matching GLM Coding Plan guidance.
+- **Moonshot kimi-k2 via platform.moonshot.ai (https://platform.moonshot.ai/docs/guide/agent-support#install-claude-code):** Before writing the config, the module enforces Node.js ≥ 18 (Moonshot also installs its own Claude Code CLI build) and optionally reinstalls `@anthropic-ai/claude-code`. It then prompts for your Moonshot API key, base URL (defaults to `https://api.moonshot.ai/anthropic`), and preferred model (`kimi-k2-0711-preview` or `kimi-k2-turbo-preview`). All values are written back to `~/.claude/settings.json`, so rerunning the menu simply masks existing keys if you need to rotate secrets later on.
+
+Both flows surface the upstream documentation links and keep the key in place if you press Enter, which makes credential rotation painless.
+
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
 
@@ -335,7 +343,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `4` | AI CLI araçları (alt menü). |
 | `5` | AI Frameworkleri (SuperGemini/SuperQwen/SuperClaude). |
 | `6` | Git yapılandırması. |
-| `7` | GLM-4.6 ayarları (anahtar maskeleme). |
+| `7` | Claude Code sağlayıcı menüsü (GLM-4.6 veya Moonshot kimi-k2 ayarları). |
 | `8` | PHP & Composer kurulum sihirbazı. |
 | `9` | GitHub CLI. |
 | `10` | AI Framework kaldırma menüsü. |
@@ -471,6 +479,14 @@ OPENAI_API_KEY=sk-... aider --architect "Eklenti mimarisi tasarla"
 ```
 
 Pipx sayesinde `pipx upgrade aider-chat` komutuyla güncelleyebilirsiniz.
+
+##### Claude Code Sağlayıcıları (Seçenek 7)
+Ana menüdeki `7` numaralı seçenek artık iki resmi senaryoyu kapsayan küçük bir menü açar:
+
+- **GLM-4.6 (z.ai)** – https://z.ai/model-api üzerinden alınan API key’i maskeleyerek `~/.claude/settings.json` dosyasına yazar, varsayılan `https://api.z.ai/api/anthropic` adresini dilerseniz değiştirmenize izin verir ve `ANTHROPIC_DEFAULT_*` modellerini GLM-4.6/GLM-4.5-Air olarak belirler.
+- **Moonshot kimi-k2** – https://platform.moonshot.ai/docs/guide/agent-support#install-claude-code rehberindeki adımlara göre önce Node.js ≥ 18 koşulunu doğrular (gerekirse Claude Code CLI’yi yeniden kurmayı teklif eder), ardından Moonshot API key’inizi, taban URL’yi (`https://api.moonshot.ai/anthropic`) ve tercih edilen modeli (`kimi-k2-0711-preview` veya `kimi-k2-turbo-preview`) ister. Tüm değerler `~/.claude/settings.json` dosyasına yazıldığı için daha sonra sadece Enter’a basarak anahtarları koruyabilirsiniz.
+
+Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut anahtarlarınızı maskeleyerek hızlıca rota değiştirmenize olanak tanır.
 
 #### AI Framework Menüsü
 Önce `pipx` ve gerekirse Python kurulumunu doğrular, ardından Super* framework’lerini tek tek veya toplu olarak kurar. API anahtar istemleri `/dev/tty` üzerinden aktığı için `curl | bash` senaryolarında bile güvenli şekilde giriş yapabilirsiniz.

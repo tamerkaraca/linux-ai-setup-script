@@ -87,6 +87,13 @@ install_ai_cli_tools_menu() {
                 fi
                 ;;
             9)
+                label="Aider CLI"
+                login_hint="aider --help (API anahtarlarını export edin)"
+                if ! run_module "install_aider_cli" "$interactive"; then
+                    success=1
+                fi
+                ;;
+            10)
                 label="GitHub Copilot CLI"
                 login_hint="copilot auth login && copilot auth activate"
                 if ! run_module "install_copilot_cli" "$interactive"; then
@@ -123,8 +130,9 @@ install_ai_cli_tools_menu() {
             echo -e "  ${GREEN}6${NC} OpenAI Codex CLI"
             echo -e "  ${GREEN}7${NC} Cursor Agent CLI"
             echo -e "  ${GREEN}8${NC} Cline CLI"
-            echo -e "  ${GREEN}9${NC} GitHub Copilot CLI"
-            echo -e "  ${GREEN}10${NC} Tümünü Kur"
+            echo -e "  ${GREEN}9${NC} Aider CLI"
+            echo -e "  ${GREEN}10${NC} GitHub Copilot CLI"
+            echo -e "  ${GREEN}11${NC} Tümünü Kur"
             echo -e "  ${RED}0${NC} Ana Menü"
             echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,3,7)."
             echo
@@ -139,7 +147,7 @@ install_ai_cli_tools_menu() {
                 break
             fi
         else
-            cli_choices="10"
+            cli_choices="11"
             batch_context=true
         fi
 
@@ -154,7 +162,7 @@ install_ai_cli_tools_menu() {
             choice=$(echo "$choice" | tr -d '[:space:]')
             [ -z "$choice" ] && continue
 
-            if [ "$choice" = "10" ]; then
+            if [ "$choice" = "11" ]; then
                 batch_context=true
             fi
 
@@ -164,12 +172,12 @@ install_ai_cli_tools_menu() {
             fi
 
             case $choice in
-                1|2|3|4|5|6|7|8|9)
+                1|2|3|4|5|6|7|8|9|10)
                     run_cli_choice "$choice" "$interactive_flag" || true
                     ;;
-                10)
+                11)
                     batch_context=true
-                    for sub_choice in 1 2 3 4 5 6 7 8 9; do
+                    for sub_choice in 1 2 3 4 5 6 7 8 9 10; do
                         run_cli_choice "$sub_choice" "false" || true
                     done
                     all_installed=true

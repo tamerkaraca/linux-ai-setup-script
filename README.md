@@ -37,7 +37,7 @@
 
 ### Overview
 
-`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, OpenAI Codex, Copilot CLI), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
+`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, OpenAI Codex, Copilot CLI), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
 
 ### Architecture
 
@@ -102,7 +102,7 @@ bash -n setup && shellcheck setup  # optional
 ### CLI & Framework Sub-menus
 
 #### AI CLI Menu
-The sub-menu accepts comma-separated selections (`1,3,7`) or a `10` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `copilot auth login`, etc.).
+The sub-menu accepts comma-separated selections (`1,3,7`) or an `11` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `copilot auth login`, etc.).
 
 | Option | Tool | Highlights |
 |--------|------|------------|
@@ -114,8 +114,9 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `10` shortcut tha
 | `6` | OpenAI Codex CLI | Installs Codex/Cursor helpers and points you to the ChatGPT or `OPENAI_API_KEY` auth flow. |
 | `7` | Cursor Agent CLI | Requires Node.js ≥ 18, installs `cursor-agent` via npm, and reminds you to run `cursor-agent login` (interactive runs open `/dev/tty`). |
 | `8` | Cline CLI | Requires Node.js ≥ 18, installs the `@cline/cli` package, and prompts for `cline login` only during interactive runs. |
-| `9` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
-| `10` | Install every CLI | Runs options `1-9` in batch mode (logins skipped, summary printed at the end). |
+| `9` | Aider CLI | Installs the `aider-chat` package via pipx (Node.js ≥ 18 guard) and reminds you to export provider API keys before running `aider`. |
+| `10` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
+| `11` | Install every CLI | Runs options `1-10` in batch mode (logins skipped, summary printed at the end). |
 
 ##### Cursor Agent CLI
 Cursor’s official CLI exposes the editor’s “AI pair-programmer” features inside any terminal session. The installer enforces Node.js ≥ 18, falls back to npm’s user prefix when the global prefix is read-only, and reloads your shell so `cursor-agent` is immediately available. During interactive runs it opens `/dev/tty` and launches `cursor-agent login`; in batch mode it skips the login and prints a reminder so pipelines never block. Example flows:
@@ -136,6 +137,19 @@ cline init my-playground
 cline chat --prompt "Generate integration tests for payments.ts"
 cline upgrade
 ```
+
+Batches reuse your npm cache, so `install_ai_cli_tools_menu all` remains fast.
+
+##### Aider CLI
+Aider (https://aider.chat/docs/install.html) is a GPT-powered pair-programming tool distributed as the `aider-chat` Python package. Even though it runs on Python, the installer enforces Node.js ≥ 18 to stay aligned with the repo baseline (and because most users install Cursor/Cline alongside it). After passing the Node check, the script ensures pipx + Python exist, installs `aider-chat`, reloads your shell, and prints reminders to set environment variables such as `OPENAI_API_KEY`, `AIDER_ANTHROPIC_API_KEY`, or `ANTHROPIC_API_KEY`. Interactive runs pause so you can paste keys immediately; batch runs simply remind you to export them later. Typical commands:
+
+```bash
+aider --help
+aider --model gpt-4o-mini app/main.py
+OPENAI_API_KEY=sk-... aider --architect "Plan a plugin architecture"
+```
+
+Because Aider is pipx-managed, upgrades are as easy as `pipx upgrade aider-chat`.
 
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
@@ -255,7 +269,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 ### Alt Menü Detayları
 
 #### AI CLI Menüsü
-Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `10` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `copilot auth login` vb.) özet olarak yazdırır.
+Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `11` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `copilot auth login` vb.) özet olarak yazdırır.
 
 | Seçenek | Araç | Detaylar |
 |---------|------|----------|
@@ -267,8 +281,9 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `10` kısayolu
 | `6` | OpenAI Codex CLI | Codex/Cursor yardımcılarını yükler, ChatGPT veya `OPENAI_API_KEY` tabanlı giriş akışını açıklar. |
 | `7` | Cursor Agent CLI | Node.js ≥ 18 gerektirir, `cursor-agent` paketini npm ile kurar ve interaktif modda `/dev/tty` üzerinden `cursor-agent login` komutunu çalıştırır. |
 | `8` | Cline CLI | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
-| `9` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
-| `10` | Hepsini Kur | `1-9` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+| `9` | Aider CLI | Pipx üzerinden `aider-chat` paketini kurar (Node.js ≥ 18 kontrolü sonrası) ve API anahtarlarını export etmeniz gerektiğini hatırlatır. |
+| `10` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
+| `11` | Hepsini Kur | `1-10` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 ##### Cursor Agent CLI
 Cursor’un resmi terminal aracı, editördeki “AI pair-programmer” deneyimini komut satırına taşır. Kurulum Node.js ≥ 18 kontrolü yapar, gerekirse npm kullanıcı prefix’ine düşer ve shell yeniden yüklendiği için `cursor-agent` komutu anında kullanılabilir. Etkileşimli modda `/dev/tty` üzerinden `cursor-agent login` çalıştırılır; toplu kurulumlar ise giriş adımını atlayıp kullanıcıyı bilgilendirir. Örnek kullanım:
@@ -291,6 +306,17 @@ cline upgrade
 ```
 
 Böylece terminalden Cline agent’larını yönetebilir, sohbet tabanlı refaktör süreçleri başlatabilirsiniz.
+
+##### Aider CLI
+Aider (https://aider.chat/docs/install.html), GPT tabanlı eş programlama deneyimini pipx ile dağıtılan `aider-chat` paketi üzerinden sunar. Installer Node.js ≥ 18 şartını doğrular (repo standartları ile uyumlu), pipx + Python’un kurulu olduğundan emin olur ve paketi yükledikten sonra shell’i yeniden yükler. Etkileşimli modda script, `OPENAI_API_KEY`, `AIDER_ANTHROPIC_API_KEY` gibi değişkenleri export etmeniz için bekler; toplu modda ise yalnızca hatırlatma mesajı verir. Örnek kullanım:
+
+```bash
+aider --help
+aider --model gpt-4o-mini app/main.py
+OPENAI_API_KEY=sk-... aider --architect "Eklenti mimarisi tasarla"
+```
+
+Pipx sayesinde `pipx upgrade aider-chat` komutuyla güncelleyebilirsiniz.
 
 #### AI Framework Menüsü
 Önce `pipx` ve gerekirse Python kurulumunu doğrular, ardından Super* framework’lerini tek tek veya toplu olarak kurar. API anahtar istemleri `/dev/tty` üzerinden aktığı için `curl | bash` senaryolarında bile güvenli şekilde giriş yapabilirsiniz.

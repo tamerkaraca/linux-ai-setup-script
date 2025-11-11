@@ -10,6 +10,7 @@
 : "${NC:=$'\033[0m'}"
 : "${BOLD:=$'\033[1m'}"
 
+BANNER_READY="${BANNER_READY:-false}"
 # shellcheck disable=SC2034
 RAINBOW_COLORS=("$RED" "$YELLOW" "$GREEN" "$CYAN" "$BLUE" "$MAGENTA")
 # shellcheck disable=SC2034
@@ -68,8 +69,40 @@ print_info_panel() {
 render_setup_banner() {
     local version="$1"
     local repo="$2"
-    print_banner_block BANNER_AI
-    print_banner_block BANNER_AUTHOR
+    if ensure_toilet; then
+        toilet -f standard "AI CLI ARACLARI KURULUMU" --gay
+        toilet -f standard "TAMER KARACA" --metal
+    else
+        print_banner_block BANNER_AI
+        print_banner_block BANNER_AUTHOR
+    fi
     print_info_panel "$version" "$repo"
     echo
+}
+
+ensure_toilet() {
+    if command -v toilet &> /dev/null; then
+        return 0
+    fi
+
+    if [ -z "${PKG_MANAGER:-}" ] || [ -z "${INSTALL_CMD:-}" ]; then
+        echo -e "${YELLOW}[UYARI]${NC} 'toilet' komutu bulunamadı ve paket yöneticisi tespit edilemedi."
+        return 1
+    fi
+
+    echo -e "${YELLOW}[BİLGİ]${NC} 'toilet' aracı kuruluyor..."
+    case "$PKG_MANAGER" in
+        apt|dnf|yum|pacman)
+            if eval "$INSTALL_CMD" toilet; then
+                return 0
+            fi
+            ;;
+        *)
+            echo -e "${RED}[HATA]${NC} $PKG_MANAGER paket yöneticisi için otomatik 'toilet' kurulumu desteklenmiyor."
+            return 1
+            ;;
+    esac
+
+    echo -e "${RED}[HATA]${NC} 'toilet' kurulumu başarısız oldu."
+    return 1
 }

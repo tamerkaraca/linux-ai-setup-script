@@ -9,7 +9,7 @@ The `setup` script automates preparing a Linux workstation for AI development. I
 
 ### Features
 - **Modular & On-Demand Installation:** The `setup` script provides an interactive menu to select and install only the components you need. Each component is downloaded and executed via `curl` on demand, avoiding a full repository clone for initial setup.
-- Automatic package-manager detection, colored logging, and CRLF self-healing.
+- Automatic package-manager detection, colored logging, vivid 3D startup banners (powered by `toilet`), and CRLF self-healing.
 - System upgrade + essential developer tooling (curl, wget, git, jq, zip/unzip, build toolchains).
 - Full Python toolchain (python3, pip, pipx, UV) and JavaScript runtimes (NVM-managed Node.js, Bun).
 - AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI, plus GitHub CLI.
@@ -20,7 +20,8 @@ The `setup` script automates preparing a Linux workstation for AI development. I
 
 ### Requirements
 - Linux distribution with one of `apt`, `dnf`, `yum`, or `pacman`.
-- `bash` 5+, `sudo` privileges, and an active internet connection (cURL downloads, package repos).
+- `bash` 5+, `sudo` privileges, and an active internet connection (cURL downloads, package repos).  
+  The script auto-installs the `toilet` CLI (for the rainbow banner) through your package manager if it is missing.
 - Optional but recommended: `dos2unix` for faster CRLF fixes and `shellcheck` for static analysis.
 
 ### Installation
@@ -91,7 +92,7 @@ If you prefer to inspect the code or contribute, you can clone the repository:
 
 ### Özellikler
 - **Modüler ve İsteğe Bağlı Kurulum:** `setup` script'i, yalnızca ihtiyacınız olan bileşenleri seçip kurmanız için etkileşimli bir menü sunar. Her bileşen, ilk kurulum için tüm depoyu klonlamaya gerek kalmadan, isteğe bağlı olarak `curl` aracılığıyla indirilir ve çalıştırılır.
-- Paket yöneticisi tespiti, renkli günlükler ve CRLF otomatik düzeltmesi ile sürüm kontrolünde güvenli kullanım.
+- Paket yöneticisi tespiti, renkli günlükler, `toilet` tabanlı 3B açılış banner'ı ve CRLF otomatik düzeltmesi ile sürüm kontrolünde güvenli kullanım.
 - Sistem güncellemesi + temel geliştirici araçları (curl, wget, git, jq, zip/unzip, derleme araçları).
 - Python ekosistemi (python3, pip, pipx, UV) ve JavaScript çalıştırıcıları (NVM ile Node.js, Bun).
 - AI CLI kurulumları: Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, GitHub Copilot CLI, GitHub CLI.

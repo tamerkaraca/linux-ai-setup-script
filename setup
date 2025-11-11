@@ -122,7 +122,7 @@ main_menu() {
         echo -e "  ${GREEN}4${NC} - AI CLI Araçlarını Kur (Claude Code, Gemini CLI, vb.)"
         echo -e "  ${GREEN}5${NC} - AI Frameworklerini Kur (SuperGemini, SuperQwen, SuperClaude)"
         echo -e "  ${GREEN}6${NC} - Git Yapılandırması"
-        echo -e "  ${GREEN}7${NC} - GLM-4.6 Claude Code Yapılandırması"
+        echo -e "  ${GREEN}7${NC} - Claude Code Sağlayıcı Yapılandırması"
         echo -e "  ${GREEN}8${NC} - PHP ve Composer Kurulumu"
         echo -e "  ${GREEN}9${NC} - GitHub CLI Kurulumu"
         echo -e "  ${GREEN}10${NC} - AI Frameworklerini Kaldır"

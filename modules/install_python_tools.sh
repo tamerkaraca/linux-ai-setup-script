@@ -251,7 +251,7 @@ run_python_tools_menu() {
     while true; do
         clear
         echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        echo -e "${BLUE}║          Python Araçları Kurulum Menüsü        ║${NC}"
+        echo -e "${BLUE}║          Python Araçları Kurulum Menüsü       ║${NC}"
         echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
         echo -e "  ${GREEN}1${NC} - Python 3 Kur"
         echo -e "  ${GREEN}2${NC} - Pip Kur / Güncelle"

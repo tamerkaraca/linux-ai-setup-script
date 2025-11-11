@@ -8,41 +8,65 @@
 : "${NC:=$'\033[0m'}"
 : "${BOLD:=$'\033[1m'}"
 
-BANNER_AI=("=== AI CLI ARACLARI ===")
-BANNER_DEV=("=== GELISTIRME ARACLARI ===")
+HEADING_WIDTH=70
+BANNER_AI_TITLE="AI CLI ARACLARI"
+BANNER_DEV_TITLE="GELISTIRME ARACLARI"
 
-print_banner_block() {
-    local -n banner_ref="$1"
-    for line in "${banner_ref[@]}"; do
-        echo -e "${CYAN}${line}${NC}"
+center_text() {
+    local text="$1"
+    local width="$2"
+    local plain
+    plain=$(printf '%s' "$text" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
+    local len=${#plain}
+    if [ "$len" -ge "$width" ]; then
+        printf "%s" "$text"
+        return
+    fi
+    local padding=$((width - len))
+    local left=$((padding / 2))
+    local right=$((padding - left))
+    printf "%*s%s%*s" "$left" "" "$text" "$right" ""
+}
+
+panel_line_raw() {
+    local content="$1"
+    local plain
+    plain=$(printf '%s' "$content" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
+    local len=${#plain}
+    local pad=$((HEADING_WIDTH - len + 1))
+    [ "$pad" -lt 1 ] && pad=1
+    printf "%s %s%*s%s\n" "${BLUE}║${NC}" "$content" "$pad" "" "${BLUE}║${NC}"
+}
+
+print_heading_panel() {
+    local -a titles=("$@")
+    local border_top="╔════════════════════════════════════════════════════════════════════════╗"
+    local border_bottom="╚════════════════════════════════════════════════════════════════════════╝"
+    echo -e "${BLUE}${border_top}${NC}"
+    for title in "${titles[@]}"; do
+        panel_line_raw "$(center_text "${BOLD}${title}${NC}" "$HEADING_WIDTH")"
     done
+    echo -e "${BLUE}${border_bottom}${NC}"
 }
 
 print_info_panel() {
     local version="$1"
     local repo="$2"
-    local inner_width=66
 
-    panel_line() {
-        local content="$1"
-        printf "%s %-${inner_width}s %s\n" "${BLUE}║${NC}" "$content" "${BLUE}║${NC}"
-    }
-
-    echo -e "${BLUE}╔══════════════════════════════════════════════════════════════════════╗${NC}"
-    panel_line "${BOLD}Script Bilgileri                                                    ${NC}"
-    echo -e "${BLUE}╠══════════════════════════════════════════════════════════════════════╣${NC}"
-    panel_line "Versiyon      : ${GREEN}${version}                                               ${NC}"
-    panel_line "Geliştirici   : ${GREEN}Tamer KARACA                                        ${NC}"
-    panel_line "GitHub Hesabı : ${CYAN}@tamerkaraca                                        ${NC}"
-    panel_line "Depo          : ${CYAN}${repo}${NC}"
-    echo -e "${BLUE}╚══════════════════════════════════════════════════════════════════════╝${NC}"
+    echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+    panel_line_raw "${BOLD}Script Bilgileri${NC}"
+    echo -e "${BLUE}╠════════════════════════════════════════════════════════════════════════╣${NC}"
+    panel_line_raw "Versiyon      : ${GREEN}${version}${NC}"
+    panel_line_raw "Geliştirici   : ${GREEN}Tamer KARACA${NC}"
+    panel_line_raw "GitHub Hesabı : ${CYAN}@tamerkaraca${NC}"
+    panel_line_raw "Depo          : ${CYAN}${repo}${NC}"
+    echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
 render_setup_banner() {
     local version="$1"
     local repo="$2"
-    print_banner_block BANNER_AI
-    print_banner_block BANNER_DEV
+    print_heading_panel "$BANNER_AI_TITLE" "$BANNER_DEV_TITLE"
     print_info_panel "$version" "$repo"
     echo
 }

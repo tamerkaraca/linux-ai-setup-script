@@ -532,7 +532,7 @@ Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut a
 ### Emek Verenler
 
 - **Geliştirici:** Tamer Karaca  
-- **Topluluk:** Super* framework ekipleri, açık kaynak katkıcıları.
+- **Framework Ekipleri:** SuperGemini/SuperQwen/SuperClaude, Anthropic, Google, OpenAI, GitHub Copilot CLI katkıcıları
 
 ### Lisans
 

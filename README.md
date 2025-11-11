@@ -539,7 +539,3 @@ Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut a
 ### Lisans
 
 Bu proje **MIT Lisansı** ile dağıtılır. Ayrıntılar için [LICENSE](./LICENSE) dosyasına bakın.
-- **Where to find it:** `setup` main menu → option `7` (“Claude Code Provider Setup”) → choose `1` (GLM-4.6 / z.ai) or `2` (Moonshot kimi-k2).
-- **Inputs collected:** both flows only ask for the API key (masked if already present). GLM always writes `ANTHROPIC_BASE_URL=https://api.z.ai/api/anthropic`; Moonshot always writes `ANTHROPIC_BASE_URL=https://api.moonshot.ai/anthropic` and also prompts for the preferred kimi model.
-- **CLI refresh:** the Moonshot path optionally reinstalls `@anthropic-ai/claude-code` via npm before writing the config, matching Moonshot’s official guide.
-- **Result:** a regenerated `~/.claude/settings.json` containing the token, base URL, timeout, and model defaults, so running `claude` immediately targets the chosen provider.

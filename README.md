@@ -96,6 +96,7 @@ bash -n setup && shellcheck setup  # optional
 | `9` | GitHub CLI install with official repo keys. |
 | `10` | Remove AI frameworks (Super* uninstall + cleanup). |
 | `11` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
+| `12` | Install Contains Studio Claude Code agents into `~/.claude/agents`. |
 | `A` | Install everything sequentially (skips interactive logins, prints summaries). |
 | `0` | Exit. |
 
@@ -236,6 +237,21 @@ Option `7` in the primary menu now opens a mini-menu that targets two officially
 
 Both flows surface the upstream documentation links and keep the key in place if you press Enter, which makes credential rotation painless.
 
+#### Contains Studio Agents for Claude Code (Option 12)
+
+Selecting option `12` clones the [Contains Studio agents](https://github.com/contains-studio/agents) repository and copies every agent manifest into `~/.claude/agents`. After the sync completes, restart Claude Code so it discovers the new sub-agents.
+
+- The installer requires `git`; rerun the option any time to pull the latest agent definitions.
+- Files are copied with `rsync -a --delete`, which means your local `~/.claude/agents` folder mirrors the upstream repo.
+- You can also update manually:
+
+```bash
+git clone https://github.com/contains-studio/agents.git
+cp -r agents/* ~/.claude/agents/
+```
+
+The repository organizes agents by department (engineering, design, marketing, operations, etc.), so they immediately appear inside Claude Code’s “Agents” sidebar.
+
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
 
@@ -347,6 +363,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `9` | GitHub CLI. |
 | `10` | AI Framework kaldırma menüsü. |
 | `11` | MCP sunucularını listeleme/temizleme. |
+| `12` | Contains Studio Claude Code ajan paketini `~/.claude/agents/` içine kurar. |
 | `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
 | `0` | Çıkış. |
 
@@ -491,6 +508,21 @@ Ek Bilgiler:
 - **İstenen bilgiler:** Her iki akış da yalnızca API key sorar (varsa maskelemiş şekilde gösterilir). GLM senaryosunda `ANTHROPIC_BASE_URL` değeri otomatik olarak `https://api.z.ai/api/anthropic` yapılır; Moonshot’ta ise `https://api.moonshot.ai/anthropic` yazılır ve hangi kimi modelinin kullanılacağı seçilir.
 - **CLI yenileme:** Moonshot seçeneği, resmi dokümana uygun olarak Node.js ≥ 18 doğrulaması yapar ve gerekirse `@anthropic-ai/claude-code` paketini npm ile yeniden kurmayı teklif eder.
 - **Sonuç:** `~/.claude/settings.json` dosyası yeniden oluşturulur; token, base URL, timeout ve varsayılan modeller güncellenir, böylece `claude` komutu seçtiğiniz sağlayıcıyı anında kullanır.
+
+#### Claude Code İçin Contains Studio Ajanları (Seçenek 12)
+
+`12` numaralı seçenek, [Contains Studio agents](https://github.com/contains-studio/agents) deposunu klonlayarak tüm `.md` ajan tanımlarını `~/.claude/agents/` dizinine kopyalar. Kurulumdan sonra Claude Code’u yeniden başlatarak yeni ajanların görünmesini sağlayabilirsiniz.
+
+- Script `git` gerektirir; en güncel ajanları almak için istediğiniz zaman tekrar çalıştırabilirsiniz.
+- Kopyalama işlemi `rsync -a --delete` ile yapıldığı için yerel klasörünüz depo ile aynı içerikte olur.
+- Manuel yüklemek isterseniz:
+
+```bash
+git clone https://github.com/contains-studio/agents.git
+cp -r agents/* ~/.claude/agents/
+```
+
+Depo, ajanları departmanlara göre (engineering, design, marketing vb.) sınıflandırdığı için Claude Code’un “Agents” panelinde kategorize bir şekilde listelenir.
 
 Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut anahtarlarınızı maskeleyerek hızlıca rota değiştirmenize olanak tanır.
 

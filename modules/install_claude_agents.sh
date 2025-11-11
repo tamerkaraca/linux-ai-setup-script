@@ -27,7 +27,7 @@ install_claude_agents() {
 
     local temp_dir
     temp_dir="$(mktemp -d)"
-    trap 'rm -rf "$temp_dir"' EXIT
+    trap 'rm -rf "$temp_dir"' RETURN
 
     echo -e "${YELLOW}[BİLGİ]${NC} Git deposu indiriliyor: ${CLAUDE_AGENTS_REPO}"
     if ! git clone --depth=1 "$CLAUDE_AGENTS_REPO" "$temp_dir/agents" >/dev/null 2>&1; then
@@ -55,6 +55,7 @@ install_claude_agents() {
     echo -e "${YELLOW}[BİLGİ]${NC} Konum: ${CLAUDE_AGENTS_DIR}"
     echo -e "${YELLOW}[BİLGİ]${NC} Değişikliklerin görünmesi için Claude Code'u yeniden başlatın."
     echo -e "${CYAN}Referans:${NC} https://github.com/contains-studio/agents"
+    trap - RETURN
 }
 
 main() {

@@ -1,161 +1,226 @@
-# 🚀 AI Development Environment Setup Script
+# 🌈 AI Development Environment Setup Script
+
+> Single-command bootstrapper for a modern AI workstation on Linux. Interactive menus, remote-safe modules, colorful banners, and bilingual guidance (English & Turkish).
+
+---
+
+## 📚 Table of Contents
+
+1. [English Guide](#-english-guide)
+   - [Overview](#overview)
+   - [Architecture](#architecture)
+   - [Requirements](#requirements)
+   - [Installation](#installation)
+   - [Primary Menu Reference](#primary-menu-reference)
+   - [CLI & Framework Sub-menus](#cli--framework-sub-menus)
+   - [Usage Notes](#usage-notes)
+   - [Troubleshooting](#troubleshooting)
+   - [Contributing](#contributing)
+   - [Credits](#credits)
+   - [License](#license)
+2. [Türkçe Rehber](#-türkçe-rehber)
 
 ---
 
 ## 🇬🇧 English Guide
 
 ### Overview
-The `setup` script automates preparing a Linux workstation for AI development. It corrects accidental Windows CRLF endings, detects the system's package manager (`apt`, `dnf`, `yum`, `pacman`), upgrades the OS, and installs all required runtimes (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5). On top of that it bootstraps frequently used AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI, and Pipx-based AI frameworks (SuperGemini/SuperQwen/SuperClaude), plus helpers for Git, GLM-4.6 credentials, and MCP server cleanup.
 
-### Features
-- **Modular & On-Demand Installation:** The `setup` script provides an interactive menu to select and install only the components you need. Each component is downloaded and executed via `curl` on demand, avoiding a full repository clone for initial setup.
-- Automatic package-manager detection, colored logging, vivid 3D startup banners (powered by `toilet`), and CRLF self-healing.
-- System upgrade + essential developer tooling (curl, wget, git, jq, zip/unzip, build toolchains).
-- Full Python toolchain (python3, pip, pipx, UV) and JavaScript runtimes (NVM-managed Node.js, Bun).
-- AI CLI installers for Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, and GitHub Copilot CLI, plus GitHub CLI.
-- AI framework menu for SuperGemini, SuperQwen, SuperClaude with guided API-key prompts.
-- Removal menu to undo SuperGemini/SuperQwen/SuperClaude installs and purge their configs in one go.
-- PHP installer with selectable versions, Laravel-friendly extension packs, automatic Composer bootstrap, and version switcher.
-- Configuration helpers: interactive Git setup, GLM-4.6 configuration for Claude Code, MCP server listing/reset.
+`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, Copilot CLI), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
+
+### Architecture
+
+| Component | Description |
+|-----------|-------------|
+| **Self-healing launcher** | Detects CRLF, re-runs itself after fixing permissions/line endings. |
+| **Remote-safe modules** | When invoked via `bash -c "$(curl …)"`, `setup` downloads helper modules to a temp directory and exports helper functions so nested scripts operate as if run locally. |
+| **Banner system** | `modules/banner.sh` renders rainbow 3D headers using the `toilet` CLI (auto-installed if missing). |
+| **Menu runner** | `run_module` prefers local `./modules/*.sh`; otherwise downloads from GitHub and passes environment variables (`PKG_MANAGER`, `INSTALL_CMD` etc.) to sub-processes. |
 
 ### Requirements
-- Linux distribution with one of `apt`, `dnf`, `yum`, or `pacman`.
-- `bash` 5+, `sudo` privileges, and an active internet connection (cURL downloads, package repos).  
-  The script auto-installs the `toilet` CLI (for the rainbow banner) through your package manager if it is missing.
-- Optional but recommended: `dos2unix` for faster CRLF fixes and `shellcheck` for static analysis.
+
+- Linux distribution exposing `apt`, `dnf`, `yum`, or `pacman`.
+- `bash` 5+, `sudo` rights, internet access.
+- `curl` (auto-installed when missing for remote runs).
+- Optional: `dos2unix`, `shellcheck`, `jq` (installed automatically when relevant).
+
+`setup` also installs `toilet` for the intro banner the first time it runs.
 
 ### Installation
 
-You have two primary ways to use this setup script:
-
-#### 1. Quick Install via cURL (Recommended for initial setup)
-This method downloads and runs the main `setup` script directly, which then allows you to selectively install components.
+#### 1. Quick One-Liner (recommended)
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
 ```
 
-#### 2. Local Clone and Run
-If you prefer to inspect the code or contribute, you can clone the repository:
+#### 2. Local Clone
 
-1. **Clone the repository:**
-   ```bash
-   git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
-   cd linux-ai-setup-script
-   ```
-2. **Make the main script executable** (and optionally run quick linting):
-   ```bash
-   chmod +x setup
-   bash -n setup
-   shellcheck setup   # optional but recommended
-   ```
-3. **Run the installer** (use `sudo` password when asked):
-   ```bash
-   ./setup
-   ```
+```bash
+git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
+cd linux-ai-setup-script
+chmod +x setup
+bash -n setup && shellcheck setup  # optional
+./setup
+```
 
-### Usage
-- Launching the `setup` script opens an interactive menu. You may enter a single number to perform an operation. Some options lead to sub-menus.
-- Menu overview:
-  - `1` – Update System and Install Basic Packages
-  - `2` – Install Python and Related Tools (Pip, Pipx, UV)
-  - `3` – Install Node.js and Related Tools (NVM, Bun.js)
-  - `4` – Install AI Frameworks (SuperGemini, SuperQwen, SuperClaude) - *This opens a sub-menu.*
-  - `5` – Install AI CLI Tools (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) - *This opens a sub-menu.*
-  - `6` – Git Configuration
-  - `7` – GLM-4.6 Claude Code Configuration
-  - `8` – PHP and Composer Installation
-  - `9` – GitHub CLI Installation
-  - `10` – Uninstall AI Frameworks - *This opens a sub-menu.*
-  - `11` – MCP Server Management - *This opens a sub-menu.*
-  - `A` – Install All (Sequentially)
-  - `0` – Exit
-- Within sub-menus, typing `0` returns to the previous screen. Prompts default to the safest option if you simply press `Enter`.
+### Primary Menu Reference
 
-### Usage Details & Tips
-- **API keys:** SuperGemini/SuperQwen/SuperClaude installers request Gemini, Anthropic, OpenAI, and related provider keys. GLM configuration requires a key from https://z.ai/model-api. GitHub Copilot CLI flows follow https://github.com/github/copilot-cli (`npm install -g @github/copilot`, then manually run `copilot auth login` and `copilot auth activate`), with the script auto-adding the alias (`eval "$(copilot alias -- bash|zsh)"`) to your shell RC.
-- **Privileges:** Package installations run via `sudo`; review the prompts before confirming. System upgrades may take several minutes.
-- **Environment updates:** The script appends PATH exports for Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`), and Bun (`~/.bun/bin`) to `~/.bashrc`, `~/.zshrc`, and `~/.profile` when present. Restart your shell or `source ~/.bashrc` afterwards.
-- **Idempotent behavior:** Re-running the script is safe; existing tools are detected, and missing components are installed. Use targeted menu selections for incremental updates (e.g., rerun option `11` to refresh AI CLIs).
-- **Troubleshooting:** If a CLI remains unavailable after installation, ensure your shell has the updated PATH entries and reopen the terminal. Logs are color-coded (`[BİLGİ]`, `[UYARI]`, `[HATA]`) to highlight the current step.
-- **Composer availability:** Installing any PHP version automatically downloads Composer (signature-verified) into `/usr/local/bin/composer`, so Laravel or other PHP projects can start immediately.
-- **GLM credentials:** Menu option 7 shows your existing GLM API key in masked form (`abcd***wxyz`). Press `Enter` to keep it or type a new key to overwrite; the base URL prompt behaves the same way.
-- **Auto-sourcing:** Whenever PATH or toolchain exports are updated, the script reloads your shell config (`~/.bashrc`, `~/.zshrc`, or `~/.profile`) automatically and prints a notice so follow-up commands in the same run can see the changes.
-- **Testing:** Before submitting changes, run `shellcheck setup` and `bash -n setup`. For smoke tests, you can set `PKG_MANAGER=apt ./setup --dry-run` once the flag is implemented.
+| Option | Description |
+|--------|-------------|
+| `1` | Update system packages + install essentials (`curl`, `wget`, `git`, `jq`, `zip`, compilers). |
+| `2` | Install Python toolchain: Python 3, Pip, ensurepip fallback, Pipx, UV; auto-reloads shell RC files. |
+| `3` | Install Node.js tooling: NVM, latest LTS node, npm upgrade guard, Bun. |
+| `4` | Install AI CLI tools (opens sub-menu). |
+| `5` | Install AI frameworks (opens sub-menu; handles Pipx, GLM prompts, tty-safe runs). |
+| `6` | Git configuration (name/email, signing, alias suggestions). |
+| `7` | GLM-4.6 Claude Code configuration (masked key display, base URL management). |
+| `8` | PHP & Composer installer with selectable versions and Laravel-friendly extensions. |
+| `9` | GitHub CLI install with official repo keys. |
+| `10` | Remove AI frameworks (Super* uninstall + cleanup). |
+| `11` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
+| `A` | Install everything sequentially (skips interactive logins, prints summaries). |
+| `0` | Exit. |
+
+### CLI & Framework Sub-menus
+
+#### AI CLI Menu
+- Multi-select (comma-separated) and “install all” options.
+- During batches, installers skip interactive logins and later print a summary reminding you which commands (`claude login`, `gemini auth`, `copilot auth login`, etc.) still need attention.
+
+#### AI Framework Menu
+- Ensures Pipx exists.
+- Each framework uses `attach_tty_and_run` so pipx-installed binaries (SuperGemini/SuperQwen/SuperClaude) can prompt for API keys even when you launched via curl.
+- TTY fallback automatically reuses `/dev/tty` when available.
+
+### Usage Notes
+
+- **Environment reloads:** PATH updates for `pipx`, `uv`, `nvm`, `bun`, `gh`, etc., are appended to `~/.bashrc`, `~/.zshrc`, and `~/.profile`. The script auto-sources whichever exists so new commands are usable immediately.
+- **Remote execution:** The menu structure, colorized logs, and sub-modules behave the same whether you cloned locally or piped via curl.
+- **API keys:** Super* installers guide you through provider portals (Gemini, Anthropic, OpenAI). GLM configuration masks existing keys (`abcd***wxyz`) and only replaces them if you supply a new value.
+- **TTY requirements:** The Claude Code, SuperQwen, and SuperClaude installers now route to `/dev/tty`, preventing Ink-based CLIs from exiting with “Raw mode is not supported”.
+
+### Troubleshooting
+
+| Symptom | Resolution |
+|---------|------------|
+| `curl: (3) URL rejected: No host part` | Ensure you are on the latest `setup` (≥ `7d4ee0a`). The script now exports `SCRIPT_BASE_URL` and caches modules with fully qualified URLs. |
+| `mask_secret: command not found` | Pull latest changes; GLM config now sources `modules/utils.sh` even in remote runs. |
+| `SuperQwen install` aborts without prompting | Fixed by `attach_tty_and_run`; rerun option `5` → SuperQwen. |
+| `toilet` not found | The script installs it automatically; rerun option `1` or `setup`. |
+| CLI still missing after install | Re-open the terminal or run `source ~/.bashrc`; confirm `$PATH` contains `~/.local/bin` and `~/.nvm`. |
+| `pip` errors about externally-managed environment | `install_pip` now falls back to `ensurepip`, distro packages, or `get-pip.py --break-system-packages`. Re-run option `2`. |
+
+### Contributing
+
+1. Fork the repository and create a feature branch.
+2. Run `shellcheck` on touched scripts plus `bash -n` for syntax checks.
+3. Update README/localized docs when adding menus or modules.
+4. Submit a PR describing motivation, impacted scripts, and sample output (screenshots/logs for interactive flows help reviewers).
+5. For module changes, verify both local and remote (`bash -c "$(curl …)"`) workflows.
+
+### Credits
+
+- **Maintainer:** Tamer Karaca (@tamerkaraca)  
+- **ASCII & Banner Styling:** Inspired by `toilet` community themes.  
+- **Framework Authors:** SuperGemini/SuperQwen/SuperClaude teams, Anthropic, Google, OpenAI, GitHub Copilot CLI contributors.
+
+### License
+
+This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) for full text.
 
 ---
 
 ## 🇹🇷 Türkçe Rehber
 
 ### Genel Bakış
-`setup`, Linux tabanlı geliştirici makinelerde uçtan uca AI çalışma ortamını hazırlar. Windows’tan gelen CRLF satır sonlarını düzeltir, paket yöneticisini (`apt`, `dnf`, `yum`, `pacman`) otomatik saptar, sistemi günceller ve gerekli tüm çalışma ortamlarını (Python, Pip, Pipx, UV, NVM, Node.js, Bun, PHP 7.4–8.5) kurar. Buna ek olarak sık kullanılan AI CLI araçlarını (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI), GitHub CLI ve Pipx tabanlı AI framework’lerini (SuperGemini/SuperQwen/SuperClaude) yükler; Git yapılandırması, GLM-4.6 anahtarı ve MCP sunucu temizliği gibi yardımcı menüler sağlar.
 
-### Özellikler
-- **Modüler ve İsteğe Bağlı Kurulum:** `setup` script'i, yalnızca ihtiyacınız olan bileşenleri seçip kurmanız için etkileşimli bir menü sunar. Her bileşen, ilk kurulum için tüm depoyu klonlamaya gerek kalmadan, isteğe bağlı olarak `curl` aracılığıyla indirilir ve çalıştırılır.
-- Paket yöneticisi tespiti, renkli günlükler, `toilet` tabanlı 3B açılış banner'ı ve CRLF otomatik düzeltmesi ile sürüm kontrolünde güvenli kullanım.
-- Sistem güncellemesi + temel geliştirici araçları (curl, wget, git, jq, zip/unzip, derleme araçları).
-- Python ekosistemi (python3, pip, pipx, UV) ve JavaScript çalıştırıcıları (NVM ile Node.js, Bun).
-- AI CLI kurulumları: Claude Code, Gemini CLI, OpenCode CLI, Qoder CLI, Qwen CLI, OpenAI Codex CLI, GitHub Copilot CLI, GitHub CLI.
-- Pipx üzerinden SuperGemini, SuperQwen, SuperClaude kurulum menüsü ve anahtar istemleri.
-- SuperGemini/SuperQwen/SuperClaude için temiz kaldırma menüsü ve yapılandırma temizliği.
-- PHP 7.4/8.x kurulumu, Laravel eklentileri, Composer kurulumu ve sürüm değiştirme menüsü.
-- Git, GLM-4.6 yapılandırması ve MCP sunucu yönetimine yönelik etkileşimli rehberler.
+`setup`, Linux tabanlı geliştirici makinelerinde uçtan uca AI ortamı kurar. Paket yöneticisini otomatik saptar, CRLF düzeltir, Python/Node/PHP ekosistemlerini kurar, AI CLI & framework menüleri sunar, GLM-4.6 yapılandırmasını ve MCP temizliğini yönetir.
+
+### Mimari
+
+| Bileşen | Açıklama |
+|---------|---------|
+| **Kendini onaran başlatıcı** | CRLF algılar, izin/dosya sorunlarını düzeltip script’i yeniden başlatır. |
+| **Uzaktan güvenli modüller** | `bash -c "$(curl …)"` yöntemiyle çalıştırıldığında yardımcı modülleri geçici dizine indirir ve alt süreçlerle paylaşır. |
+| **Banner sistemi** | `toilet` aracı ile gökkuşağı renkli 3B başlıklar oluşturur (eksikse otomatik kurulur). |
+| **Menü çalıştırıcısı** | Önce yerel `./modules/*.sh` dosyalarını, yoksa GitHub sürümlerini kullanır. |
+
+### Gereksinimler
+
+- `apt`, `dnf`, `yum` veya `pacman` içeren Linux dağıtımı.
+- `bash` 5+, `sudo` hakları, aktif internet bağlantısı.
+- `curl` (uzaktan kurulum için zorunlu).
+- `toilet` aracı script tarafından gerekirse otomatik kurulur.
 
 ### Kurulum
 
-Bu kurulum script'ini kullanmak için iki ana yöntem bulunmaktadır:
-
-#### 1. cURL ile Hızlı Kurulum (İlk kurulum için önerilir)
-Bu yöntem, ana `setup` script'ini doğrudan indirir ve çalıştırır; bu sayede bileşenleri seçerek kurabilirsiniz.
+#### 1. Tek Satırlık Kurulum
 
 ```bash
 bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
 ```
 
-#### 2. Yerel Klonlama ve Çalıştırma
-Kodu incelemeyi veya katkıda bulunmayı tercih ediyorsanız, depoyu klonlayabilirsiniz:
+#### 2. Yerel Klon
 
-1. **Depoyu klonlayın:**
-   ```bash
-   git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
-   cd linux-ai-setup-script
-   ```
-2. **Ana script'i çalıştırılabilir yapın** (ve isteğe bağlı olarak hızlı lint kontrolü yapın):
-   ```bash
-   chmod +x setup
-   bash -n setup
-   shellcheck setup   # isteğe bağlı fakat önerilir
-   ```
-3. **Kurulumu başlatın** (`sudo` parolanızı isteyebilir):
-   ```bash
-   ./setup
-   ```
+```bash
+git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
+cd linux-ai-setup-script
+chmod +x setup
+bash -n setup && shellcheck setup  # isteğe bağlı
+./setup
+```
 
-### Kullanım
-- `setup` script'ini başlattığınızda etkileşimli bir menü açılır. Bir işlem gerçekleştirmek için tek bir sayı girebilirsiniz. Bazı seçenekler alt menülere yönlendirir.
-- Menü özeti:
-  - `1` – Sistemi Güncelle ve Temel Paketleri Kur
-  - `2` – Python ve İlgili Araçları Kur (Pip, Pipx, UV)
-  - `3` – Node.js ve İlgili Araçları Kur (NVM, Bun.js)
-  - `4` – AI Frameworklerini Kur (SuperGemini, SuperQwen, SuperClaude) - *Bu bir alt menü açar.*
-  - `5` – AI CLI Araçlarını Kur (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, OpenAI Codex, GitHub Copilot CLI) - *Bu bir alt menü açar.*
-  - `6` – Git Yapılandırması
-  - `7` – GLM-4.6 Claude Code Yapılandırması
-  - `8` – PHP ve Composer Kurulumu
-  - `9` – GitHub CLI Kurulumu
-  - `10` – AI Frameworklerini Kaldır - *Bu bir alt menü açar.*
-  - `11` – MCP Sunucu Yönetimi - *Bu bir alt menü açar.*
-  - `A` – Hepsini Kur (Sırayla)
-  - `0` – Çıkış
-- Alt menülerde `0` yazarak geri dönebilir, `Enter` ile varsayılan yanıtları kabul edebilirsiniz.
+### Ana Menü Özeti
 
-### Kullanım Detayları
-- **API anahtarları:** SuperGemini/SuperQwen/SuperClaude kurulumlarında Gemini, Anthropic, OpenAI vb. anahtarlar istenir. GLM yapılandırması için https://z.ai/model-api adresinden alınan anahtar gereklidir. GitHub Copilot CLI akışları https://github.com/github/copilot-cli adresini takip eder (`npm install -g @github/copilot`, ardından `copilot auth login` ve `copilot auth activate` komutlarını manuel olarak çalıştırın), script otomatik olarak alias'ı (`eval "$(copilot alias -- bash|zsh)"`) shell RC dosyanıza ekler.
-- **Yetkiler:** Paket kurulumları `sudo` ile yapılır; yükseltilmiş komutları onaylamadan önce inceleyin. Sistem güncellemeleri birkaç dakika sürebilir.
-- **Ortam değişkenleri:** Script; Pipx (`~/.local/bin`), UV (`~/.cargo/bin`), NVM (`~/.nvm`) ve Bun (`~/.bun/bin`) yollarını `~/.bashrc`, `~/.zshrc`, `~/.profile` dosyalarınıza ekler. İşlem sonrası terminalinizi yeniden başlatın veya `source ~/.bashrc` çalıştırın.
-- **Tekrar çalıştırma:** Script idem-potent çalışır; eksik bileşenleri tamamlamak veya belirli menüleri (örn. sadece AI CLI’ları) yeniden kurmak için tekrar çalıştırabilirsiniz.
-- **Sorun giderme:** Kurulumdan sonra komut bulunamıyorsa PATH güncellemelerinin yüklendiğinden emin olun ve terminali kapatıp açın. `[BİLGİ]`, `[UYARI]`, `[HATA]` etiketleri hangi adımda olduğunuzu gösterir.
-- **Composer kullanımı:** Herhangi bir PHP sürümü kurduğunuzda script otomatik olarak imza doğrulamalı Composer'i `/usr/local/bin/composer` yoluna ekler; Laravel projelerine hemen başlayabilirsiniz.
-- **GLM bilgileri:** 7 numaralı menüde mevcut GLM API key maskeleme ile (`abcd***wxyz`) gösterilir. Enter'a bastığınızda değer korunur, yeni key girerseniz eskisiyle değiştirilir; Base URL için de aynı mantık geçerlidir.
-- **Otomatik source:** PATH veya ortam değişikliklerinde script uygun shell dosyasını (`~/.bashrc`, `~/.zshrc`, `~/.profile`) otomatik olarak `source` eder ve bilgi mesajı gösterir; böylece aynı oturumda komutlar güncel yolu görür.
-- **Test önerisi:** Değişiklik yapıyorsanız `shellcheck setup` ve `bash -n setup` çalıştırın; ayrıca uygun olduğunda `PKG_MANAGER=apt ./setup --dry-run` gibi duman testleri planlayın.
+| Seçenek | Açıklama |
+|---------|---------|
+| `1` | Sistem güncellemesi + temel paketler. |
+| `2` | Python + Pip/Pipx/UV kurulumu, PATH güncellemeleri. |
+| `3` | Node.js/NVM/Bun kurulumu. |
+| `4` | AI CLI araçları (alt menü). |
+| `5` | AI Frameworkleri (SuperGemini/SuperQwen/SuperClaude). |
+| `6` | Git yapılandırması. |
+| `7` | GLM-4.6 ayarları (anahtar maskeleme). |
+| `8` | PHP & Composer kurulum sihirbazı. |
+| `9` | GitHub CLI. |
+| `10` | AI Framework kaldırma menüsü. |
+| `11` | MCP sunucularını listeleme/temizleme. |
+| `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
+| `0` | Çıkış. |
+
+### Alt Menü Detayları
+
+- **AI CLI Menüsü:** Virgülle çoklu seçim yapabilirsiniz. Toplu kurulumda `claude login`, `gemini auth` vb. komutlar özet olarak yazdırılır.
+- **AI Framework Menüsü:** Pipx kontrolü yapar, API anahtar istemlerinde `/dev/tty` kullanır; böylece `SuperQwen install` gibi komutlar uzaktan bile bekleme ekranına düşer.
+
+### Kullanım Notları
+
+- **PATH güncellemeleri** script tarafından otomatik `source` edilir; yeni komutlar aynı terminalde erişilebilir.
+- **API anahtarları** maskelenerek gösterilir, boş bırakılırsa mevcut değer korunur.
+- **TTY gereksinimleri** `attach_tty_and_run` ile çözüldü; artık `Raw mode is not supported` hatası alınmaz.
+- **Uzaktan çalışma** sırasında modüller geçici dizine alınır ve tekrar kullanılmak üzere önbelleğe atılır.
+
+### Sorun Giderme
+
+- `curl: (3)` hatası: En güncel `setup` sürümünü kullanın; `SCRIPT_BASE_URL` artık her alt süreçte mevcut.
+- `mask_secret` hatası: GLM menüsü artık utils’i otomatik yüklüyor.
+- SuperQwen/SuperClaude menüsü girdi beklemiyorsa: Güncel sürüme geçin; `attach_tty_and_run` eklendi.
+- Komut bulunamıyorsa: Terminali kapatıp açın veya `source ~/.bashrc` çalıştırın.
+
+### Katkı
+
+1. Fork + branch açın.
+2. Script değişikliklerinde `shellcheck` ve `bash -n` çalıştırın.
+3. README/TR bölümlerini yeni özelliklerle güncelleyin.
+4. PR özetine ekran görüntüsü veya log ekleyin.
+
+### Emek Verenler
+
+- **Geliştirici:** Tamer Karaca  
+- **Topluluk:** Super* framework ekipleri, açık kaynak katkıcıları.  
+- **Banner:** `toilet` projesi ve ASCII sanatçıları.
+
+### Lisans
+
+Bu proje **MIT Lisansı** ile dağıtılır. Ayrıntılar için [LICENSE](./LICENSE) dosyasına bakın.

@@ -1,7 +1,13 @@
 #!/bin/bash
+set -euo pipefail
 
 # Ortak yardımcı fonksiyonları yükle
-
+UTILS_PATH="./modules/utils.sh"
+if [ ! -f "$UTILS_PATH" ] && [ -n "${BASH_SOURCE[0]:-}" ]; then
+    UTILS_PATH="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)/utils.sh"
+fi
+# shellcheck source=/dev/null
+[ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
 # Python kurulumu
 install_python() {
@@ -241,15 +247,98 @@ install_uv() {
     fi
 }
 
-# Ana kurulum akışı
-main() {
-    detect_package_manager
+run_python_tools_menu() {
+    while true; do
+        clear
+        echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+        echo -e "${BLUE}║          Python Araçları Kurulum Menüsü        ║${NC}"
+        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+        echo -e "  ${GREEN}1${NC} - Python 3 Kur"
+        echo -e "  ${GREEN}2${NC} - Pip Kur / Güncelle"
+        echo -e "  ${GREEN}3${NC} - Pipx Kur"
+        echo -e "  ${GREEN}4${NC} - UV Kur"
+        echo -e "  ${GREEN}A${NC} - Hepsini Kur"
+        echo -e "  ${RED}0${NC} - Ana Menü"
+        echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,3)."
+        echo
+        read -r -p "${YELLOW}Seçiminiz:${NC} " raw_choice </dev/tty
+
+        if [ -z "$(echo "$raw_choice" | tr -d '[:space:]')" ]; then
+            echo -e "${YELLOW}[UYARI]${NC} Bir seçim yapmadınız, lütfen tekrar deneyin."
+            sleep 1
+            continue
+        fi
+
+        local choice_upper
+        choice_upper=$(echo "$raw_choice" | tr '[:lower:]' '[:upper:]')
+
+        if [[ "$choice_upper" == "0" ]]; then
+            echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
+            break
+        fi
+
+        if [[ "$choice_upper" == "A" ]]; then
+            install_python_stack
+            break
+        fi
+
+        local action_performed=false
+        IFS=',' read -ra selections <<< "$choice_upper"
+        for selection in "${selections[@]}"; do
+            selection=$(echo "$selection" | tr -d '[:space:]')
+            [ -z "$selection" ] && continue
+            case "$selection" in
+                1)
+                    install_python
+                    action_performed=true
+                    ;;
+                2)
+                    install_pip
+                    action_performed=true
+                    ;;
+                3)
+                    install_pipx
+                    action_performed=true
+                    ;;
+                4)
+                    install_uv
+                    action_performed=true
+                    ;;
+                *)
+                    echo -e "${YELLOW}[UYARI]${NC} Geçersiz seçim: ${selection}"
+                    ;;
+            esac
+        done
+
+        if [ "$action_performed" = false ]; then
+            echo -e "${YELLOW}[UYARI]${NC} Geçerli bir seçim yapılmadı."
+        fi
+
+        echo -e "\n${YELLOW}Başka bir işlem yapmak ister misiniz? Devam için Enter'a basın, çıkmak için 0 yazın.${NC}"
+        read -r continue_choice </dev/tty
+        if [[ "$(echo "$continue_choice" | tr -d '[:space:]')" == "0" ]]; then
+            break
+        fi
+    done
+}
+
+install_python_stack() {
     install_python
     install_pip
     install_pipx
     install_uv
     reload_shell_configs
-    echo -e "${GREEN}[BAŞARILI]${NC} Python ve ilgili araçların kurulumu tamamlandı!"
+    echo -e "${GREEN}[BAŞARILI]${NC} Python ve ilgili araçların tamamı kuruldu!"
+}
+
+# Ana kurulum akışı
+main() {
+    detect_package_manager
+    if [[ "${1:-}" =~ ^(all|ALL|a)$ ]]; then
+        install_python_stack
+        return
+    fi
+    run_python_tools_menu
 }
 
 main "$@"

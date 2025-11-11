@@ -1,6 +1,16 @@
 #!/bin/bash
 
 # Ortak yardımcı fonksiyonları yükle
+if [ -f "./modules/utils.sh" ]; then
+    # shellcheck source=/dev/null
+    source "./modules/utils.sh"
+else
+    BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules}"
+    if command -v curl &> /dev/null; then
+        # shellcheck disable=SC1090
+        source <(curl -fsSL "$BASE_URL/utils.sh") || true
+    fi
+fi
 
 
 # GLM-4.6 Claude Code yapılandırması

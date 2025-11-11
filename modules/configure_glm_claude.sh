@@ -40,6 +40,46 @@ write_settings_file() {
     echo -e "${GREEN}[BAŞARILI]${NC} Yapılandırma kaydedildi: ${SETTINGS_FILE}"
 }
 
+select_base_url() {
+    local provider_label="$1"
+    local default_url="$2"
+    local previous_url="$3"
+    local choices=()
+    choices+=("Varsayılan (${default_url})")
+    if [ -n "$previous_url" ] && [ "$previous_url" != "$default_url" ]; then
+        choices+=("Mevcut değer (${previous_url})")
+    else
+        previous_url=""
+    fi
+    choices+=("Özel base URL gir")
+
+    echo -e "\n${YELLOW}[BİLGİ]${NC} ${provider_label} için base URL seçin:"
+    local idx=1
+    for choice in "${choices[@]}"; do
+        echo -e "  ${GREEN}${idx}${NC} ${choice}"
+        idx=$((idx + 1))
+    done
+
+    read -r -p "Seçiminiz [1]: " selection </dev/tty || true
+    case "${selection:-1}" in
+        2)
+            if [ -n "$previous_url" ]; then
+                echo "$previous_url"
+            else
+                read -r -p "Base URL: " custom_url </dev/tty || true
+                echo "${custom_url:-$default_url}"
+            fi
+            ;;
+        3)
+            read -r -p "Base URL: " custom_url </dev/tty || true
+            echo "${custom_url:-$default_url}"
+            ;;
+        *)
+            echo "$default_url"
+            ;;
+    esac
+}
+
 # shellcheck disable=SC2120
 configure_glm_provider() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"

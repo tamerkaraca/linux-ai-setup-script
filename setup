@@ -44,6 +44,28 @@ source_module() {
 
 source_module "./modules/utils.sh" "modules/utils.sh"
 source_module "./modules/banner.sh" "modules/banner.sh"
+BASE_URL="${BASE_URL:-${SCRIPT_BASE_URL}/modules}"
+export BASE_URL
+
+REMOTE_MODULE_DIR=""
+
+prepare_remote_module_dir() {
+    if [ -n "$REMOTE_MODULE_DIR" ]; then
+        return 0
+    fi
+    REMOTE_MODULE_DIR="$(mktemp -d)"
+    mkdir -p "$REMOTE_MODULE_DIR/modules"
+    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils.sh" -o "$REMOTE_MODULE_DIR/modules/utils.sh" || return 1
+    curl -fsSL "${SCRIPT_BASE_URL}/modules/banner.sh" -o "$REMOTE_MODULE_DIR/modules/banner.sh" || true
+    return 0
+}
+
+cleanup_remote_modules() {
+    if [ -n "$REMOTE_MODULE_DIR" ] && [ -d "$REMOTE_MODULE_DIR" ]; then
+        rm -rf "$REMOTE_MODULE_DIR"
+    fi
+}
+trap cleanup_remote_modules EXIT
 
 # Script çalıştırma fonksiyonu
 run_module() {
@@ -60,7 +82,18 @@ run_module() {
         fi
     else
         echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
-        if ! curl -fsSL "$module_url" | PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash -s -- "$@"; then
+        prepare_remote_module_dir || {
+            echo -e "${RED}[HATA]${NC} Uzaktan modül dizini hazırlanamadı."
+            return 1
+        }
+        local remote_file="$REMOTE_MODULE_DIR/${module_name}.sh"
+        if [ ! -f "$remote_file" ]; then
+            if ! curl -fsSL "$module_url" -o "$remote_file"; then
+                echo -e "${RED}[HATA]${NC} $module_name modülü indirilemedi."
+                return 1
+            fi
+        fi
+        if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash "$remote_file" "$@"); then
             echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi

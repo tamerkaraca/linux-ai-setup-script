@@ -38,6 +38,21 @@ if [ -z "${LANGUAGE:-}" ]; then
 fi
 export LANGUAGE
 
+if [ "$LANGUAGE" = "tr" ]; then
+    INFO_TAG="${INFO_TAG}"
+    WARN_TAG="${WARN_TAG}"
+    ERROR_TAG="${ERROR_TAG}"
+    SUCCESS_TAG="${SUCCESS_TAG}"
+    NOTE_TAG="${NOTE_TAG}"
+else
+    INFO_TAG="[INFO]"
+    WARN_TAG="[WARNING]"
+    ERROR_TAG="[ERROR]"
+    SUCCESS_TAG="[SUCCESS]"
+    NOTE_TAG="[NOTE]"
+fi
+export INFO_TAG WARN_TAG ERROR_TAG SUCCESS_TAG NOTE_TAG
+
 get_language_label() {
     case "$1" in
         tr) echo "Türkçe" ;;
@@ -220,14 +235,14 @@ reload_shell_configs() {
     fi
 
     if [ -n "$sourced_file" ]; then
-        echo -e "${GREEN}[BİLGİ]${NC} Shell yapılandırmaları otomatik olarak yüklendi (${sourced_file})."
+        echo -e "${GREEN}${INFO_TAG}${NC} Shell yapılandırmaları otomatik olarak yüklendi (${sourced_file})."
     else
-        echo -e "${YELLOW}[UYARI]${NC} Shell yapılandırma dosyaları bulunamadı; gerekirse terminalinizi yeniden başlatın."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Shell yapılandırma dosyaları bulunamadı; gerekirse terminalinizi yeniden başlatın."
     fi
 }
 
 detect_package_manager() {
-    echo -e "${YELLOW}[BİLGİ]${NC} İşletim sistemi ve paket yöneticisi tespit ediliyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} İşletim sistemi ve paket yöneticisi tespit ediliyor..."
     
     if command -v dnf &> /dev/null; then
         PKG_MANAGER="dnf"
@@ -246,44 +261,44 @@ detect_package_manager() {
         UPDATE_CMD="sudo pacman -Syu --noconfirm"
         INSTALL_CMD="sudo pacman -S --noconfirm"
     else
-        echo -e "${RED}[HATA]${NC} Desteklenen bir paket yöneticisi bulunamadı!"
+        echo -e "${RED}${ERROR_TAG}${NC} Desteklenen bir paket yöneticisi bulunamadı!"
         exit 1
     fi
     
-    echo -e "${GREEN}[BAŞARILI]${NC} Paket yöneticisi: $PKG_MANAGER"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Paket yöneticisi: $PKG_MANAGER"
 }
 
 update_system() {
-    echo -e "\n${YELLOW}[BİLGİ]${NC} Sistem güncelleniyor..."
+    echo -e "\n${YELLOW}${INFO_TAG}${NC} Sistem güncelleniyor..."
     eval "$UPDATE_CMD"
     
-    echo -e "${YELLOW}[BİLGİ]${NC} Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
     
     if [ "$PKG_MANAGER" = "apt" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip-full"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip-full"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip-full
-        echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (build-essential) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (build-essential) kuruluyor..."
         eval "$INSTALL_CMD" build-essential
         
     elif [ "$PKG_MANAGER" = "dnf" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
-        echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (Development Tools) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (Development Tools) kuruluyor..."
         sudo dnf groupinstall "Development Tools" -y
         
     elif [ "$PKG_MANAGER" = "pacman" ]; then
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
-        echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (base-devel) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (base-devel) kuruluyor..."
         sudo pacman -S base-devel --noconfirm
         
     elif [ "$PKG_MANAGER" = "yum" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
-        echo -e "${YELLOW}[BİLGİ]${NC} Geliştirme araçları (Development Tools) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (Development Tools) kuruluyor..."
         sudo yum groupinstall "Development Tools" -y
     fi
     
-    echo -e "${GREEN}[BAŞARILI]${NC} Sistem güncelleme ve temel paket kurulumu tamamlandı!"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Sistem güncelleme ve temel paket kurulumu tamamlandı!"
 }
 
 mask_secret() {
@@ -306,21 +321,21 @@ mask_secret() {
 # Python kurulumu
 install_python() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Python kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Python kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if command -v python3 &> /dev/null; then
-        echo -e "${GREEN}[BAŞARILI]${NC} Python zaten kurulu: $(python3 --version)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Python zaten kurulu: $(python3 --version)"
         return 0
     fi
     
-    echo -e "${YELLOW}[BİLGİ]${NC} Python3 kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Python3 kuruluyor..."
     eval "$INSTALL_CMD" python3 python3-pip python3-venv
     
     if command -v python3 &> /dev/null; then
-        echo -e "${GREEN}[BAŞARILI]${NC} Python kurulumu tamamlandı: $(python3 --version)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Python kurulumu tamamlandı: $(python3 --version)"
     else
-        echo -e "${RED}[HATA]${NC} Python kurulumu başarısız!"
+        echo -e "${RED}${ERROR_TAG}${NC} Python kurulumu başarısız!"
         return 1
     fi
 }
@@ -328,31 +343,31 @@ install_python() {
 # Pip kurulumu/güncelleme
 install_pip() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Pip kurulumu/güncelleme başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Pip kurulumu/güncelleme başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if ! command -v python3 &> /dev/null; then
-        echo -e "${YELLOW}[UYARI]${NC} Python kurulu değil, önce Python kuruluyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Python kurulu değil, önce Python kuruluyor..."
         install_python
         if [ $? -ne 0 ]; then
-            echo -e "${RED}[HATA]${NC} Python kurulumu başarısız oldu, Pip kurulamıyor."
+            echo -e "${RED}${ERROR_TAG}${NC} Python kurulumu başarısız oldu, Pip kurulamıyor."
             return 1
         fi
     fi
     
-    echo -e "${YELLOW}[BİLGİ]${NC} Pip güncelleniyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Pip güncelleniyor..."
     
     local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
     local pip_install_fallback_cmd="curl -sS https://bootstrap.pypa.io/get-pip.py | python3"
 
     # Pip'in python3 modülü olarak mevcut olup olmadığını kontrol et
     if ! python3 -m pip --version &> /dev/null; then
-        echo -e "${YELLOW}[UYARI]${NC} Pip bulunamadı. get-pip.py ile kurulum deneniyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Pip bulunamadı. get-pip.py ile kurulum deneniyor..."
         if ! $pip_install_fallback_cmd; then
-            echo -e "${RED}[HATA]${NC} get-pip.py ile Pip kurulumu başarısız!"
+            echo -e "${RED}${ERROR_TAG}${NC} get-pip.py ile Pip kurulumu başarısız!"
             return 1
         fi
-        echo -e "${GREEN}[BAŞARILI]${NC} Pip, get-pip.py ile kuruldu."
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Pip, get-pip.py ile kuruldu."
     fi
 
     # Pip'i güncelleme
@@ -361,25 +376,25 @@ install_pip() {
         $pip_upgrade_cmd
     else
         # externally-managed-environment hatası, --break-system-packages ile dene
-        echo -e "${YELLOW}[BİLGİ]${NC} Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
         $pip_upgrade_cmd --break-system-packages
     fi
 
     # Eğer güncelleme başarısız olursa
     if [ $? -ne 0 ]; then
-        echo -e "${RED}[HATA]${NC} Pip güncellemesi başarısız!"
+        echo -e "${RED}${ERROR_TAG}${NC} Pip güncellemesi başarısız!"
         return 1
     fi
     
     if [ $? -eq 0 ]; then
-        echo -e "${GREEN}[BAŞARILI]${NC} Pip sürümü: $(python3 -m pip --version)"
-        echo -e "\n${CYAN}[BİLGİ]${NC} Pip Kullanım İpuçları:"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Pip sürümü: $(python3 -m pip --version)"
+        echo -e "\n${CYAN}${INFO_TAG}${NC} Pip Kullanım İpuçları:"
         echo -e "  ${GREEN}•${NC} Paket kurma: ${GREEN}pip install paket_adi${NC}"
         echo -e "  ${GREEN}•${NC} Sanal ortamda kurma (önerilen): ${GREEN}python3 -m venv myenv && source myenv/bin/activate${NC}"
         echo -e "  ${GREEN}•${NC} Sistem geneli kurma: ${GREEN}pip install --break-system-packages paket_adi${NC}"
         echo -e "  ${YELLOW}•${NC} Not: Modern sistemlerde sanal ortam kullanımı önerilir (PEP 668)"
     else
-        echo -e "${RED}[HATA]${NC} Pip güncellemesi başarısız!"
+        echo -e "${RED}${ERROR_TAG}${NC} Pip güncellemesi başarısız!"
         return 1
     fi
 }
@@ -387,15 +402,15 @@ install_pip() {
 # Pipx kurulumu
 install_pipx() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Pipx kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Pipx kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if ! command -v python3 &> /dev/null; then
-        echo -e "${YELLOW}[UYARI]${NC} Python kurulu değil, önce Python kuruluyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Python kurulu değil, önce Python kuruluyor..."
         install_python
     fi
     
-    echo -e "${YELLOW}[BİLGİ]${NC} Sistem paket yöneticisi ile pipx kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Sistem paket yöneticisi ile pipx kuruluyor..."
     
     if [ "$PKG_MANAGER" = "apt" ]; then
         eval "$INSTALL_CMD" pipx
@@ -408,10 +423,10 @@ install_pipx() {
     fi
     
     if ! command -v pipx &> /dev/null; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Sistem paketi bulunamadı, manuel kurulum yapılıyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Sistem paketi bulunamadı, manuel kurulum yapılıyor..."
         
         if python3 -m pip install --user pipx 2>&1 | grep -q "externally-managed-environment"; then
-            echo -e "${YELLOW}[BİLGİ]${NC} Externally-managed-environment hatası, alternatif yöntem deneniyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Externally-managed-environment hatası, alternatif yöntem deneniyor..."
             
             TEMP_VENV="/tmp/pipx_install_venv"
             rm -rf "$TEMP_VENV"
@@ -428,7 +443,7 @@ install_pipx() {
             rm -rf "$TEMP_VENV"
             
             if ! command -v pipx &> /dev/null; then
-                echo -e "${YELLOW}[UYARI]${NC} --break-system-packages ile kurulum deneniyor..."
+                echo -e "${YELLOW}${WARN_TAG}${NC} --break-system-packages ile kurulum deneniyor..."
                 python3 -m pip install --user --break-system-packages pipx
             fi
         else
@@ -455,10 +470,10 @@ install_pipx() {
     reload_shell_configs
     
     if command -v pipx &> /dev/null; then
-        echo -e "${GREEN}[BAŞARILI]${NC} Pipx kurulumu tamamlandı: $(pipx --version 2>/dev/null || echo 'kuruldu')"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Pipx kurulumu tamamlandı: $(pipx --version 2>/dev/null || echo 'kuruldu')"
     else
-        echo -e "${RED}[HATA]${NC} Pipx kurulumu başarısız!"
-        echo -e "${YELLOW}[BİLGİ]${NC} Manuel kurulum için: sudo apt install pipx"
+        echo -e "${RED}${ERROR_TAG}${NC} Pipx kurulumu başarısız!"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Manuel kurulum için: sudo apt install pipx"
         return 1
     fi
 }
@@ -491,7 +506,7 @@ ensure_path_contains_dir() {
     done
 
     if [ ${#updated_files[@]} -gt 0 ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} '${target_dir}' PATH'e eklendi (${updated_files[*]}). Terminalinizi yeniden başlatın veya 'source ${updated_files[0]}' komutunu çalıştırın."
+        echo -e "${YELLOW}${INFO_TAG}${NC} '${target_dir}' PATH'e eklendi (${updated_files[*]}). Terminalinizi yeniden başlatın veya 'source ${updated_files[0]}' komutunu çalıştırın."
     fi
 
     hash -r 2>/dev/null || true
@@ -526,20 +541,20 @@ npm_install_global_with_fallback() {
             NPM_LAST_INSTALL_PREFIX="$default_prefix"
             return 0
         fi
-        echo -e "${YELLOW}[UYARI]${NC} ${display_name} varsayılan prefixte kurulamadı. Kullanıcı dizinine düşülüyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} ${display_name} varsayılan prefixte kurulamadı. Kullanıcı dizinine düşülüyor..."
     elif [ -n "$default_prefix" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} için varsayılan prefix (${default_prefix}) yazılamıyor; kullanıcı dizinine kurulacak."
+        echo -e "${YELLOW}${INFO_TAG}${NC} ${display_name} için varsayılan prefix (${default_prefix}) yazılamıyor; kullanıcı dizinine kurulacak."
     fi
 
     fallback_prefix=$(npm_prepare_user_prefix)
-    echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} kullanıcı prefixine kuruluyor: ${fallback_prefix}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} ${display_name} kullanıcı prefixine kuruluyor: ${fallback_prefix}"
     if npm install -g --prefix "$fallback_prefix" "$package"; then
         NPM_LAST_INSTALL_PREFIX="$fallback_prefix"
         ensure_path_contains_dir "${fallback_prefix}/bin" "npm user prefix"
         return 0
     fi
 
-    echo -e "${RED}[HATA]${NC} ${display_name} kullanıcı prefixine kurulamadı."
+    echo -e "${RED}${ERROR_TAG}${NC} ${display_name} kullanıcı prefixine kurulamadı."
     return 1
 }
 
@@ -574,20 +589,20 @@ bootstrap_node_runtime() {
 
     local installer_path
     if ! installer_path="$(find_module_script "install_nodejs_tools.sh")"; then
-        echo -e "${YELLOW}[UYARI]${NC} Node.js kurulumu için 'install_nodejs_tools.sh' bulunamadı."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Node.js kurulumu için 'install_nodejs_tools.sh' bulunamadı."
         NODE_BOOTSTRAP_ATTEMPTED=1
         return 1
     fi
 
     NODE_BOOTSTRAP_ATTEMPTED=1
-    echo -e "${YELLOW}[BİLGİ]${NC} Node.js eksik; otomatik kurulum deneniyor (${installer_path})."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Node.js eksik; otomatik kurulum deneniyor (${installer_path})."
     if bash "$installer_path" --node-only; then
         reload_shell_configs silent
         hash -r 2>/dev/null || true
         return 0
     fi
 
-    echo -e "${RED}[HATA]${NC} Node.js otomatik kurulumu başarısız oldu. Lütfen 'Ana Menü -> 3' seçeneğini manuel çalıştırın."
+    echo -e "${RED}${ERROR_TAG}${NC} Node.js otomatik kurulumu başarısız oldu. Lütfen 'Ana Menü -> 3' seçeneğini manuel çalıştırın."
     return 1
 }
 
@@ -602,9 +617,9 @@ require_node_version() {
         if [ "${current_major:-0}" -ge "${min_major}" ]; then
             return 0
         fi
-        echo -e "${YELLOW}[UYARI]${NC} ${context_label} için Node.js v${min_major}+ gerekiyor, mevcut sürüm: $(node -v)."
+        echo -e "${YELLOW}${WARN_TAG}${NC} ${context_label} için Node.js v${min_major}+ gerekiyor, mevcut sürüm: $(node -v)."
     else
-        echo -e "${YELLOW}[UYARI]${NC} ${context_label} için Node.js v${min_major}+ gerekiyor ancak sistemde Node.js bulunamadı."
+        echo -e "${YELLOW}${WARN_TAG}${NC} ${context_label} için Node.js v${min_major}+ gerekiyor ancak sistemde Node.js bulunamadı."
     fi
 
     if [ "$attempt_bootstrap" = true ] && bootstrap_node_runtime; then
@@ -612,13 +627,13 @@ require_node_version() {
             local refreshed_major
             refreshed_major=$(node -v | sed -E 's/^v([0-9]+).*/\1/')
             if [ "${refreshed_major:-0}" -ge "${min_major}" ]; then
-                echo -e "${GREEN}[BAŞARILI]${NC} Node.js kurulumu tamamlandı: $(node -v)"
+                echo -e "${GREEN}${SUCCESS_TAG}${NC} Node.js kurulumu tamamlandı: $(node -v)"
                 return 0
             fi
         fi
-        echo -e "${YELLOW}[UYARI]${NC} Node.js kuruldu ancak sürüm gereksinimini karşılamıyor."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Node.js kuruldu ancak sürüm gereksinimini karşılamıyor."
     fi
 
-    echo -e "${RED}[HATA]${NC} ${context_label} kurulumu Node.js ${min_major}+ olmadan devam edemez."
+    echo -e "${RED}${ERROR_TAG}${NC} ${context_label} kurulumu Node.js ${min_major}+ olmadan devam edemez."
     return 1
 }

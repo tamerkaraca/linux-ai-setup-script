@@ -14,9 +14,9 @@ fi
 
 CURRENT_LANG="${LANGUAGE:-en}"
 if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="[BİLGİ]"
-    WARN_TAG="[UYARI]"
-    ERROR_TAG="[HATA]"
+    INFO_TAG="${INFO_TAG}"
+    WARN_TAG="${WARN_TAG}"
+    ERROR_TAG="${ERROR_TAG}"
 else
     INFO_TAG="[INFO]"
     WARN_TAG="[WARNING]"
@@ -68,18 +68,18 @@ PHP_EXTENSION_PACKAGES=("mbstring" "zip" "gd" "tokenizer" "curl" "xml" "bcmath" 
 ensure_php_repository() {
 
     if [ "$PKG_MANAGER" = "apt" ]; then
-        echo -e "\n${YELLOW}[BİLGİ]${NC} PHP için Ondřej Surý deposu kontrol ediliyor..."
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} PHP için Ondřej Surý deposu kontrol ediliyor..."
         eval "$INSTALL_CMD software-properties-common ca-certificates apt-transport-https lsb-release gnupg"
         if ! grep -R "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d 2>/dev/null | grep -q ondrej;
         then
-            echo -e "${YELLOW}[BİLGİ]${NC} Ondřej Surý PPA ekleniyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Ondřej Surý PPA ekleniyor..."
             sudo add-apt-repository -y ppa:ondrej/php
         fi
         sudo apt update
     elif [ "$PKG_MANAGER" = "dnf" ] || [ "$PKG_MANAGER" = "yum" ]; then
         if ! rpm -qa | grep -qi remi-release;
         then
-            echo -e "${YELLOW}[BİLGİ]${NC} Remi PHP deposu ekleniyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Remi PHP deposu ekleniyor..."
             if [ -f /etc/os-release ]; then
                 # shellcheck disable=SC1091
                 . /etc/os-release
@@ -93,7 +93,7 @@ ensure_php_repository() {
                 if [ -n "$fedora_ver" ]; then
                     sudo "$PKG_MANAGER" install -y "https://rpms.remirepo.net/fedora/remi-release-${fedora_ver}.rpm"
                 else
-                    echo -e "${RED}[HATA]${NC} Fedora sürümü tespit edilemedi."
+                    echo -e "${RED}${ERROR_TAG}${NC} Fedora sürümü tespit edilemedi."
                     return 1
                 fi
             else
@@ -102,7 +102,7 @@ ensure_php_repository() {
                 if [ -n "$rhel_version" ]; then
                     sudo "$PKG_MANAGER" install -y "https://rpms.remirepo.net/enterprise/remi-release-${rhel_version}.rpm"
                 else
-                    echo -e "${RED}[HATA]${NC} Remi deposu otomatik eklenemedi. Lütfen manuel olarak yapılandırın."
+                    echo -e "${RED}${ERROR_TAG}${NC} Remi deposu otomatik eklenemedi. Lütfen manuel olarak yapılandırın."
                     return 1
                 fi
             fi
@@ -153,18 +153,18 @@ list_installed_php_versions() {
 switch_php_version() {
     mapfile -t INSTALLED_PHP < <(list_installed_php_versions 2>/dev/null)
     if [ "${#INSTALLED_PHP[@]}" -eq 0 ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Sistemde kayıtlı PHP sürümü bulunamadı. Önce kurulum yapın."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Sistemde kayıtlı PHP sürümü bulunamadı. Önce kurulum yapın."
         return 1
     fi
     if [ "${#INSTALLED_PHP[@]}" -eq 1 ]; then
         local only_ver only_path
         IFS=':::' read -r only_ver only_path <<< "${INSTALLED_PHP[0]}"
-        echo -e "${YELLOW}[BİLGİ]${NC} Yalnızca PHP ${only_ver} (${only_path}) bulundu; varsayılan zaten bu sürüm."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Yalnızca PHP ${only_ver} (${only_path}) bulundu; varsayılan zaten bu sürüm."
         return 0
     fi
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Aktif PHP sürümünü değiştirmek için seçim yapın:"
+    echo -e "${YELLOW}${INFO_TAG}${NC} Aktif PHP sürümünü değiştirmek için seçim yapın:"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     local idx=1
@@ -179,11 +179,11 @@ switch_php_version() {
     read -r -p "Seçiminiz: " selection </dev/tty
 
     if [ "$selection" = "0" ] || [ -z "$selection" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} PHP sürüm değiştirme iptal edildi."
+        echo -e "${YELLOW}${INFO_TAG}${NC} PHP sürüm değiştirme iptal edildi."
         return 0
     fi
     if ! [[ "$selection" =~ ^[0-9]+$ ]] || [ "$selection" -lt 1 ] || [ "$selection" -gt "${#INSTALLED_PHP[@]}" ]; then
-        echo -e "${RED}[HATA]${NC} Geçersiz seçim."
+        echo -e "${RED}${ERROR_TAG}${NC} Geçersiz seçim."
         return 1
     fi
 
@@ -195,20 +195,20 @@ switch_php_version() {
 
     if command -v update-alternatives &> /dev/null; then
         if sudo update-alternatives --set php "$chosen_path" >/dev/null 2>&1; then
-            echo -e "${GREEN}[BAŞARILI]${NC} PHP varsayılanı PHP ${chosen_ver} olarak güncellendi."
+            echo -e "${GREEN}${SUCCESS_TAG}${NC} PHP varsayılanı PHP ${chosen_ver} olarak güncellendi."
         else
-            echo -e "${YELLOW}[UYARI]${NC} update-alternatives başarısız oldu, sembolik bağ güncelleniyor."
+            echo -e "${YELLOW}${WARN_TAG}${NC} update-alternatives başarısız oldu, sembolik bağ güncelleniyor."
             sudo ln -sf "$chosen_path" /usr/bin/php
         fi
     else
         sudo ln -sf "$chosen_path" /usr/bin/php
-        echo -e "${GREEN}[BİLGİ]${NC} /usr/bin/php -> ${chosen_path} olarak güncellendi."
+        echo -e "${GREEN}${INFO_TAG}${NC} /usr/bin/php -> ${chosen_path} olarak güncellendi."
     fi
 
     if command -v php &> /dev/null; then
         local active
         active=$(php -v 2>/dev/null | head -n1)
-        echo -e "${CYAN}[BİLGİ]${NC} Güncel PHP çıktısı: ${GREEN}${active}${NC}"
+        echo -e "${CYAN}${INFO_TAG}${NC} Güncel PHP çıktısı: ${GREEN}${active}${NC}"
     fi
 }
 
@@ -216,7 +216,7 @@ register_php_alternative() {
     local version="$1"
     local binary_path="$2"
     if [ ! -x "$binary_path" ]; then
-        echo -e "${YELLOW}[UYARI]${NC} $binary_path mevcut değil, alternatives kaydı atlandı."
+        echo -e "${YELLOW}${WARN_TAG}${NC} $binary_path mevcut değil, alternatives kaydı atlandı."
         return 1
     fi
     local priority
@@ -231,25 +231,25 @@ register_php_alternative() {
 
 install_composer() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Composer kurulumu denetleniyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Composer kurulumu denetleniyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if command -v composer &> /dev/null;
     then
-        echo -e "${GREEN}[BAŞARILI]${NC} Composer zaten kurulu: $(composer --version)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Composer zaten kurulu: $(composer --version)"
         return 0
     fi
 
     if ! command -v php &> /dev/null;
     then
-        echo -e "${RED}[HATA]${NC} Composer kurulumu için PHP gereklidir. Lütfen önce PHP kurun."
+        echo -e "${RED}${ERROR_TAG}${NC} Composer kurulumu için PHP gereklidir. Lütfen önce PHP kurun."
         return 1
     fi
 
     local temp_dir
     temp_dir=$(mktemp -d)
     if [ ! -d "$temp_dir" ]; then
-        echo -e "${RED}[HATA]${NC} Geçici dizin oluşturulamadı."
+        echo -e "${RED}${ERROR_TAG}${NC} Geçici dizin oluşturulamadı."
         return 1
     fi
 
@@ -257,17 +257,17 @@ install_composer() {
     local installer_sig_url="https://composer.github.io/installer.sig"
     local installer_url="https://getcomposer.org/installer"
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Composer installer indiriliyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Composer installer indiriliyor..."
     local expected_checksum
     expected_checksum=$(curl -sS "$installer_sig_url") || true
     if [ -z "$expected_checksum" ]; then
-        echo -e "${RED}[HATA]${NC} Installer imza bilgisi alınamadı."
+        echo -e "${RED}${ERROR_TAG}${NC} Installer imza bilgisi alınamadı."
         rm -rf "$temp_dir"
         return 1
     fi
 
     if ! php -r "copy('$installer_url', '$installer_path');"; then
-        echo -e "${RED}[HATA]${NC} Composer installer indirilemedi."
+        echo -e "${RED}${ERROR_TAG}${NC} Composer installer indirilemedi."
         rm -rf "$temp_dir"
         return 1
     fi
@@ -275,15 +275,15 @@ install_composer() {
     local actual_checksum
     actual_checksum=$(php -r "echo hash_file('sha384', '$installer_path');")
     if [ "$expected_checksum" != "$actual_checksum" ]; then
-        echo -e "${RED}[HATA]${NC} İmza doğrulaması başarısız! Kurulum iptal edildi."
+        echo -e "${RED}${ERROR_TAG}${NC} İmza doğrulaması başarısız! Kurulum iptal edildi."
         rm -rf "$temp_dir"
         return 1
     fi
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Installer doğrulandı, Composer yükleniyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Installer doğrulandı, Composer yükleniyor..."
     if ! sudo php "$installer_path" --quiet --install-dir=/usr/local/bin --filename=composer;
     then
-        echo -e "${RED}[HATA]${NC} Composer kurulumu başarısız oldu."
+        echo -e "${RED}${ERROR_TAG}${NC} Composer kurulumu başarısız oldu."
         rm -rf "$temp_dir"
         return 1
     fi
@@ -292,11 +292,11 @@ install_composer() {
 
     if command -v composer &> /dev/null;
     then
-        echo -e "${GREEN}[BAŞARILI]${NC} Composer kurulumu tamamlandı: $(composer --version)"
-        echo -e "${CYAN}[BİLGİ]${NC} Composer projeleri oluşturmak için: ${GREEN}composer init${NC}"
-        echo -e "${CYAN}[BİLGİ]${NC} Bağımlılık kurmak için: ${GREEN}composer install${NC}"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Composer kurulumu tamamlandı: $(composer --version)"
+        echo -e "${CYAN}${INFO_TAG}${NC} Composer projeleri oluşturmak için: ${GREEN}composer init${NC}"
+        echo -e "${CYAN}${INFO_TAG}${NC} Bağımlılık kurmak için: ${GREEN}composer install${NC}"
     else
-        echo -e "${YELLOW}[UYARI]${NC} Composer komutu bulunamadı. PATH ayarlarınızı kontrol edin."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Composer komutu bulunamadı. PATH ayarlarınızı kontrol edin."
         return 1
     fi
 }
@@ -304,7 +304,7 @@ install_composer() {
 install_php_version() {
     local version="$1"
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} PHP ${version} ve Laravel eklentileri kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} PHP ${version} ve Laravel eklentileri kuruluyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     ensure_php_repository || return 1
@@ -361,7 +361,7 @@ install_php_version() {
             done
             ;; 
         pacman)
-            echo -e "${YELLOW}[UYARI]${NC} Pacman depoları tek PHP sürümünü destekler. Varsayılan php paketi kurulacak."
+            echo -e "${YELLOW}${WARN_TAG}${NC} Pacman depoları tek PHP sürümünü destekler. Varsayılan php paketi kurulacak."
             pkg_map["php"]=1
             pkg_map["php-fpm"]=1
             pkg_map["php-intl"]=1
@@ -376,7 +376,7 @@ install_php_version() {
             pkg_map["php-mysql"]=1
             ;; 
         *)
-            echo -e "${RED}[HATA]${NC} Bu paket yöneticisi için PHP kurulumu otomatikleştirilmedi."
+            echo -e "${RED}${ERROR_TAG}${NC} Bu paket yöneticisi için PHP kurulumu otomatikleştirilmedi."
             return 1
             ;; 
     esac
@@ -387,17 +387,17 @@ install_php_version() {
     fi
 
     if [ ${#packages[@]} -eq 0 ]; then
-        echo -e "${RED}[HATA]${NC} Kurulacak paket bulunamadı."
+        echo -e "${RED}${ERROR_TAG}${NC} Kurulacak paket bulunamadı."
         return 1
     fi
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Kurulacak paketler: ${GREEN}${packages[*]}${NC}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} Kurulacak paketler: ${GREEN}${packages[*]}${NC}"
     local install_command
     install_command="$INSTALL_CMD ${packages[*]}"
     eval "$install_command"
 
     if [ ${#skipped_exts[@]} -gt 0 ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Paket gerektirmeyen/atlanan eklentiler: ${CYAN}${skipped_exts[*]}${NC}"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Paket gerektirmeyen/atlanan eklentiler: ${CYAN}${skipped_exts[*]}${NC}"
     fi
 
     local binary_path
@@ -454,7 +454,7 @@ main() {
                     fi
 
                     if [ -z "$(echo "$choice" | tr -d '[:space:]')" ]; then
-                        echo -e "${YELLOW}[UYARI]${NC} Bir seçim yapmadınız."
+                        echo -e "${YELLOW}${WARN_TAG}${NC} Bir seçim yapmadınız."
                         continue
                     fi
 
@@ -464,7 +464,7 @@ main() {
                     for c in "${VERSION_CHOICES[@]}"; do
                         c=$(echo "$c" | tr -d '[:space:]')
                         if ! [[ "$c" =~ ^[0-9]+$ ]] || [ "$c" -lt 1 ] || [ "$c" -gt "${#PHP_SUPPORTED_VERSIONS[@]}" ]; then
-                            echo -e "${RED}[HATA]${NC} Geçersiz seçim: $c"
+                            echo -e "${RED}${ERROR_TAG}${NC} Geçersiz seçim: $c"
                             valid=false
                             break
                         fi

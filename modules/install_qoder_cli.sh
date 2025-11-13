@@ -43,7 +43,7 @@ semver_ge() {
 
 ensure_npm_available() {
     if ! command -v npm &> /dev/null; then
-        echo -e "${RED}[HATA]${NC} npm bulunamadı. Lütfen Node.js ve npm'i kurun (Ana Menü -> 3. Node.js ve İlgili Araçları Kur)."
+        echo -e "${RED}${ERROR_TAG}${NC} npm bulunamadı. Lütfen Node.js ve npm'i kurun (Ana Menü -> 3. Node.js ve İlgili Araçları Kur)."
         return 1
     fi
 }
@@ -53,7 +53,7 @@ ensure_modern_npm() {
     local current_version
     current_version=$(npm -v 2>/dev/null | tr -d '[:space:]')
     if [ -z "$current_version" ]; then
-        echo -e "${RED}[HATA]${NC} npm sürümü okunamadı."
+        echo -e "${RED}${ERROR_TAG}${NC} npm sürümü okunamadı."
         return 1
     fi
 
@@ -61,19 +61,19 @@ ensure_modern_npm() {
         return 0
     fi
 
-    echo -e "${YELLOW}[UYARI]${NC} Mevcut npm sürümü (${current_version}) minimum gereksinim (${MIN_NPM_VERSION}) altında."
+    echo -e "${YELLOW}${WARN_TAG}${NC} Mevcut npm sürümü (${current_version}) minimum gereksinim (${MIN_NPM_VERSION}) altında."
     if [ "$dry_run" = true ]; then
         echo -e "${YELLOW}[DRY-RUN]${NC} npm install -g npm@latest (kullanıcı prefix)"
         return 0
     fi
 
-    echo -e "${YELLOW}[BİLGİ]${NC} npm güncelleniyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} npm güncelleniyor..."
     if npm_install_global_with_fallback "npm@latest" "npm" true; then
-        echo -e "${GREEN}[BAŞARILI]${NC} npm sürümü güncellendi: $(npm -v 2>/dev/null)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} npm sürümü güncellendi: $(npm -v 2>/dev/null)"
         return 0
     fi
 
-    echo -e "${RED}[HATA]${NC} npm güncellemesi başarısız oldu."
+    echo -e "${RED}${ERROR_TAG}${NC} npm güncellemesi başarısız oldu."
     return 1
 }
 
@@ -84,11 +84,11 @@ install_npm_cli() {
     local dry_run="${4:-false}"
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} kurulumu başlatılıyor (referans: https://docs.qoder.com/cli/quick-start)"
+    echo -e "${YELLOW}${INFO_TAG}${NC} ${display_name} kurulumu başlatılıyor (referans: https://docs.qoder.com/cli/quick-start)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if command -v "$binary_name" &> /dev/null; then
-        echo -e "${GREEN}[BAŞARILI]${NC} ${display_name} zaten kurulu: $("$binary_name" --version 2>/dev/null)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} ${display_name} zaten kurulu: $("$binary_name" --version 2>/dev/null)"
         return 0
     fi
 
@@ -98,26 +98,26 @@ install_npm_cli() {
     if [ "$dry_run" = true ]; then
         echo -e "${YELLOW}[DRY-RUN]${NC} npm install -g ${npm_package}"
     else
-        echo -e "${YELLOW}[BİLGİ]${NC} ${display_name} npm ile kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} ${display_name} npm ile kuruluyor..."
         if npm_install_global_with_fallback "$npm_package" "$display_name"; then
-            echo -e "${GREEN}[BAŞARILI]${NC} ${display_name} kurulumu tamamlandı."
+            echo -e "${GREEN}${SUCCESS_TAG}${NC} ${display_name} kurulumu tamamlandı."
             reload_shell_configs silent
         else
-            echo -e "${RED}[HATA]${NC} ${display_name} kurulumu başarısız oldu."
+            echo -e "${RED}${ERROR_TAG}${NC} ${display_name} kurulumu başarısız oldu."
             return 1
         fi
     fi
 
     if [ "$dry_run" = true ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Kurulum atlandı (dry-run)."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Kurulum atlandı (dry-run)."
         return 0
     fi
 
     if command -v "$binary_name" &> /dev/null; then
-        echo -e "${GREEN}[BAŞARILI]${NC} ${display_name} başarıyla kuruldu: $("$binary_name" --version 2>/dev/null)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} ${display_name} başarıyla kuruldu: $("$binary_name" --version 2>/dev/null)"
     else
-        echo -e "${RED}[HATA]${NC} ${display_name} kuruldu ancak '${binary_name}' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen terminalinizi yeniden başlatın veya aşağıdaki komutları çalıştırın:"
+        echo -e "${RED}${ERROR_TAG}${NC} ${display_name} kuruldu ancak '${binary_name}' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen terminalinizi yeniden başlatın veya aşağıdaki komutları çalıştırın:"
         echo -e "${CYAN}  source ~/.bashrc${NC} (veya kullandığınız shell yapılandırma dosyası, örneğin ~/.zshrc)"
         echo -e "${CYAN}  hash -r${NC} (shell'in komut önbelleğini temizlemek için)"
         return 1
@@ -139,7 +139,7 @@ resolve_qoder_package() {
 
     if [ -n "$explicit_package" ]; then
         resolved_ref="$explicit_package"
-        echo -e "${YELLOW}[BİLGİ]${NC} Qoder CLI paketi override edildi: ${explicit_package}"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Qoder CLI paketi override edildi: ${explicit_package}"
         return 0
     fi
 
@@ -151,8 +151,8 @@ resolve_qoder_package() {
 
     if [ "$skip_probe" = "true" ]; then
         resolved_ref="${candidates[0]}"
-        echo -e "${YELLOW}[UYARI]${NC} npm kayıt kontrolü atlandı. Varsayılan paket kullanılacak: ${resolved_ref}"
-        echo -e "${YELLOW}[BİLGİ]${NC} Özel bir paket belirtmek için 'QODER_NPM_PACKAGE' veya '--package' parametresini kullanabilirsiniz."
+        echo -e "${YELLOW}${WARN_TAG}${NC} npm kayıt kontrolü atlandı. Varsayılan paket kullanılacak: ${resolved_ref}"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Özel bir paket belirtmek için 'QODER_NPM_PACKAGE' veya '--package' parametresini kullanabilirsiniz."
         return 0
     fi
 
@@ -160,15 +160,15 @@ resolve_qoder_package() {
     for candidate in "${candidates[@]}"; do
         if npm view "$candidate" version >/dev/null 2>&1; then
             resolved_ref="$candidate"
-            echo -e "${YELLOW}[BİLGİ]${NC} npm paketi bulundu: ${candidate}"
+            echo -e "${YELLOW}${INFO_TAG}${NC} npm paketi bulundu: ${candidate}"
             return 0
         fi
     done
 
     resolved_ref="${candidates[0]}"
-    echo -e "${YELLOW}[UYARI]${NC} npm kaydında doğrulanmış bir Qoder CLI paketi bulunamadı. Varsayılan paket kullanılacak: ${resolved_ref}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Bilinen paket adını 'QODER_NPM_PACKAGE=\"<paket>\"' veya '--package <paket>' ile belirtebilirsiniz."
-    echo -e "${YELLOW}[BİLGİ]${NC} Güncel talimatlar için: https://docs.qoder.com/cli/quick-start"
+    echo -e "${YELLOW}${WARN_TAG}${NC} npm kaydında doğrulanmış bir Qoder CLI paketi bulunamadı. Varsayılan paket kullanılacak: ${resolved_ref}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} Bilinen paket adını 'QODER_NPM_PACKAGE=\"<paket>\"' veya '--package <paket>' ile belirtebilirsiniz."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Güncel talimatlar için: https://docs.qoder.com/cli/quick-start"
     return 0
 }
 
@@ -183,10 +183,10 @@ install_qoder_cli() {
             echo -e "${YELLOW}[DRY-RUN]${NC} Yerel Qoder CLI paketi kullanılacak: ${QODER_BUNDLE_OVERRIDE}"
         else
             if [ ! -e "$QODER_BUNDLE_OVERRIDE" ]; then
-                echo -e "${RED}[HATA]${NC} '--bundle' ile belirtilen dosya bulunamadı: ${QODER_BUNDLE_OVERRIDE}"
+                echo -e "${RED}${ERROR_TAG}${NC} '--bundle' ile belirtilen dosya bulunamadı: ${QODER_BUNDLE_OVERRIDE}"
                 return 1
             fi
-            echo -e "${YELLOW}[BİLGİ]${NC} Yerel Qoder CLI paketi kullanılıyor: ${QODER_BUNDLE_OVERRIDE}"
+            echo -e "${YELLOW}${INFO_TAG}${NC} Yerel Qoder CLI paketi kullanılıyor: ${QODER_BUNDLE_OVERRIDE}"
         fi
         install_source="$QODER_BUNDLE_OVERRIDE"
     else
@@ -222,7 +222,7 @@ main() {
                 ;;
             --package)
                 if [ -z "${2:-}" ]; then
-                    echo -e "${RED}[HATA]${NC} '--package' seçeneği bir değer gerektirir."
+                    echo -e "${RED}${ERROR_TAG}${NC} '--package' seçeneği bir değer gerektirir."
                     return 1
                 fi
                 QODER_PACKAGE_OVERRIDE="$2"
@@ -230,7 +230,7 @@ main() {
                 ;;
             --bundle|--from-file)
                 if [ -z "${2:-}" ]; then
-                    echo -e "${RED}[HATA]${NC} '--bundle' seçeneği bir dosya yolu gerektirir."
+                    echo -e "${RED}${ERROR_TAG}${NC} '--bundle' seçeneği bir dosya yolu gerektirir."
                     return 1
                 fi
                 QODER_BUNDLE_OVERRIDE="$2"
@@ -246,7 +246,7 @@ main() {
                 dry_run="true"
                 ;;
             *)
-                echo -e "${YELLOW}[UYARI]${NC} Bilinmeyen argüman: $1"
+                echo -e "${YELLOW}${WARN_TAG}${NC} Bilinmeyen argüman: $1"
                 ;;
         esac
         shift || true
@@ -264,14 +264,14 @@ main() {
             install_coder_cli "$dry_run"
             ;;
         *)
-            echo -e "${RED}[HATA]${NC} Geçersiz --tool değeri: ${target_cli}. 'qoder', 'coder' veya 'both' kullanın."
+            echo -e "${RED}${ERROR_TAG}${NC} Geçersiz --tool değeri: ${target_cli}. 'qoder', 'coder' veya 'both' kullanın."
             return 1
             ;;
     esac
 
     if [ "$interactive_mode" != "false" ]; then
-        echo -e "\n${YELLOW}[BİLGİ]${NC} ${target_cli} CLI kurulum adımları tamamlandı."
-        echo -e "${YELLOW}[BİLGİ]${NC} Kurulumun tam olarak etkili olması için lütfen terminalinizi yeniden başlatın veya aşağıdaki komutları çalıştırın:"
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} ${target_cli} CLI kurulum adımları tamamlandı."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Kurulumun tam olarak etkili olması için lütfen terminalinizi yeniden başlatın veya aşağıdaki komutları çalıştırın:"
         echo -e "${CYAN}  source ~/.bashrc${NC} (veya kullandığınız shell yapılandırma dosyası, örneğin ~/.zshrc)"
         echo -e "${CYAN}  hash -r${NC} (shell'in komut önbelleğini temizlemek için)"
     fi

@@ -12,15 +12,15 @@ run_module() {
     shift
 
     if [ -f "$local_path" ]; then
-        echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
+        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
     else
-        echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
+        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
         if ! curl -fsSL "$module_url" | PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash -s -- "$@"; then
-            echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
     fi
@@ -56,9 +56,9 @@ install_ai_frameworks_menu() {
 
         # Pipx kontrolü
         if ! command -v pipx &> /dev/null; then
-            echo -e "${YELLOW}[UYARI]${NC} AI Frameworks için önce Pipx kurulumu yapılıyor..."
+            echo -e "${YELLOW}${WARN_TAG}${NC} AI Frameworks için önce Pipx kurulumu yapılıyor..."
             if ! command -v python3 &> /dev/null; then
-                 echo -e "${YELLOW}[UYARI]${NC} Pipx için önce Python kurulumu yapılıyor..."
+                 echo -e "${YELLOW}${WARN_TAG}${NC} Pipx için önce Python kurulumu yapılıyor..."
                  install_python
             fi
             install_pipx

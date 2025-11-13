@@ -7,20 +7,20 @@
 install_copilot_cli() {
     local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI kurulumu başlatılıyor (referans: https://github.com/github/copilot-cli)"
+    echo -e "${YELLOW}${INFO_TAG}${NC} GitHub Copilot CLI kurulumu başlatılıyor (referans: https://github.com/github/copilot-cli)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if ! npm install -g @github/copilot; then
-        echo -e "${RED}[HATA]${NC} 'npm install -g @githubnext/github-copilot-cli' komutu başarısız oldu."
+        echo -e "${RED}${ERROR_TAG}${NC} 'npm install -g @githubnext/github-copilot-cli' komutu başarısız oldu."
         return 1
     fi
 
     if ! command -v copilot &> /dev/null; then
-        echo -e "${RED}[HATA]${NC} GitHub Copilot CLI komutu bulunamadı. PATH ayarlarını kontrol edin."
+        echo -e "${RED}${ERROR_TAG}${NC} GitHub Copilot CLI komutu bulunamadı. PATH ayarlarını kontrol edin."
         return 1
     fi
 
-    echo -e "${GREEN}[BAŞARILI]${NC} GitHub Copilot CLI sürümü: $(copilot --version)"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} GitHub Copilot CLI sürümü: $(copilot --version)"
 
     if [ "$interactive_mode" = true ]; then
         echo -e "\n${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
@@ -29,14 +29,14 @@ install_copilot_cli() {
         echo -e "  ${GREEN}1.${NC} ${GREEN}copilot auth login${NC} komutunu çalıştırın."
         echo -e "  ${GREEN}2.${NC} Tarayıcıda açılan GitHub Copilot sayfasından erişimi onaylayın."
         echo -e "  ${GREEN}3.${NC} ${GREEN}copilot auth activate${NC} ile kabuk entegrasyonunu tamamlayın."
-        echo -e "\n${YELLOW}[BİLGİ]${NC} İşlemleri sizin yerinize başlatıyoruz; gerekirse komutları manuel tekrarlayabilirsiniz.\n"
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} İşlemleri sizin yerinize başlatıyoruz; gerekirse komutları manuel tekrarlayabilirsiniz.\n"
 
 
 
         read -r -p "Devam etmek için Enter'a basın..." </dev/tty
     else
-        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen '${GREEN}copilot auth login${NC}' ve '${GREEN}copilot auth activate${NC}' komutlarını daha sonra çalıştırın."
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen '${GREEN}copilot auth login${NC}' ve '${GREEN}copilot auth activate${NC}' komutlarını daha sonra çalıştırın."
     fi
 
     local detected_shell
@@ -66,23 +66,23 @@ install_copilot_cli() {
                 echo '# GitHub Copilot CLI aliasları'
                 echo "$alias_line"
             } >> "$rc_file"
-            echo -e "${GREEN}[BAŞARILI]${NC} Copilot CLI aliasları ${rc_file} dosyasına eklendi."
+            echo -e "${GREEN}${SUCCESS_TAG}${NC} Copilot CLI aliasları ${rc_file} dosyasına eklendi."
         else
-            echo -e "${YELLOW}[BİLGİ]${NC} Copilot CLI aliasları zaten ${rc_file} dosyasında mevcut."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Copilot CLI aliasları zaten ${rc_file} dosyasında mevcut."
         fi
     else
-        echo -e "${YELLOW}[UYARI]${NC} 'copilot alias -- ${detected_shell}' komutu başarısız oldu. Aliasları manuel oluşturun."
+        echo -e "${YELLOW}${WARN_TAG}${NC} 'copilot alias -- ${detected_shell}' komutu başarısız oldu. Aliasları manuel oluşturun."
     fi
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} GitHub Copilot CLI Kullanım İpuçları:"
+    echo -e "${YELLOW}${INFO_TAG}${NC} GitHub Copilot CLI Kullanım İpuçları:"
     echo -e "  ${GREEN}•${NC} Kod isteği: ${GREEN}copilot suggest \"read a csv\"${NC}"
     echo -e "  ${GREEN}•${NC} Komut açıklaması: ${GREEN}copilot explain \"what does ls -la do\"${NC}"
     echo -e "  ${GREEN}•${NC} Aliasları tekrar yükleme: ${GREEN}eval \"\\]$(copilot alias -- ${detected_shell})\"${NC}"
     echo -e "  ${GREEN}•${NC} Daha fazla bilgi: https://github.com/github/copilot-cli${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    echo -e "\n${GREEN}[BAŞARILI]${NC} GitHub Copilot CLI kurulumu tamamlandı!"
+    echo -e "\n${GREEN}${SUCCESS_TAG}${NC} GitHub Copilot CLI kurulumu tamamlandı!"
 }
 
 # Ana kurulum akışı

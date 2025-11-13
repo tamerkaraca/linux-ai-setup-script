@@ -31,13 +31,13 @@ source_module() {
         source "$local_path"
     else
         if ! command -v curl &> /dev/null; then
-            echo "[HATA] 'curl' komutu bulunamadı; $remote_rel_path dosyası yüklenemiyor."
+            echo "${ERROR_TAG} 'curl' komutu bulunamadı; $remote_rel_path dosyası yüklenemiyor."
             exit 1
         fi
         local remote_url="${SCRIPT_BASE_URL}/${remote_rel_path}"
         # shellcheck disable=SC1090
         source <(curl -fsSL "$remote_url") || {
-            echo "[HATA] $remote_url dosyası yüklenemedi."
+            echo "${ERROR_TAG} $remote_url dosyası yüklenemedi."
             exit 1
         }
     fi
@@ -76,26 +76,26 @@ run_module() {
     shift
 
     if [ -f "$local_path" ]; then
-        echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
+        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
     else
-        echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
+        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
         prepare_remote_module_dir || {
-            echo -e "${RED}[HATA]${NC} Uzaktan modül dizini hazırlanamadı."
+            echo -e "${RED}${ERROR_TAG}${NC} Uzaktan modül dizini hazırlanamadı."
             return 1
         }
         local remote_file="$REMOTE_MODULE_DIR/${module_name}.sh"
         if [ ! -f "$remote_file" ]; then
             if ! curl -fsSL "$module_url" -o "$remote_file"; then
-                echo -e "${RED}[HATA]${NC} $module_name modülü indirilemedi."
+                echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü indirilemedi."
                 return 1
             fi
         fi
         if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
-            echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
     fi

@@ -96,7 +96,6 @@ bash -n setup && shellcheck setup  # optional
 | `9` | GitHub CLI install with official repo keys. |
 | `10` | Remove AI frameworks (Super* uninstall + cleanup). |
 | `11` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
-| `12` | Install Contains Studio Claude Code agents into `~/.claude/agents`. |
 | `A` | Install everything sequentially (skips interactive logins, prints summaries). |
 | `0` | Exit. |
 
@@ -250,7 +249,7 @@ Option `11` installs the [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) 
 
 #### Contains Studio Agents for Claude Code (AI CLI Option 12)
 
-AI CLI option `12` (and main menu option `12`) clones the [Contains Studio agents](https://github.com/contains-studio/agents) repository and copies every `.md` manifest into `~/.claude/agents`. Restart Claude Code after the sync so the agents show up in the sidebar.
+AI CLI option `12` clones the [Contains Studio agents](https://github.com/contains-studio/agents) repository and copies every `.md` manifest into `~/.claude/agents`. Restart Claude Code after the sync so the agents show up in the sidebar.
 
 - Requires `git`; rerun the option any time to pull the latest changes (uses `rsync -a --delete`).
 - Agents are categorized by department (engineering, design, marketing, ops, etc.).
@@ -372,7 +371,6 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `9` | GitHub CLI. |
 | `10` | AI Framework kaldırma menüsü. |
 | `11` | MCP sunucularını listeleme/temizleme. |
-| `12` | Contains Studio Claude Code ajan paketini `~/.claude/agents/` içine kurar. |
 | `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
 | `0` | Çıkış. |
 
@@ -522,7 +520,7 @@ Ek Bilgiler:
 
 #### Claude Code İçin Contains Studio Ajanları (Seçenek 12)
 
-AI CLI veya ana menüdeki `12` numaralı seçenek, [Contains Studio agents](https://github.com/contains-studio/agents) deposunu klonlayarak tüm `.md` ajan tanımlarını `~/.claude/agents/` dizinine kopyalar. Kurulumdan sonra Claude Code’u yeniden başlatarak yeni ajanların görünmesini sağlayabilirsiniz.
+AI CLI menüsündeki `12` numaralı seçenek, [Contains Studio agents](https://github.com/contains-studio/agents) deposunu klonlayarak tüm `.md` ajan tanımlarını `~/.claude/agents/` dizinine kopyalar. Kurulumdan sonra Claude Code’u yeniden başlatarak yeni ajanların görünmesini sağlayabilirsiniz.
 
 - Script `git` gerektirir; en güncel ajanları almak için istediğiniz zaman tekrar çalıştırabilirsiniz.
 - Kopyalama işlemi `rsync -a --delete` ile yapıldığı için yerel klasörünüz depo ile aynı içerikte olur.

@@ -9,7 +9,7 @@ if ! declare -f run_module >/dev/null 2>&1; then
         local module_name="$1"
         local module_url="${BASE_URL}/${module_name}.sh"
         shift
-        if ! curl -fsSL "$module_url" | bash -s -- "$@"; then
+        if ! curl -fsSL "$module_url" | LANGUAGE="$LANGUAGE" bash -s -- "$@"; then
             echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi

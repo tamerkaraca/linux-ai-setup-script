@@ -77,7 +77,7 @@ run_module() {
 
     if [ -f "$local_path" ]; then
         echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
-        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash "$local_path" "$@"; then
+        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
             echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
@@ -94,7 +94,7 @@ run_module() {
                 return 1
             fi
         fi
-        if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash "$remote_file" "$@"); then
+        if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
             echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi

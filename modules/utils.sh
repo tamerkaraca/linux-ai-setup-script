@@ -98,6 +98,14 @@ declare -A TEXT_EN=(
     ["ai_option17"]="Install every CLI"
     ["ai_option_return"]="Return to main menu"
     ["ai_prompt_install_more"]="Install another AI CLI? (y/n) [n]:"
+    ["fw_menu_title"]="AI Framework Installation Menu"
+    ["fw_menu_hint"]="Use commas for multiple selections (e.g., 1,2)."
+    ["fw_option1"]="SuperGemini Framework"
+    ["fw_option2"]="SuperQwen Framework"
+    ["fw_option3"]="SuperClaude Framework"
+    ["fw_option4"]="Install every framework"
+    ["fw_option_return"]="Return to main menu"
+    ["fw_prompt_install_more"]="Install another AI framework? (y/n) [n]:"
 )
 
 declare -A TEXT_TR=(
@@ -153,6 +161,14 @@ declare -A TEXT_TR=(
     ["ai_option17"]="Tüm CLI araçlarını kur"
     ["ai_option_return"]="Ana menüye dön"
     ["ai_prompt_install_more"]="Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]:"
+    ["fw_menu_title"]="AI Framework Kurulum Menüsü"
+    ["fw_menu_hint"]="Birden fazla seçim için virgül kullanın (örn: 1,2)."
+    ["fw_option1"]="SuperGemini Framework"
+    ["fw_option2"]="SuperQwen Framework"
+    ["fw_option3"]="SuperClaude Framework"
+    ["fw_option4"]="Tüm AI frameworklerini kur"
+    ["fw_option_return"]="Ana menüye dön"
+    ["fw_prompt_install_more"]="Başka bir AI framework kurmak ister misiniz? (e/h) [h]:"
 )
 
 translate() {

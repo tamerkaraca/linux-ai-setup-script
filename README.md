@@ -104,7 +104,7 @@ bash -n setup && shellcheck setup  # optional
 ### CLI & Framework Sub-menus
 
 #### AI CLI Menu
-The sub-menu accepts comma-separated selections (`1,3,7`) or an `11` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `copilot auth login`, etc.).
+The sub-menu accepts comma-separated selections (`1,3,7`) or a `12` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `openspec init`, `copilot auth login`, etc.).
 
 | Option | Tool | Highlights |
 |--------|------|------------|
@@ -118,7 +118,8 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or an `11` shortcut th
 | `8` | Cline CLI | Requires Node.js ≥ 18, installs the `@cline/cli` package, and prompts for `cline login` only during interactive runs. |
 | `9` | Aider CLI | Installs the `aider-chat` package via pipx (Node.js ≥ 18 guard) and reminds you to export provider API keys before running `aider`. |
 | `10` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
-| `11` | Install every CLI | Runs options `1-10` in batch mode (logins skipped, summary printed at the end). |
+| `11` | OpenSpec CLI + Agents | Installs `@fission-ai/openspec` globally and syncs Contains Studio agents into `~/.claude/agents`. |
+| `12` | Install every CLI | Runs options `1-11` in batch mode (logins skipped, summary printed at the end). |
 
 ##### Claude Code CLI
 Anthropic’s Claude Code CLI (https://github.com/anthropics/claude-code) ships the same Ink-based workflow you see in the Claude desktop app. The installer attaches `/dev/tty` before launching `claude login`, preventing “Raw mode is not supported” errors when you run the script remotely. Sample usage:
@@ -390,7 +391,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 ### Alt Menü Detayları
 
 #### AI CLI Menüsü
-Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `11` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `copilot auth login` vb.) özet olarak yazdırır.
+Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `12` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `openspec init`, `copilot auth login` vb.) özet olarak yazdırır.
 
 | Seçenek | Araç | Detaylar |
 |---------|------|----------|
@@ -404,7 +405,8 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `11` kısayolu
 | `8` | Cline CLI | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
 | `9` | Aider CLI | Pipx üzerinden `aider-chat` paketini kurar (Node.js ≥ 18 kontrolü sonrası) ve API anahtarlarını export etmeniz gerektiğini hatırlatır. |
 | `10` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
-| `11` | Hepsini Kur | `1-10` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+| `11` | OpenSpec CLI + Agents | `@fission-ai/openspec` paketini kurar ve Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder. |
+| `12` | Hepsini Kur | `1-11` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 ##### Claude Code CLI
 Anthropic’in Claude Code CLI aracı (https://github.com/anthropics/claude-code), Claude masaüstündeki Ink tabanlı deneyimi terminale taşır. Kurulum sırasında `/dev/tty` bağlandığı için “Raw mode is not supported” hatası alınmaz ve `claude login` komutu uzaktan bile sorunsuz çalışır:

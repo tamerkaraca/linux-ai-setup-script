@@ -9,8 +9,36 @@
 : "${BOLD:=$'\033[1m'}"
 
 HEADING_WIDTH=70
-BANNER_AI_TITLE="AI CLI ARACLARI"
-BANNER_DEV_TITLE="GELISTIRME ARACLARI"
+
+declare -A BANNER_TEXT_EN=(
+    ["ai_title"]="AI CLI TOOLS"
+    ["dev_title"]="DEVELOPMENT TOOLS"
+    ["info_title"]="Script Information"
+    ["version"]="Version"
+    ["developer"]="Developer"
+    ["github_account"]="GitHub Account"
+    ["repository"]="Repository"
+)
+
+declare -A BANNER_TEXT_TR=(
+    ["ai_title"]="AI CLI ARAÇLARI"
+    ["dev_title"]="GELİŞTİRME ARAÇLARI"
+    ["info_title"]="Script Bilgileri"
+    ["version"]="Versiyon"
+    ["developer"]="Geliştirici"
+    ["github_account"]="GitHub Hesabı"
+    ["repository"]="Depo"
+)
+
+banner_text() {
+    local key="$1"
+    local default_value="${BANNER_TEXT_EN[$key]:-$key}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${BANNER_TEXT_TR[$key]:-$default_value}"
+    else
+        printf "%s" "$default_value"
+    fi
+}
 
 center_text() {
     local text="$1"
@@ -54,19 +82,19 @@ print_info_panel() {
     local repo="$2"
 
     echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
-    panel_line_raw "${BOLD}Script Bilgileri${NC}"
+    panel_line_raw "${BOLD}$(banner_text info_title)${NC}"
     echo -e "${BLUE}╠════════════════════════════════════════════════════════════════════════╣${NC}"
-    panel_line_raw "Versiyon      : ${GREEN}${version}${NC}"
-    panel_line_raw "Geliştirici   : ${GREEN}Tamer KARACA${NC}"
-    panel_line_raw "GitHub Hesabı : ${CYAN}@tamerkaraca${NC}"
-    panel_line_raw "Depo          : ${CYAN}${repo}${NC}"
+    panel_line_raw "$(banner_text version)      : ${GREEN}${version}${NC}"
+    panel_line_raw "$(banner_text developer)   : ${GREEN}Tamer KARACA${NC}"
+    panel_line_raw "$(banner_text github_account) : ${CYAN}@tamerkaraca${NC}"
+    panel_line_raw "$(banner_text repository)          : ${CYAN}${repo}${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
 render_setup_banner() {
     local version="$1"
     local repo="$2"
-    print_heading_panel "$BANNER_AI_TITLE" "$BANNER_DEV_TITLE"
+    print_heading_panel "$(banner_text ai_title)" "$(banner_text dev_title)"
     print_info_panel "$version" "$repo"
     echo
 }

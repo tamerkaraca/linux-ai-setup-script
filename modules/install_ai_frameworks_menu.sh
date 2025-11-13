@@ -1,8 +1,64 @@
 #!/bin/bash
+set -euo pipefail
 
 # Ortak yardımcı fonksiyonları yükle
 # shellcheck source=/dev/null
 source "./modules/utils.sh"
+
+: "${RED:=$'\033[0;31m'}"
+: "${GREEN:=$'\033[0;32m'}"
+: "${YELLOW:=$'\033[1;33m'}"
+: "${BLUE:=$'\033[0;34m'}"
+: "${CYAN:=$'\033[0;36m'}"
+: "${NC:=$'\033[0m'}"
+
+declare -A AI_FW_MENU_TEXT_EN=(
+    ["fw_menu_title"]="AI Frameworks Installation Menu"
+    ["fw_option1"]="SuperGemini Framework"
+    ["fw_option2"]="SuperQwen Framework"
+    ["fw_option3"]="SuperClaude Framework"
+    ["fw_option4"]="Install All Frameworks"
+    ["fw_option_return"]="Return to Main Menu"
+    ["fw_menu_hint"]="You can make multiple selections with commas (e.g., 1,2)."
+    ["prompt_choice"]="Your choice"
+    ["info_returning"]="Returning to the previous menu..."
+    ["warning_invalid_choice"]="Invalid choice"
+    ["fw_prompt_install_more"]="Install another framework? (y/n) [n]: "
+    ["pipx_required"]="Pipx is required for AI Frameworks; installing it first..."
+    ["python_required"]="Python is required for Pipx; installing it first..."
+    ["module_running_local"]="Running %s module from local file..."
+    ["module_downloading"]="Downloading and running %s module..."
+    ["module_error"]="An error occurred while running the %s module."
+)
+
+declare -A AI_FW_MENU_TEXT_TR=(
+    ["fw_menu_title"]="AI Frameworks Kurulum Menüsü"
+    ["fw_option1"]="SuperGemini Framework"
+    ["fw_option2"]="SuperQwen Framework"
+    ["fw_option3"]="SuperClaude Framework"
+    ["fw_option4"]="Tüm Framework'leri Kur"
+    ["fw_option_return"]="Ana Menüye Dön"
+    ["fw_menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2)."
+    ["prompt_choice"]="Seçiminiz"
+    ["info_returning"]="Bir önceki menüye dönülüyor..."
+    ["warning_invalid_choice"]="Geçersiz seçim"
+    ["fw_prompt_install_more"]="Başka bir framework kurmak ister misiniz? (e/h) [h]: "
+    ["pipx_required"]="AI Frameworks için önce Pipx kurulumu yapılıyor..."
+    ["python_required"]="Pipx için önce Python kurulumu yapılıyor..."
+    ["module_running_local"]="%s modülü yerel dosyadan çalıştırılıyor..."
+    ["module_downloading"]="%s modülü indiriliyor ve çalıştırılıyor..."
+    ["module_error"]="%s modülü çalıştırılırken bir hata oluştu."
+)
+
+ai_fw_menu_text() {
+    local key="$1"
+    local default_value="${AI_FW_MENU_TEXT_EN[$key]:-$key}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${AI_FW_MENU_TEXT_TR[$key]:-$default_value}"
+    else
+        printf "%s" "$default_value"
+    fi
+}
 
 # Script çalıştırma fonksiyonu (setup script'inin güncel versiyonu ile aynı davranış)
 run_module() {
@@ -12,15 +68,19 @@ run_module() {
     shift
 
     if [ -f "$local_path" ]; then
-        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
+        printf -v msg "$(ai_fw_menu_text module_running_local)" "$module_name"
+        echo -e "${CYAN}${INFO_TAG}${NC} $msg"
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            printf -v msg "$(ai_fw_menu_text module_error)" "$module_name"
+            echo -e "${RED}${ERROR_TAG}${NC} $msg"
             return 1
         fi
     else
-        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
+        printf -v msg "$(ai_fw_menu_text module_downloading)" "$module_name"
+        echo -e "${CYAN}${INFO_TAG}${NC} $msg"
         if ! curl -fsSL "$module_url" | PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash -s -- "$@"; then
-            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            printf -v msg "$(ai_fw_menu_text module_error)" "$module_name"
+            echo -e "${RED}${ERROR_TAG}${NC} $msg"
             return 1
         fi
     fi
@@ -36,18 +96,18 @@ install_ai_frameworks_menu() {
         if [ -z "$install_all" ]; then
             clear
             echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            printf "${BLUE}║%*s║${NC}\n" -43 " $(translate fw_menu_title) "
+            printf "${BLUE}║%*s║${NC}\n" -43 " $(ai_fw_menu_text fw_menu_title) "
             echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-            echo -e "  ${GREEN}1${NC} - $(translate fw_option1)"
-            echo -e "  ${GREEN}2${NC} - $(translate fw_option2)"
-            echo -e "  ${GREEN}3${NC} - $(translate fw_option3)"
-            echo -e "  ${GREEN}4${NC} - $(translate fw_option4)"
-            echo -e "  ${RED}0${NC} - $(translate fw_option_return)"
-            echo -e "\n${YELLOW}$(translate fw_menu_hint)${NC}"
+            echo -e "  ${GREEN}1${NC} - $(ai_fw_menu_text fw_option1)"
+            echo -e "  ${GREEN}2${NC} - $(ai_fw_menu_text fw_option2)"
+            echo -e "  ${GREEN}3${NC} - $(ai_fw_menu_text fw_option3)"
+            echo -e "  ${GREEN}4${NC} - $(ai_fw_menu_text fw_option4)"
+            echo -e "  ${RED}0${NC} - $(ai_fw_menu_text fw_option_return)"
+            echo -e "\n${YELLOW}$(ai_fw_menu_text fw_menu_hint)${NC}"
 
-            read -r -p "${YELLOW}$(translate prompt_choice):${NC} " framework_choices </dev/tty
+            read -r -p "${YELLOW}$(ai_fw_menu_text prompt_choice):${NC} " framework_choices </dev/tty
             if [ "$framework_choices" = "0" ] || [ -z "$framework_choices" ]; then
-                echo -e "${YELLOW}$(translate info_returning)${NC}"
+                echo -e "${YELLOW}$(ai_fw_menu_text info_returning)${NC}"
                 break
             fi
         else
@@ -56,9 +116,9 @@ install_ai_frameworks_menu() {
 
         # Pipx kontrolü
         if ! command -v pipx &> /dev/null; then
-            echo -e "${YELLOW}${WARN_TAG}${NC} AI Frameworks için önce Pipx kurulumu yapılıyor..."
+            echo -e "${YELLOW}${WARN_TAG}${NC} $(ai_fw_menu_text pipx_required)"
             if ! command -v python3 &> /dev/null; then
-                 echo -e "${YELLOW}${WARN_TAG}${NC} Pipx için önce Python kurulumu yapılıyor..."
+                 echo -e "${YELLOW}${WARN_TAG}${NC} $(ai_fw_menu_text python_required)"
                  install_python
             fi
             install_pipx
@@ -79,7 +139,7 @@ install_ai_frameworks_menu() {
                     run_module "install_superclaude"
                     all_installed=true
                     ;;
-                *) echo -e "${RED}$(translate warning_invalid_choice): $choice${NC}" ;;
+                *) echo -e "${RED}$(ai_fw_menu_text warning_invalid_choice): $choice${NC}" ;;
             esac
         done
         
@@ -87,7 +147,7 @@ install_ai_frameworks_menu() {
             break
         fi
 
-        read -r -p "${YELLOW}$(translate fw_prompt_install_more)${NC} " continue_choice </dev/tty
+        read -r -p "${YELLOW}$(ai_fw_menu_text fw_prompt_install_more)${NC} " continue_choice </dev/tty
         if [[ ! "$continue_choice" =~ ^([eEyY])$ ]]; then
             break
         fi

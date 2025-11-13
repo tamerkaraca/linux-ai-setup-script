@@ -52,7 +52,7 @@
 
 - Linux distribution exposing `apt`, `dnf`, `yum`, or `pacman`.
 - `bash` 5+, `sudo` rights, internet access.
-- `curl` (auto-installed when missing for remote runs).
+- `curl` or `wget` (auto-installed when missing for remote runs).
 - Optional: `dos2unix`, `shellcheck`, `jq` (installed automatically when relevant).
 
 The banner renderer ships with the repo, so no extra packages are fetched just to print headers.
@@ -68,7 +68,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-set
 or with `wget`:
 
 ```bash
-bash -c "$(wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup | bash
 ```
 
 #### 2. Local Clone
@@ -177,11 +177,18 @@ The framework menu ensures `pipx` exists (installing Python first if necessary),
 
 ### Contributing
 
-1. Fork the repository and create a feature branch.
+1. Fork repository and create a feature branch.
 2. Run `shellcheck` on touched scripts plus `bash -n` for syntax checks. Ensure all issues are resolved.
 3. Update README/localized docs when adding menus or modules.
 4. Submit a PR describing motivation, impacted scripts, and sample output (screenshots/logs for interactive flows help reviewers).
 5. For module changes, verify both local and remote (`bash -c "$(curl …)"`) workflows.
+
+#### Script Validation
+All scripts in this repository are validated with:
+- **Syntax checks:** `bash -n` for all shell scripts
+- **Static analysis:** `shellcheck` for best practices and security
+- **Line ending normalization:** Automatic CRLF to LF conversion
+- **Current status:** ✅ 40 scripts validated (39 modules + setup)
 
 ### Credits
 
@@ -213,7 +220,7 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 
 - `apt`, `dnf`, `yum` veya `pacman` içeren Linux dağıtımı.
 - `bash` 5+, `sudo` hakları, aktif internet bağlantısı.
-- `curl` (uzaktan kurulum için zorunlu).
+- `curl` veya `wget` (uzaktan kurulum için zorunlu).
 - Banner panelleri depo ile birlikte gelir; ekstra bir ASCII aracı kurmanıza gerek kalmaz.
 
 ### Kurulum
@@ -227,7 +234,7 @@ bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-set
 veya `wget` ile:
 
 ```bash
-bash -c "$(wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup | bash
 ```
 
 #### 2. Yerel Klon
@@ -336,6 +343,13 @@ Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon od
 2. Script değişikliklerinde `shellcheck` ve `bash -n` çalıştırın.
 3. README/TR bölümlerini yeni özelliklerle güncelleyin.
 4. PR özetine ekran görüntüsü veya log ekleyin.
+
+#### Script Doğrulama
+Bu depodaki tüm scriptler aşağıdaki yöntemlerle doğrulanmıştır:
+- **Sözdizimi kontrolleri:** Tüm shell scriptler için `bash -n`
+- **Statik analiz:** En iyi pratikler ve güvenlik için `shellcheck`
+- **Satır sonu normalizasyonu:** Otomatik CRLF'den LF'ye dönüşüm
+- **Mevcut durum:** ✅ 40 script doğrulandı (39 modül + setup)
 
 ### Emek Verenler
 

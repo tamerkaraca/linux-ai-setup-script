@@ -115,9 +115,9 @@ declare -A TEXT_TR=(
 
 translate() {
     local key="$1"
-    local default_value="${TEXT_EN["$key"]:-$key}"
+    local default_value="${TEXT_EN[$key]:-$key}"
     if [ "$LANGUAGE" = "tr" ]; then
-        echo "${TEXT_TR["$key"]:-$default_value}"
+        echo "${TEXT_TR[$key]:-$default_value}"
     else
         echo "$default_value"
     fi

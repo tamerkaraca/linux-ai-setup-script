@@ -9,6 +9,25 @@ CYAN=$'\033[0;36m'
 NC=$'\033[0m' # No Color
 export RED GREEN YELLOW BLUE CYAN NC
 
+# Log functions
+log_info() {
+    echo -e "${CYAN}${INFO_TAG}${NC} $1"
+}
+
+log_warning() {
+    echo -e "${YELLOW}${WARN_TAG}${NC} $1"
+}
+
+log_error() {
+    echo -e "${RED}${ERROR_TAG}${NC} $1"
+}
+
+log_success() {
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} $1"
+}
+
+export -f log_info log_warning log_error log_success
+
 # Dil ve yerelleştirme ayarları
 SUPPORTED_LANGUAGES=(en tr)
 

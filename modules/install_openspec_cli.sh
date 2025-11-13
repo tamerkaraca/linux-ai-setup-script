@@ -10,13 +10,24 @@ fi
 # shellcheck source=/dev/null
 [ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
+ensure_npm_available_local() {
+    if command -v npm >/dev/null 2>&1; then
+        return 0
+    fi
+    if bootstrap_node_runtime; then
+        return 0
+    fi
+    echo -e "${RED}[HATA]${NC} npm komutu bulunamadı. Lütfen menüdeki 3. seçenekle Node.js kurulumunu tamamlayın."
+    return 1
+}
+
 install_openspec_cli() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} OpenSpec CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     require_node_version 18 || return 1
-    ensure_npm_available || return 1
+    ensure_npm_available_local || return 1
     ensure_modern_npm false || return 1
 
     if npm_install_global_with_fallback "@fission-ai/openspec" "OpenSpec CLI"; then

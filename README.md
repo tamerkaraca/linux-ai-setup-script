@@ -95,8 +95,8 @@ bash -n setup && shellcheck setup  # optional
 | `8` | Install Auxiliary AI Tools (OpenSpec, Agents, etc.). |
 | `9` | Install PHP and Composer with selectable versions and Laravel-friendly extensions. |
 | `10` | Install GitHub CLI with official repo keys. |
-| `11` | Remove AI frameworks (Super* uninstall + cleanup). |
-| `12` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
+| `A` | Remove all AI frameworks |
+| `A` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
 | `L` | Switch the interface language (English ↔ Türkçe, auto-detected default). |
 | `A` | Install everything sequentially (skips interactive logins, prints summaries). |
 | `0` | Exit. |
@@ -143,7 +143,7 @@ This new menu, accessible via option `8` in the main menu, groups together tools
 | `2` | specify-cli | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. Requires Python tools to be installed. |
 | `3` | Contains Studio Agents | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
 | `4` | Wes Hobson Agents | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
-| `5` | Install All | Installs all auxiliary tools sequentially. |
+| `A` | Install All | Installs all auxiliary tools sequentially. |
 
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
@@ -173,11 +173,12 @@ The framework menu ensures `pipx` exists (installing Python first if necessary),
 | Aider CLI install fails | The script now uses the official `aider-install` script, which is more robust. If it still fails, check the logs from the installer. |
 | CLI still missing after install | Re-open the terminal or run `source ~/.bashrc`; confirm `$PATH` contains `~/.local/bin` and `~/.nvm`. |
 | `pip` errors about externally-managed environment | `install_pip` now falls back to `ensurepip`, distro packages, or `get-pip.py --break-system-packages`. Re-run option `2`. |
+| `file: command not found` or syntax errors in `install_specify_cli.sh` | Fixed by ensuring `file` command check and correcting associative array syntax. |
 
 ### Contributing
 
 1. Fork the repository and create a feature branch.
-2. Run `shellcheck` on touched scripts plus `bash -n` for syntax checks.
+2. Run `shellcheck` on touched scripts plus `bash -n` for syntax checks. Ensure all issues are resolved.
 3. Update README/localized docs when adding menus or modules.
 4. Submit a PR describing motivation, impacted scripts, and sample output (screenshots/logs for interactive flows help reviewers).
 5. For module changes, verify both local and remote (`bash -c "$(curl …)"`) workflows.
@@ -253,8 +254,8 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `8` | Yardımcı AI Araçlarını Kur (OpenSpec, Ajanlar, vb.). |
 | `9` | PHP & Composer kurulum sihirbazı. |
 | `10` | GitHub CLI. |
-| `11` | AI Framework kaldırma menüsü. |
-| `12` | MCP sunucularını listeleme/temizleme. |
+| `A` | AI Framework kaldırma menüsü. |
+| `A` | MCP sunucu yönetimi (listele, `~/.gemini`, `~/.qwen`, `~/.claude` temizle). |
 | `L` | Dili değiştir (varsayılan İngilizce, `tr` lokalli sistemlerde otomatik Türkçe açılır). |
 | `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
 | `0` | Çıkış. |
@@ -301,7 +302,7 @@ Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon od
 | `2` | specify-cli | GitHub'ın `spec-kit` deposundan `specify-cli` aracını `uv` ile kurar. Python araçlarının kurulu olmasını gerektirir. |
 | `3` | Contains Studio Agents | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
 | `4` | Wes Hobson Agents | `wshobson/agents` koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
-| `5` | Hepsini Kur | Tüm yardımcı araçları sırayla kurar. |
+| `A` | Hepsini Kur | Tüm yardımcı araçları sırayla kurar. |
 
 #### AI Framework Menüsü
 Önce `pipx` ve gerekirse Python kurulumunu doğrular, ardından Super* framework’lerini tek tek veya toplu olarak kurar. API anahtar istemleri `/dev/tty` üzerinden aktığı için `curl | bash` senaryolarında bile güvenli şekilde giriş yapabilirsiniz.

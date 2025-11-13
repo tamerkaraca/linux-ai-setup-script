@@ -179,26 +179,26 @@ run_module() {
     shift
 
     if [ -f "$local_path" ]; then
-        echo -e "${CYAN}${INFO_TAG}${NC} $(setup_text_fmt log_module_local "$module_name")"
+        echo -e "${CYAN}${INFO_TAG}${NC} Running module '$module_name' from local file..."
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            echo -e "${RED}${ERROR_TAG}${NC} $(setup_text_fmt log_module_error "$module_name")"
+            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
             return 1
         fi
     else
-        echo -e "${CYAN}${INFO_TAG}${NC} $(setup_text_fmt log_module_remote "$module_name")"
+        echo -e "${CYAN}${INFO_TAG}${NC} Downloading and running module '$module_name'..."
         prepare_remote_module_dir || {
-            echo -e "${RED}${ERROR_TAG}${NC} $(setup_text log_remote_prepare_failed)"
+            echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
         }
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.sh"
         if [ ! -f "$remote_file" ]; then
             if ! curl -fsSL "$module_url" -o "$remote_file"; then
-                echo -e "${RED}${ERROR_TAG}${NC} $(setup_text_fmt log_module_download_failed "$module_name")"
+                echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
                 return 1
             fi
         fi
         if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
-            echo -e "${RED}${ERROR_TAG}${NC} $(setup_text_fmt log_module_error "$module_name")"
+            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
             return 1
         fi
     fi

@@ -1,4 +1,11 @@
 #!/bin/bash
+# Windows CRLF düzeltme kontrolü
+if [ -f "$0" ]; then
+    if file "$0" | grep -q "CRLF"; then
+        if command -v dos2unix &> /dev/null; then dos2unix "$0"; elif command -v sed &> /dev/null; then sed -i 's/\r$//' "$0"; fi
+        exec bash "$0" "$@"
+    fi
+fi
 set -euo pipefail
 
 # Ortak yardımcı fonksiyonları yükle
@@ -89,18 +96,18 @@ install_aux_tools_menu() {
                 2) run_module "install_specify_cli" ;;
                 3) run_module "install_claude_agents" "contains" ;;
                 4) run_module "install_claude_agents" "wshobson" ;;
-                5)
+                5) 
                     run_module "install_openspec_cli"
                     run_module "install_specify_cli"
                     run_module "install_claude_agents" "contains"
                     run_module "install_claude_agents" "wshobson"
                     all_installed=true
                     ;;
-                0)
+                0) 
                     echo -e "${YELLOW}$(aux_menu_text info_returning)${NC}"
                     return 0
                     ;;
-                *)
+                *) 
                     echo -e "${RED}$(aux_menu_text warning_invalid_choice): $choice${NC}"
                     ;;
             esac

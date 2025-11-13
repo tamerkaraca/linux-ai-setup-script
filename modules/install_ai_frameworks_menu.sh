@@ -17,7 +17,7 @@ declare -A AI_FW_MENU_TEXT_EN=(
     ["fw_option1"]="SuperGemini Framework"
     ["fw_option2"]="SuperQwen Framework"
     ["fw_option3"]="SuperClaude Framework"
-    ["fw_option4"]="Install All Frameworks"
+    ["fw_optionA"]="Install All Frameworks"
     ["fw_option_return"]="Return to Main Menu"
     ["fw_menu_hint"]="You can make multiple selections with commas (e.g., 1,2)."
     ["prompt_choice"]="Your choice"
@@ -36,7 +36,7 @@ declare -A AI_FW_MENU_TEXT_TR=(
     ["fw_option1"]="SuperGemini Framework"
     ["fw_option2"]="SuperQwen Framework"
     ["fw_option3"]="SuperClaude Framework"
-    ["fw_option4"]="Tüm Framework'leri Kur"
+    ["fw_optionA"]="Tüm Framework'leri Kur"
     ["fw_option_return"]="Ana Menüye Dön"
     ["fw_menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2)."
     ["prompt_choice"]="Seçiminiz"
@@ -101,7 +101,7 @@ install_ai_frameworks_menu() {
             echo -e "  ${GREEN}1${NC} - $(ai_fw_menu_text fw_option1)"
             echo -e "  ${GREEN}2${NC} - $(ai_fw_menu_text fw_option2)"
             echo -e "  ${GREEN}3${NC} - $(ai_fw_menu_text fw_option3)"
-            echo -e "  ${GREEN}4${NC} - $(ai_fw_menu_text fw_option4)"
+            echo -e "  ${GREEN}A${NC} - $(ai_fw_menu_text fw_optionA)"
             echo -e "  ${RED}0${NC} - $(ai_fw_menu_text fw_option_return)"
             echo -e "\n${YELLOW}$(ai_fw_menu_text fw_menu_hint)${NC}"
 
@@ -111,7 +111,7 @@ install_ai_frameworks_menu() {
                 break
             fi
         else
-            framework_choices="4" # "all" parametresi gelirse tümünü seç
+            framework_choices="A" # "all" parametresi gelirse tümünü seç
         fi
 
         # Pipx kontrolü
@@ -128,16 +128,20 @@ install_ai_frameworks_menu() {
         IFS=',' read -ra SELECTED_FW <<< "$framework_choices"
 
         for choice in "${SELECTED_FW[@]}"; do
-            choice=$(echo "$choice" | tr -d ' ')
+            choice=$(echo "$choice" | tr -d ' ' | tr '[:lower:]' '[:upper:]')
             case $choice in
                 1) run_module "install_supergemini" ;;
                 2) run_module "install_superqwen" ;;
                 3) run_module "install_superclaude" ;;
-                4) 
+                A) 
                     run_module "install_supergemini"
                     run_module "install_superqwen"
                     run_module "install_superclaude"
                     all_installed=true
+                    ;;
+                0)
+                    echo -e "${YELLOW}$(ai_fw_menu_text info_returning)${NC}"
+                    return 0
                     ;;
                 *) echo -e "${RED}$(ai_fw_menu_text warning_invalid_choice): $choice${NC}" ;;
             esac

@@ -1,4 +1,11 @@
 #!/bin/bash
+# Windows CRLF düzeltme kontrolü
+if [ -f "$0" ]; then
+    if file "$0" | grep -q "CRLF"; then
+        if command -v dos2unix &> /dev/null; then dos2unix "$0"; elif command -v sed &> /dev/null; then sed -i 's/\r$//' "$0"; fi
+        exec bash "$0" "$@"
+    fi
+fi
 set -euo pipefail
 
 UTILS_PATH="./modules/utils.sh"

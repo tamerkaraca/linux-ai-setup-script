@@ -108,9 +108,16 @@ install_droid_cli() {
         return 1
     fi
 
+    local candidate_dirs=("$HOME/.local/bin" "$HOME/.factory/bin")
+    for dir in "${candidate_dirs[@]}"; do
+        if [ -d "$dir" ]; then
+            ensure_path_contains_dir "$dir" "Droid CLI"
+        fi
+    done
+    export PATH="$HOME/.local/bin:$HOME/.factory/bin:$PATH"
     hash -r 2>/dev/null || true
 
-    if ! command -v droid >/dev/null 2>/dev/null; then
+    if ! command -v droid >/dev/null 2>&1; then
         echo -e "${YELLOW}${WARN_TAG}${NC} $(droid_text path_warn)"
         return 1
     fi

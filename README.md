@@ -37,7 +37,7 @@
 
 ### Overview
 
-`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, OpenAI Codex, Copilot CLI), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
+`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, Kilocode, Droid quickstart, OpenSpec, OpenAI Codex, Copilot CLI, Contains Studio & Wes Hobson agent packs), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
 
 ### Architecture
 
@@ -102,7 +102,7 @@ bash -n setup && shellcheck setup  # optional
 ### CLI & Framework Sub-menus
 
 #### AI CLI Menu
-The sub-menu accepts comma-separated selections (`1,3,7`) or a `15` shortcut that installs every CLI sequentially. Option `11` intentionally surfaces Factory’s Droid quickstart instructions instead of attempting an opaque install, so you always follow the upstream process. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `droid quickstart`, `openspec init`, `copilot auth login`, etc.).
+The sub-menu accepts comma-separated selections (`1,3,7`) or a `16` shortcut that installs every CLI sequentially. Option `11` installs Kilocode CLI (for architect/debug/auto modes) with Node.js guards, while option `12` intentionally surfaces Factory’s Droid quickstart instructions so you always follow the upstream process. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `kilocode config`, `droid quickstart`, `openspec init`, `copilot auth login`, etc.).
 
 | Option | Tool | Highlights |
 |--------|------|------------|
@@ -116,11 +116,12 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `15` shortcut tha
 | `8` | Cline CLI | Requires Node.js ≥ 18, installs the `@cline/cli` package, and prompts for `cline login` only during interactive runs. |
 | `9` | Aider CLI | Installs the `aider-chat` package via pipx (Node.js ≥ 18 guard) and reminds you to export provider API keys before running `aider`. |
 | `10` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
-| `11` | Droid CLI | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
-| `12` | OpenSpec CLI | Installs `@fission-ai/openspec` globally (Node.js ≥ 18) so you can run `openspec init/plan/sync`. |
-| `13` | Contains Studio Agents | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
-| `14` | Wes Hobson Agents | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
-| `15` | Install every CLI | Runs options `1-14` in batch mode (logins skipped, summary printed at the end). |
+| `11` | Kilocode CLI | Installs `@kilocode/cli`, enforces Node.js ≥ 18, and prints reminders to run `kilocode config` plus architect/debug/auto modes. |
+| `12` | Droid CLI | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
+| `13` | OpenSpec CLI | Installs `@fission-ai/openspec` globally (Node.js ≥ 18) so you can run `openspec init/plan/sync`. |
+| `14` | Contains Studio Agents | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
+| `15` | Wes Hobson Agents | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
+| `16` | Install every CLI | Runs options `1-15` in batch mode (logins skipped, summary printed at the end). |
 
 ##### Claude Code CLI
 Anthropic’s Claude Code CLI (https://github.com/anthropics/claude-code) ships the same Ink-based workflow you see in the Claude desktop app. The installer attaches `/dev/tty` before launching `claude login`, preventing “Raw mode is not supported” errors when you run the script remotely. Sample usage:
@@ -240,9 +241,27 @@ Option `7` in the primary menu now opens a mini-menu that targets two officially
 
 Both flows surface the upstream documentation links and keep the key in place if you press Enter, which makes credential rotation painless.
 
-#### Droid CLI (AI CLI Option 11)
+#### Kilocode CLI (AI CLI Option 11)
 
-Factory’s [Droid CLI quickstart](https://docs.factory.ai/cli/getting-started/quickstart) currently distributes OS-specific install scripts. When you pick option `11`, the script detects whether `droid` is already present and prints the official installation steps plus the quickstart URL, so you can paste the provided curl/chmod commands for macOS/Linux or download the Windows binary. After running the upstream bootstrap:
+Kilo Code’s CLI (https://kilocode.ai/docs/cli) brings the same architect/ask/debug/orchestrator flows from the IDE extensions into a keyboard-first terminal experience. The installer pulls `@kilocode/cli` via npm (Node.js ≥ 18), refreshes your shell, and reminds you to run `kilocode config` so you can paste OpenRouter, Vercel AI Gateway, Anthropic, or custom provider secrets.
+
+- Launch interactive workspaces per mode: `kilocode --mode architect`, `kilocode --mode debug`, or `kilocode --mode orchestrator`.
+- Use `kilocode config` or `/config` slash commands to manage provider credentials and LLM routing rules.
+- Switch models on the fly: `kilocode /model list`, `/model select z-ai/glm-4.5v`, or `kilocode --workspace path`.
+- Enable autonomous usage (`kilocode --auto "Run tests"`), pipe prompts via stdin, and specify timeouts (`--timeout 300`) for CI.
+- Run multiple sessions in parallel branches with `kilocode --parallel --auto "Improve payments"`—Kilo commits work to temporary git branches before handing control back to you.
+
+Example workflow:
+
+```bash
+kilocode --mode architect
+kilocode config
+kilocode --auto "Refactor billing service" --timeout 240
+```
+
+#### Droid CLI (AI CLI Option 12)
+
+Factory’s [Droid CLI quickstart](https://docs.factory.ai/cli/getting-started/quickstart) currently distributes OS-specific install scripts. When you pick option `12`, the script detects whether `droid` is already present and prints the official installation steps plus the quickstart URL, so you can paste the provided curl/chmod commands for macOS/Linux or download the Windows binary. After running the upstream bootstrap:
 
 1. Launch `droid` inside your repository to open the interactive terminal UI.
 2. Authenticate via the browser prompt.
@@ -250,18 +269,18 @@ Factory’s [Droid CLI quickstart](https://docs.factory.ai/cli/getting-started/q
 
 Because Factory’s installer changes frequently, we defer to the documentation rather than caching binaries locally.
 
-#### OpenSpec CLI (AI CLI Option 12)
+#### OpenSpec CLI (AI CLI Option 13)
 
-Option `12` installs the [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) globally via npm (`npm install -g @fission-ai/openspec`). OpenSpec brings spec-driven development to Claude Code, Cursor, Gemini CLI, etc., so you draft change proposals in `openspec/changes/`, agree on specs, and then have the AI implement tasks referencing those specs.
+Option `13` installs the [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) globally via npm (`npm install -g @fission-ai/openspec`). OpenSpec brings spec-driven development to Claude Code, Cursor, Gemini CLI, etc., so you draft change proposals in `openspec/changes/`, agree on specs, and then have the AI implement tasks referencing those specs.
 
 - Requires Node.js ≥ 18 and `npm` (the installer upgrades npm if it’s older than 9.x).
 - Exposes commands such as `openspec init`, `openspec plan`, `openspec apply <change>`, and `openspec archive <change> --yes`.
 - Use natural-language prompts inside Claude Code (“Use OpenSpec to plan add-profile-filters”) or run the CLI directly.
-- Run option `13` or `14` afterward if you also want the Contains Studio or Wes Hobson agent packs.
+- Run option `14` or `15` afterward if you also want the Contains Studio or Wes Hobson agent packs.
 
-#### Contains Studio Agents for Claude Code (AI CLI Option 13)
+#### Contains Studio Agents for Claude Code (AI CLI Option 14)
 
-AI CLI option `13` clones the [Contains Studio agents](https://github.com/contains-studio/agents) repository and copies every `.md` manifest into `~/.claude/agents`. Restart Claude Code after the sync so the agents show up in the sidebar.
+AI CLI option `14` clones the [Contains Studio agents](https://github.com/contains-studio/agents) repository and copies every `.md` manifest into `~/.claude/agents`. Restart Claude Code after the sync so the agents show up in the sidebar.
 
 - Requires `git`; rerun the option any time to pull the latest changes (uses `rsync -a --delete`).
 - Agents are categorized by department (engineering, design, marketing, ops, etc.).
@@ -272,9 +291,9 @@ git clone https://github.com/contains-studio/agents.git
 cp -r agents/* ~/.claude/agents/
 ```
 
-#### Wes Hobson Agents for Claude Code (AI CLI Option 14)
+#### Wes Hobson Agents for Claude Code (AI CLI Option 15)
 
-Option `14` installs the [wshobson/agents](https://github.com/wshobson/agents) repository into `~/.claude/agents`. This pack focuses on practical delivery, growth, and product ops roles; restart Claude Code after syncing so the new entries appear in the Agents sidebar.
+Option `15` installs the [wshobson/agents](https://github.com/wshobson/agents) repository into `~/.claude/agents`. This pack focuses on practical delivery, growth, and product ops roles; restart Claude Code after syncing so the new entries appear in the Agents sidebar.
 
 - Requires `git`; the installer mirrors the repo via `rsync -a --delete`, so rerunning the option refreshes your local library.
 - Manual alternative:
@@ -338,7 +357,7 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 
 ### Genel Bakış
 
-`setup`, Linux tabanlı geliştirici makinelerinde uçtan uca AI ortamı kurar. Paket yöneticisini otomatik saptar, CRLF düzeltir, Python/Node/PHP ekosistemlerini kurar, AI CLI & framework menüleri sunar (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, OpenAI Codex, Copilot CLI), GLM-4.6 yapılandırmasını ve MCP temizliğini yönetir.
+`setup`, Linux tabanlı geliştirici makinelerinde uçtan uca AI ortamı kurar. Paket yöneticisini otomatik saptar, CRLF düzeltir, Python/Node/PHP ekosistemlerini kurar, AI CLI & framework menüleri sunar (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, Kilocode, Factory Droid quickstart, OpenSpec, OpenAI Codex, GitHub Copilot CLI, Contains Studio & Wes Hobson ajan paketleri), GLM-4.6 yapılandırmasını ve MCP temizliğini yönetir.
 
 ### Mimari
 
@@ -401,7 +420,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 ### Alt Menü Detayları
 
 #### AI CLI Menüsü
-Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `15` kısayolunu kabul eder. `11` numaralı Droid CLI seçeneği, Factory’nin quickstart talimatlarını terminalde gösterir; böylece betik bilinmeyen ikili dosyalar indirmek yerine resmî kurulum adımlarını hatırlatır. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `droid quickstart`, `openspec init`, `copilot auth login` vb.) özet olarak yazdırır.
+Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `16` kısayolunu kabul eder. `11` numaralı Kilocode CLI seçeneği, architect/debug/auto modlarını etkinleştiren `@kilocode/cli` paketini Node.js ≥ 18 doğrulaması ile kurar; `12` numaralı Droid CLI seçeneği ise Factory’nin quickstart talimatlarını terminalde gösterir ve manuel kurulum bağlantılarını paylaşır. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `kilocode config`, `droid quickstart`, `openspec init`, `copilot auth login` vb.) özet olarak yazdırır.
 
 | Seçenek | Araç | Detaylar |
 |---------|------|----------|
@@ -415,11 +434,12 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `15` kısayolu
 | `8` | Cline CLI | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
 | `9` | Aider CLI | Pipx üzerinden `aider-chat` paketini kurar (Node.js ≥ 18 kontrolü sonrası) ve API anahtarlarını export etmeniz gerektiğini hatırlatır. |
 | `10` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
-| `11` | Droid CLI | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir (https://docs.factory.ai/cli/getting-started/quickstart). |
-| `12` | OpenSpec CLI | `@fission-ai/openspec` paketini global kurar (Node.js ≥ 18); `openspec init/plan/sync` komutlarını kullanabilirsiniz. |
-| `13` | Contains Studio Agents | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
-| `14` | Wes Hobson Agents | wshobson/agents koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
-| `15` | Hepsini Kur | `1-14` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+| `11` | Kilocode CLI | `@kilocode/cli` paketini kurar, `kilocode config` / architect/debug/auto modları için yönergeler verir. |
+| `12` | Droid CLI | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir (https://docs.factory.ai/cli/getting-started/quickstart). |
+| `13` | OpenSpec CLI | `@fission-ai/openspec` paketini global kurar (Node.js ≥ 18); `openspec init/plan/sync` komutlarını kullanabilirsiniz. |
+| `14` | Contains Studio Agents | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
+| `15` | Wes Hobson Agents | wshobson/agents koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
+| `16` | Hepsini Kur | `1-15` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 ##### Claude Code CLI
 Anthropic’in Claude Code CLI aracı (https://github.com/anthropics/claude-code), Claude masaüstündeki Ink tabanlı deneyimi terminale taşır. Kurulum sırasında `/dev/tty` bağlandığı için “Raw mode is not supported” hatası alınmaz ve `claude login` komutu uzaktan bile sorunsuz çalışır:
@@ -544,9 +564,27 @@ Ek Bilgiler:
 - **CLI yenileme:** Moonshot seçeneği, resmi dokümana uygun olarak Node.js ≥ 18 doğrulaması yapar ve gerekirse `@anthropic-ai/claude-code` paketini npm ile yeniden kurmayı teklif eder.
 - **Sonuç:** `~/.claude/settings.json` dosyası yeniden oluşturulur; token, base URL, timeout ve varsayılan modeller güncellenir, böylece `claude` komutu seçtiğiniz sağlayıcıyı anında kullanır.
 
-#### Droid CLI (AI CLI Seçenek 11)
+#### Kilocode CLI (AI CLI Seçenek 11)
 
-Factory’nin [Droid CLI quickstart](https://docs.factory.ai/cli/getting-started/quickstart) sayfası, işletim sistemine göre değişen yükleme komutları sunar. Menüdeki `11` numaralı seçenek, sisteminizde `droid` komutunun kurulu olup olmadığını kontrol eder ve resmi dokümanın bağlantısını/özet adımlarını terminalde gösterir:
+Kilocode CLI (https://kilocode.ai/docs/cli), IDE eklentilerindeki Architect/Ask/Debug/Orchestrator deneyimini terminale taşıyan `@kilocode/cli` paketine dayanır. Installer Node.js ≥ 18 gereksinimini doğrular, npm kurulumu yoksa otomatik başlatmayı dener ve `kilocode config` komutunu çalıştırarak OpenRouter, Vercel Gateway veya diğer sağlayıcı anahtarlarını tanımlamanız gerektiğini hatırlatır.
+
+- Modlara göre başlatma: `kilocode --mode architect`, `kilocode --mode debug`, `kilocode --mode orchestrator`.
+- Oturumdan bağımsız yapılandırma: `kilocode config` veya etkileşimli sohbet sırasında `/config`.
+- Model taraması ve seçimi: `/model list`, `/model info z-ai/glm-4.5v`, `/model select`.
+- Başsız çalışma: `kilocode --auto "Testleri çalıştır"`, `echo "Fix auth bug" | kilocode --auto`, `--timeout 300`.
+- Paralel çalışma: `kilocode --parallel --auto "Improve payments"` komutları aynı depo üzerinde birden çok Kilo oturumunu sürdürür; değişiklikler ayrı git branch'lerinde tutulur.
+
+Örnek:
+
+```bash
+kilocode --mode architect
+kilocode config
+kilocode --auto "Analitik servislerini yeniden yaz" --timeout 240
+```
+
+#### Droid CLI (AI CLI Seçenek 12)
+
+Factory’nin [Droid CLI quickstart](https://docs.factory.ai/cli/getting-started/quickstart) sayfası, işletim sistemine göre değişen yükleme komutları sunar. Menüdeki `12` numaralı seçenek, sisteminizde `droid` komutunun kurulu olup olmadığını kontrol eder ve resmi dokümanın bağlantısını/özet adımlarını terminalde gösterir:
 
 1. Factory hesabınızla giriş yapın ve Quickstart sayfasındaki macOS/Linux veya Windows sekmesini açın.
 2. Sayfada verilen betiği (örneğin `curl` + `chmod` + `./droid`) çalıştırın ve tarayıcıdaki doğrulamayı tamamlayın.
@@ -554,9 +592,9 @@ Factory’nin [Droid CLI quickstart](https://docs.factory.ai/cli/getting-started
 
 CLI sürekli güncellendiğinden, betikleri doğrudan bu projede kopyalamak yerine resmi kaynağa yönlendiriyoruz.
 
-#### OpenSpec CLI (AI CLI Seçenek 12)
+#### OpenSpec CLI (AI CLI Seçenek 13)
 
-AI CLI menüsündeki `12` numaralı seçenek, [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) aracını npm üzerinden kurar (`npm install -g @fission-ai/openspec`). OpenSpec CLI, spesifikasyon odaklı geliştirme akışını Claude Code, Gemini CLI, Cursor vb. araçlara taşır; API anahtarı gerektirmez. (Contains Studio veya Wes Hobson ajanları için `13` ve `14` numaralı seçenekleri kullanın.)
+AI CLI menüsündeki `13` numaralı seçenek, [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) aracını npm üzerinden kurar (`npm install -g @fission-ai/openspec`). OpenSpec CLI, spesifikasyon odaklı geliştirme akışını Claude Code, Gemini CLI, Cursor vb. araçlara taşır; API anahtarı gerektirmez. (Contains Studio veya Wes Hobson ajanları için `14` ve `15` numaralı seçenekleri kullanın.)
 
 Kurulum adımları:
 
@@ -569,11 +607,11 @@ openspec plan          # değişiklik planı oluşturur
 openspec sync          # spesifikasyonları güncel tutar
 ```
 
-CLI kurulduktan sonra spesifikasyon odaklı akışı kullanabilir; ihtiyaç halinde Contains Studio veya Wes Hobson ajanlarını yüklemek için `13`/`14` numaralı seçenekleri çalıştırabilirsiniz.
+CLI kurulduktan sonra spesifikasyon odaklı akışı kullanabilir; ihtiyaç halinde Contains Studio veya Wes Hobson ajanlarını yüklemek için `14`/`15` numaralı seçenekleri çalıştırabilirsiniz.
 
-#### Claude Code İçin Contains Studio Ajanları (Seçenek 13)
+#### Claude Code İçin Contains Studio Ajanları (Seçenek 14)
 
-AI CLI menüsündeki `13` numaralı seçenek, [Contains Studio agents](https://github.com/contains-studio/agents) deposunu klonlayarak tüm `.md` ajan tanımlarını `~/.claude/agents/` dizinine kopyalar. Kurulumdan sonra Claude Code’u yeniden başlatarak yeni ajanların görünmesini sağlayabilirsiniz.
+AI CLI menüsündeki `14` numaralı seçenek, [Contains Studio agents](https://github.com/contains-studio/agents) deposunu klonlayarak tüm `.md` ajan tanımlarını `~/.claude/agents/` dizinine kopyalar. Kurulumdan sonra Claude Code’u yeniden başlatarak yeni ajanların görünmesini sağlayabilirsiniz.
 
 - Script `git` gerektirir; en güncel ajanları almak için istediğiniz zaman tekrar çalıştırabilirsiniz.
 - Kopyalama işlemi `rsync -a --delete` ile yapıldığı için yerel klasörünüz depo ile aynı içerikte olur.
@@ -586,9 +624,9 @@ cp -r agents/* ~/.claude/agents/
 
 Depo, ajanları departmanlara göre (engineering, design, marketing vb.) sınıflandırdığı için Claude Code’un “Agents” panelinde kategorize bir şekilde listelenir.
 
-#### Claude Code İçin Wes Hobson Ajanları (Seçenek 14)
+#### Claude Code İçin Wes Hobson Ajanları (Seçenek 15)
 
-AI CLI menüsündeki `14` numaralı seçenek, [wshobson/agents](https://github.com/wshobson/agents) deposunu `~/.claude/agents/` dizinine kopyalar. Bu koleksiyon, ürün teslimi, büyüme ve operasyon süreçlerine odaklanan ajanlar içerir; senkronizasyon sonrasında Claude Code’u yeniden başlatarak ajanları görebilirsiniz.
+AI CLI menüsündeki `15` numaralı seçenek, [wshobson/agents](https://github.com/wshobson/agents) deposunu `~/.claude/agents/` dizinine kopyalar. Bu koleksiyon, ürün teslimi, büyüme ve operasyon süreçlerine odaklanan ajanlar içerir; senkronizasyon sonrasında Claude Code’u yeniden başlatarak ajanları görebilirsiniz.
 
 - `git` gerektirir ve `rsync -a --delete` ile yerel klasörü depo ile eşitler.
 - Manuel kurulum için:

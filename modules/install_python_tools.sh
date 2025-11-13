@@ -1,5 +1,8 @@
 #!/bin/bash
-set -euo pipefail
+set -eu
+if set -o | grep -q 'pipefail'; then
+    set -o pipefail
+fi
 
 # Ortak yardımcı fonksiyonları yükle
 UTILS_PATH="./modules/utils.sh"
@@ -10,12 +13,7 @@ fi
 [ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
 CURRENT_LANG="${LANGUAGE:-en}"
-if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="${INFO_TAG}"
-    WARN_TAG="${WARN_TAG}"
-    ERROR_TAG="${ERROR_TAG}"
-    SUCCESS_TAG="${SUCCESS_TAG}"
-else
+if [ "$CURRENT_LANG" != "tr" ]; then
     INFO_TAG="[INFO]"
     WARN_TAG="[WARNING]"
     ERROR_TAG="[ERROR]"

@@ -10,36 +10,6 @@
 
 HEADING_WIDTH=70
 
-declare -A BANNER_TEXT_EN=(
-    ["ai_title"]="AI CLI TOOLS"
-    ["dev_title"]="DEVELOPMENT TOOLS"
-    ["info_title"]="Script Information"
-    ["version"]="Version"
-    ["developer"]="Developer"
-    ["github_account"]="GitHub Account"
-    ["repository"]="Repository"
-)
-
-declare -A BANNER_TEXT_TR=(
-    ["ai_title"]="AI CLI ARAÇLARI"
-    ["dev_title"]="GELİŞTİRME ARAÇLARI"
-    ["info_title"]="Script Bilgileri"
-    ["version"]="Versiyon"
-    ["developer"]="Geliştirici"
-    ["github_account"]="GitHub Hesabı"
-    ["repository"]="Depo"
-)
-
-banner_text() {
-    local key="$1"
-    local default_value="${BANNER_TEXT_EN[$key]:-$key}"
-    if [ "${LANGUAGE:-en}" = "tr" ]; then
-        printf "%s" "${BANNER_TEXT_TR[$key]:-$default_value}"
-    else
-        printf "%s" "$default_value"
-    fi
-}
-
 center_text() {
     local text="$1"
     local width="$2"
@@ -67,7 +37,7 @@ panel_line_raw() {
 }
 
 print_heading_panel() {
-    local -a titles=("$@")
+    local -a titles=($@)
     local border_top="╔════════════════════════════════════════════════════════════════════════╗"
     local border_bottom="╚════════════════════════════════════════════════════════════════════════╝"
     echo -e "${BLUE}${border_top}${NC}"
@@ -80,21 +50,42 @@ print_heading_panel() {
 print_info_panel() {
     local version="$1"
     local repo="$2"
+    local info_title="Script Bilgileri"
+    local version_label="Versiyon"
+    local developer_label="Geliştirici"
+    local github_label="GitHub Hesabı"
+    local repo_label="Depo"
+
+    if [ "${LANGUAGE:-en}" = "en" ]; then
+        info_title="Script Information"
+        version_label="Version"
+        developer_label="Developer"
+        github_label="GitHub Account"
+        repo_label="Repository"
+    fi
 
     echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
-    panel_line_raw "${BOLD}$(banner_text info_title)${NC}"
+    panel_line_raw "$(center_text "${BOLD}${info_title}${NC}" "$HEADING_WIDTH")"
     echo -e "${BLUE}╠════════════════════════════════════════════════════════════════════════╣${NC}"
-    panel_line_raw "$(banner_text version)      : ${GREEN}${version}${NC}"
-    panel_line_raw "$(banner_text developer)   : ${GREEN}Tamer KARACA${NC}"
-    panel_line_raw "$(banner_text github_account) : ${CYAN}@tamerkaraca${NC}"
-    panel_line_raw "$(banner_text repository)          : ${CYAN}${repo}${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${version_label}" "${GREEN}${version}${NC}" "45" "" "${BLUE}║${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${developer_label}" "${GREEN}Tamer KARACA${NC}" "41" "" "${BLUE}║${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${github_label}" "${CYAN}@tamerkaraca${NC}" "43" "" "${BLUE}║${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${repo_label}" "${CYAN}${repo}${NC}" "8" "" "${BLUE}║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
 render_setup_banner() {
     local version="$1"
     local repo="$2"
-    print_heading_panel "$(banner_text ai_title)" "$(banner_text dev_title)"
+    local ai_title="AI CLI ARACLARI"
+    local dev_title="GELISTIRME ARACLARI"
+
+    if [ "${LANGUAGE:-en}" = "en" ]; then
+        ai_title="AI CLI TOOLS"
+        dev_title="DEVELOPMENT TOOLS"
+    fi
+
+    print_heading_panel "$ai_title" "$dev_title"
     print_info_panel "$version" "$repo"
     echo
 }

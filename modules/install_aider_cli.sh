@@ -95,46 +95,33 @@ ensure_aider_build_prereqs() {
     local packages=()
     case "${PKG_MANAGER}" in
         apt)
-            packages=(build-essential python3-dev python3-venv)
+            packages=(build-essential python3-dev python3-venv libffi-dev pkg-config gfortran libopenblas-dev liblapack-dev)
             ;;
         dnf|dnf5)
-            packages=(gcc gcc-c++ make python3-devel)
+            packages=(gcc gcc-c++ make python3-devel libffi-devel pkg-config)
             ;;
         yum)
-            packages=(gcc gcc-c++ make python3-devel)
+            packages=(gcc gcc-c++ make python3-devel libffi-devel pkg-config)
             ;;
         pacman)
-            packages=(base-devel python)
+            packages=(base-devel python libffi pkg-config)
             ;;
         *)
             return 0
             ;;
     esac
 
-    local missing=()
-    for pkg in "${packages[@]}"; do
-        case "${PKG_MANAGER}" in
-            apt)
-                dpkg -s "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
-                ;;
-            dnf|dnf5|yum)
-                rpm -q "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
-                ;;
-            pacman)
-                pacman -Qi "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
-                ;;
-        esac
-    done
-
-    if [ ${#missing[@]} -eq 0 ]; then
-        return 0
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        echo -e "${YELLOW}${INFO_TAG}${NC} Aider için gerekli derleme paketleri kontrol ediliyor ve kuruluyor: ${packages[*]}"
+    else
+        echo -e "${YELLOW}${INFO_TAG}${NC} Checking and installing required build packages for Aider: ${packages[*]}"
     fi
 
     local install_cmd="${INSTALL_CMD:-}"
     if [ -z "$install_cmd" ]; then
         case "${PKG_MANAGER}" in
             apt)
-                install_cmd="sudo apt install -y"
+                install_cmd="sudo apt-get install -y"
                 ;;
             dnf|dnf5)
                 install_cmd="sudo ${PKG_MANAGER} install -y"
@@ -143,18 +130,19 @@ ensure_aider_build_prereqs() {
                 install_cmd="sudo yum install -y"
                 ;;
             pacman)
-                install_cmd="sudo pacman -S --noconfirm"
+                install_cmd="sudo pacman -S --noconfirm --needed"
                 ;;
         esac
     fi
 
-    if [ "${LANGUAGE:-en}" = "tr" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Aider için gerekli derleme paketleri yükleniyor: ${missing[*]}"
-    else
-        echo -e "${YELLOW}${INFO_TAG}${NC} Installing required build packages for Aider: ${missing[*]}"
-    fi
     if [ -n "$install_cmd" ]; then
-        $install_cmd "${missing[@]}" >/dev/null 2>&1 || $install_cmd "${missing[@]}"
+        if ! $install_cmd "${packages[@]}"; then
+            if [ "${LANGUAGE:-en}" = "tr" ]; then
+                echo -e "${RED}${ERROR_TAG}${NC} Derleme paketlerinin kurulumu başarısız oldu. Aider kurulumu başarısız olabilir."
+            else
+                echo -e "${RED}${ERROR_TAG}${NC} Build packages installation failed. Aider installation might fail."
+            fi
+        fi
     fi
 }
 

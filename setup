@@ -106,6 +106,7 @@ setup_text() {
         printf "%s" "$default_value"
     fi
 }
+export -f setup_text
 
 setup_text_fmt() {
     local key="$1"
@@ -114,6 +115,7 @@ setup_text_fmt() {
     fmt=$(setup_text "$key")
     printf "$fmt" "$@"
 }
+export -f setup_text_fmt
 # --- End Multi-language Setup ---
 
 source_module() {
@@ -277,7 +279,7 @@ main_menu() {
                 11) run_module "manage_mcp_servers_menu" ;;
                 L)
                     language_menu
-                    ;;
+                    ;; 
                 A)
                     update_system
                     run_module "install_python_tools"
@@ -292,15 +294,14 @@ main_menu() {
                     if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
                         run_module "install_php_composer"
                     fi
-                    ;;
+                    ;; 
                 0)
                     echo -e "${GREEN}$(setup_text info_returning)${NC}"
                     exit_menu=true
                     break
-                    ;;
+                    ;; 
                 *)
-                    echo -e "${RED}$(setup_text warning_invalid_choice): $raw_choice${NC}"
-                    ;;
+                    echo -e "${RED}$(setup_text warning_invalid_choice): $raw_choice${NC}" ;;
             esac
         done
 

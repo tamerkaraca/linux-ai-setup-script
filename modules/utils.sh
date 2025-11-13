@@ -45,7 +45,8 @@ get_language_label() {
     esac
 }
 
-declare -A TEXT_EN=(
+init_translation_tables() {
+    declare -gA TEXT_EN=(
     ["menu_title"]="MAIN INSTALL MENU"
     ["menu_subtitle"]="Select an action"
     ["menu_option1"]="Update system packages and core tools"
@@ -106,9 +107,9 @@ declare -A TEXT_EN=(
     ["fw_option4"]="Install every framework"
     ["fw_option_return"]="Return to main menu"
     ["fw_prompt_install_more"]="Install another AI framework? (y/n) [n]:"
-)
+    )
 
-declare -A TEXT_TR=(
+    declare -gA TEXT_TR=(
     ["menu_title"]="ANA KURULUM MENÜSÜ"
     ["menu_subtitle"]="Bir işlem seçin"
     ["menu_option1"]="Sistemi güncelle ve temel paketleri kur"
@@ -169,7 +170,10 @@ declare -A TEXT_TR=(
     ["fw_option4"]="Tüm AI frameworklerini kur"
     ["fw_option_return"]="Ana menüye dön"
     ["fw_prompt_install_more"]="Başka bir AI framework kurmak ister misiniz? (e/h) [h]:"
-)
+    )
+}
+
+init_translation_tables
 
 translate() {
     local key="$1"

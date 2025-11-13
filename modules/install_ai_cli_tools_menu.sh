@@ -9,7 +9,7 @@ if ! declare -f run_module >/dev/null 2>&1; then
         local module_name="$1"
         local module_url="${BASE_URL}/${module_name}.sh"
         shift
-        if ! curl -fsSL "$module_url" | bash -s -- "$@"; then
+        if ! curl -fsSL "$module_url" | LANGUAGE="$LANGUAGE" bash -s -- "$@"; then
             echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
@@ -143,7 +143,7 @@ install_ai_cli_tools_menu() {
                 fi
                 ;;
             *)
-                echo -e "${RED}[HATA]${NC} Geçersiz seçim: $option"
+                echo -e "${RED}$(translate warning_invalid_choice): $option${NC}"
                 success=1
                 ;;
         esac
@@ -162,36 +162,36 @@ install_ai_cli_tools_menu() {
         clear
         if [ -z "$install_all" ]; then
             echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            echo -e "${BLUE}║        AI CLI Araçları Kurulum Menüsü         ║${NC}"
+            printf "${BLUE}║%*s║${NC}\n" -43 " $(translate ai_menu_title) "
             echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-            echo -e "  ${GREEN}1${NC} Claude Code CLI"
-            echo -e "  ${GREEN}2${NC} Gemini CLI"
-            echo -e "  ${GREEN}3${NC} OpenCode CLI"
-            echo -e "  ${GREEN}4${NC} Qoder CLI"
-            echo -e "  ${GREEN}5${NC} Qwen CLI"
-            echo -e "  ${GREEN}6${NC} OpenAI Codex CLI"
-            echo -e "  ${GREEN}7${NC} Cursor Agent CLI"
-            echo -e "  ${GREEN}8${NC} Cline CLI"
-            echo -e "  ${GREEN}9${NC} Aider CLI"
-            echo -e "  ${GREEN}10${NC} GitHub Copilot CLI"
-            echo -e "  ${GREEN}11${NC} Kilocode CLI"
-            echo -e "  ${GREEN}12${NC} Auggie CLI"
-            echo -e "  ${GREEN}13${NC} Droid CLI"
-            echo -e "  ${GREEN}14${NC} OpenSpec CLI"
-            echo -e "  ${GREEN}15${NC} Contains Studio Agents"
-            echo -e "  ${GREEN}16${NC} Wes Hobson Agents"
-            echo -e "  ${GREEN}17${NC} Tümünü Kur"
-            echo -e "  ${RED}0${NC} Ana Menü"
-            echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,3,7)."
+            echo -e "  ${GREEN}1${NC} $(translate ai_option1)"
+            echo -e "  ${GREEN}2${NC} $(translate ai_option2)"
+            echo -e "  ${GREEN}3${NC} $(translate ai_option3)"
+            echo -e "  ${GREEN}4${NC} $(translate ai_option4)"
+            echo -e "  ${GREEN}5${NC} $(translate ai_option5)"
+            echo -e "  ${GREEN}6${NC} $(translate ai_option6)"
+            echo -e "  ${GREEN}7${NC} $(translate ai_option7)"
+            echo -e "  ${GREEN}8${NC} $(translate ai_option8)"
+            echo -e "  ${GREEN}9${NC} $(translate ai_option9)"
+            echo -e "  ${GREEN}10${NC} $(translate ai_option10)"
+            echo -e "  ${GREEN}11${NC} $(translate ai_option11)"
+            echo -e "  ${GREEN}12${NC} $(translate ai_option12)"
+            echo -e "  ${GREEN}13${NC} $(translate ai_option13)"
+            echo -e "  ${GREEN}14${NC} $(translate ai_option14)"
+            echo -e "  ${GREEN}15${NC} $(translate ai_option15)"
+            echo -e "  ${GREEN}16${NC} $(translate ai_option16)"
+            echo -e "  ${GREEN}17${NC} $(translate ai_option17)"
+            echo -e "  ${RED}0${NC} $(translate ai_option_return)"
+            echo -e "\n${YELLOW}$(translate ai_menu_hint)${NC}"
             echo
-            read -r -p "${YELLOW}Seçiminiz:${NC} " cli_choices </dev/tty
+            read -r -p "${YELLOW}$(translate prompt_choice):${NC} " cli_choices </dev/tty
             if [ -z "$(echo "$cli_choices" | tr -d '[:space:]')" ]; then
-                echo -e "${YELLOW}[UYARI]${NC} Bir seçim yapmadınız, lütfen tekrar deneyin."
+                echo -e "${YELLOW}$(translate warning_no_selection)${NC}"
                 sleep 1
                 continue
             fi
             if [ "$cli_choices" = "0" ]; then
-                echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
+                echo -e "${YELLOW}$(translate info_returning)${NC}"
                 break
             fi
         else
@@ -235,13 +235,13 @@ install_ai_cli_tools_menu() {
                     break
                     ;;
                 *)
-                    echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice"
+                    echo -e "${RED}$(translate warning_invalid_choice): $choice${NC}"
                     ;;
             esac
         done
 
         if [ "$exit_menu" = true ]; then
-            echo -e "${YELLOW}[BİLGİ]${NC} Ana menüye dönülüyor..."
+            echo -e "${YELLOW}$(translate info_returning)${NC}"
             break
         fi
 
@@ -269,8 +269,8 @@ install_ai_cli_tools_menu() {
             break
         fi
 
-        read -r -p "Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]: " continue_choice </dev/tty
-        if [[ "$continue_choice" != "e" && "$continue_choice" != "E" ]]; then
+        read -r -p "${YELLOW}$(translate ai_prompt_install_more)${NC} " continue_choice </dev/tty
+        if [[ ! "$continue_choice" =~ ^([eEyY])$ ]]; then
             break
         fi
     done

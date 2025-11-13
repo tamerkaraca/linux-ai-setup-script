@@ -77,7 +77,7 @@ run_module() {
 
     if [ -f "$local_path" ]; then
         echo -e "${CYAN}[BİLGİ]${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
-        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash "$local_path" "$@"; then
+        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
             echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
@@ -94,7 +94,7 @@ run_module() {
                 return 1
             fi
         fi
-        if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" bash "$remote_file" "$@"); then
+        if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
             echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
@@ -105,36 +105,57 @@ export -f run_module
 export -f prepare_remote_module_dir
 export -f cleanup_remote_modules
 
+language_menu() {
+    clear
+    echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${BLUE}║ $(translate menu_language_option) ║${NC}"
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+    echo -e "  ${GREEN}1${NC} - English"
+    echo -e "  ${GREEN}2${NC} - Türkçe"
+    echo -e "\n$(translate menu_current_language): $(get_language_label "$LANGUAGE")"
+    read -r -p "$(translate prompt_choice): " lang_choice </dev/tty
+    case "$lang_choice" in
+        1)
+            set_language "en" && echo -e "${GREEN}$(translate info_language_switched)${NC}" ;;
+        2)
+            set_language "tr" && echo -e "${GREEN}$(translate info_language_switched)${NC}" ;;
+        *)
+            echo -e "${YELLOW}$(translate warning_invalid_choice): ${lang_choice}${NC}" ;;
+    esac
+    sleep 1
+}
+
 # Ana menü
 main_menu() {
     detect_package_manager # Paket yöneticisini başta tespit et
-    
+
     while true; do
         clear
         render_setup_banner "1.0.1" "https://github.com/tamerkaraca/linux-ai-setup-script"
-        
+
         echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        echo -e "${BLUE}║                 ANA KURULUM MENÜSÜ            ║${NC}"
+        printf "${BLUE}║%*s║${NC}\n" -43 " $(translate menu_title) "
         echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-        echo -e "  ${GREEN}1${NC} - Sistemi Güncelle ve Temel Paketleri Kur"
-        echo -e "  ${GREEN}2${NC} - Python ve İlgili Araçları Kur (Pip, Pipx, UV)"
-        echo -e "  ${GREEN}3${NC} - Node.js ve İlgili Araçları Kur (NVM, Bun.js)"
-        echo -e "  ${GREEN}4${NC} - AI CLI Araçlarını Kur (Claude Code, Gemini CLI, vb.)"
-        echo -e "  ${GREEN}5${NC} - AI Frameworklerini Kur (SuperGemini, SuperQwen, SuperClaude)"
-        echo -e "  ${GREEN}6${NC} - Git Yapılandırması"
-        echo -e "  ${GREEN}7${NC} - Claude Code Sağlayıcı Yapılandırması"
-        echo -e "  ${GREEN}8${NC} - PHP ve Composer Kurulumu"
-        echo -e "  ${GREEN}9${NC} - GitHub CLI Kurulumu"
-        echo -e "  ${GREEN}10${NC} - AI Frameworklerini Kaldır"
-        echo -e "  ${GREEN}11${NC} - MCP Sunucu Yönetimi"
-        echo -e "  ${GREEN}A${NC} - Hepsini Kur (Sırayla)"
-        echo -e "  ${RED}0${NC} - Çıkış"
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,4,5)."
+        echo -e "  ${GREEN}1${NC} - $(translate menu_option1)"
+        echo -e "  ${GREEN}2${NC} - $(translate menu_option2)"
+        echo -e "  ${GREEN}3${NC} - $(translate menu_option3)"
+        echo -e "  ${GREEN}4${NC} - $(translate menu_option4)"
+        echo -e "  ${GREEN}5${NC} - $(translate menu_option5)"
+        echo -e "  ${GREEN}6${NC} - $(translate menu_option6)"
+        echo -e "  ${GREEN}7${NC} - $(translate menu_option7)"
+        echo -e "  ${GREEN}8${NC} - $(translate menu_option8)"
+        echo -e "  ${GREEN}9${NC} - $(translate menu_option9)"
+        echo -e "  ${GREEN}10${NC} - $(translate menu_option10)"
+        echo -e "  ${GREEN}11${NC} - $(translate menu_option11)"
+        echo -e "  ${GREEN}A${NC} - $(translate menu_optionA)"
+        echo -e "  ${GREEN}L${NC} - $(translate menu_language_option) ($(get_language_label "$LANGUAGE"))"
+        echo -e "  ${RED}0${NC} - $(translate menu_option0)"
+        echo -e "\n${YELLOW}$(translate menu_multi_hint)${NC}"
         echo
-        read -r -p "${YELLOW}Seçiminiz:${NC} " choice_input </dev/tty
+        read -r -p "${YELLOW}$(translate prompt_choice):${NC} " choice_input </dev/tty
 
         if [ -z "$(echo "$choice_input" | tr -d '[:space:]')" ]; then
-            echo -e "${YELLOW}[UYARI]${NC} Bir seçim yapmadınız, lütfen tekrar deneyin."
+            echo -e "${YELLOW}$(translate warning_no_selection)${NC}"
             sleep 1
             continue
         fi
@@ -150,19 +171,22 @@ main_menu() {
             case "$choice" in
                 1) update_system ;;
                 2) run_module "install_python_tools" ;; # Bu modül Python, Pip, Pipx, UV kuracak
-                3) run_module "install_nodejs_tools" ;; # Bu modül NVM, Bun.js kuracak
+                3) run_module "install_node_menu" ;;
                 4) run_module "install_ai_cli_tools_menu" ;;
                 5) run_module "install_ai_frameworks_menu" ;;
                 6) run_module "configure_git" ;;
                 7) run_module "configure_glm_claude" ;;
-                8) run_module "install_php_composer" ;; # Bu modül PHP ve Composer kuracak
+                8) run_module "install_php_composer" ;;
                 9) run_module "install_github_cli" ;;
                 10) run_module "remove_ai_frameworks_menu" ;;
                 11) run_module "manage_mcp_servers_menu" ;;
+                L)
+                    language_menu
+                    ;;
                 A)
                     update_system
                     run_module "install_python_tools"
-                    run_module "install_nodejs_tools"
+                    run_module "install_node_menu" "all"
                     run_module "install_ai_cli_tools_menu" "all" # "all" parametresi ile tüm CLI araçlarını kur
                     run_module "install_ai_frameworks_menu" "all" # "all" parametresi ile tüm frameworkleri kur
                     run_module "configure_git"
@@ -175,12 +199,12 @@ main_menu() {
                     fi
                     ;;
                 0)
-                    echo -e "${GREEN}[BİLGİ]${NC} Çıkılıyor. Güle güle!"
+                    echo -e "${GREEN}$(translate info_returning)${NC}"
                     exit_menu=true
                     break
                     ;;
                 *)
-                    echo -e "${RED}[HATA]${NC} Geçersiz seçim: $raw_choice"
+                    echo -e "${RED}$(translate warning_invalid_choice): $raw_choice${NC}"
                     ;;
             esac
         done
@@ -188,7 +212,7 @@ main_menu() {
         if [ "$exit_menu" = true ]; then
             exit 0
         fi
-        echo -e "\n${YELLOW}Devam etmek için Enter'a basın...${NC}"
+        echo -e "\n${YELLOW}$(translate prompt_press_enter)${NC}"
         read -r </dev/tty
     done
 }

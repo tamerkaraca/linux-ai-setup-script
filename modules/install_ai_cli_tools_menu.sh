@@ -114,6 +114,13 @@ install_ai_cli_tools_menu() {
                     success=1
                 fi
                 ;;
+            13)
+                label="Wes Hobson Agents"
+                login_hint="Claude Code'u yeniden başlat"
+                if ! run_module "install_claude_agents" "wshobson"; then
+                    success=1
+                fi
+                ;;
             *)
                 echo -e "${RED}[HATA]${NC} Geçersiz seçim: $option"
                 success=1
@@ -148,7 +155,8 @@ install_ai_cli_tools_menu() {
             echo -e "  ${GREEN}10${NC} GitHub Copilot CLI"
             echo -e "  ${GREEN}11${NC} OpenSpec CLI"
             echo -e "  ${GREEN}12${NC} Contains Studio Agents"
-            echo -e "  ${GREEN}13${NC} Tümünü Kur"
+            echo -e "  ${GREEN}13${NC} Wes Hobson Agents"
+            echo -e "  ${GREEN}14${NC} Tümünü Kur"
             echo -e "  ${RED}0${NC} Ana Menü"
             echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,3,7)."
             echo
@@ -178,7 +186,7 @@ install_ai_cli_tools_menu() {
             choice=$(echo "$choice" | tr -d '[:space:]')
             [ -z "$choice" ] && continue
 
-            if [ "$choice" = "13" ]; then
+            if [ "$choice" = "14" ]; then
                 batch_context=true
             fi
 
@@ -188,12 +196,12 @@ install_ai_cli_tools_menu() {
             fi
 
             case $choice in
-                1|2|3|4|5|6|7|8|9|10|11|12)
+                1|2|3|4|5|6|7|8|9|10|11|12|13)
                     run_cli_choice "$choice" "$interactive_flag" || true
                     ;;
-                13)
+                14)
                     batch_context=true
-                    for sub_choice in 1 2 3 4 5 6 7 8 9 10 11 12; do
+                    for sub_choice in 1 2 3 4 5 6 7 8 9 10 11 12 13; do
                         run_cli_choice "$sub_choice" "false" || true
                     done
                     all_installed=true

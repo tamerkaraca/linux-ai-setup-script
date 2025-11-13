@@ -1,6 +1,6 @@
 # 🌈 AI Development Environment Setup Script
 
-> Single-command bootstrapper for a modern AI workstation on Linux. Interactive menus, remote-safe modules, colorful banners, and bilingual guidance (English & Turkish).
+> Single-command bootstrapper for a modern AI workstation on Linux/WSL and macOS. Interactive menus, remote-safe modules, colorful banners, and bilingual guidance (English & Turkish).
 
 ---
 
@@ -37,7 +37,11 @@
 
 ### Overview
 
-`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs, AI frameworks, and auxiliary tools. The UI is bilingual: English is the default, Turkish is auto-selected when your locale starts with `tr`, and you can toggle languages anytime via menu option `L`.
+`setup` prepares a workstation for AI development on Linux/WSL and macOS. It auto-detects the operating system and package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs, AI frameworks, and auxiliary tools. The UI is bilingual: English is the default, Turkish is auto-selected when your locale starts with `tr`, and you can toggle languages anytime via menu option `L`.
+
+#### Platform Support
+- **Linux/WSL**: Uses native package managers (apt, dnf, yum, pacman) with traditional installation methods
+- **macOS**: Uses Homebrew package manager with optimized Cask and Formula installations for AI tools
 
 ### Architecture
 

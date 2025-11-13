@@ -58,21 +58,8 @@ install_openspec_cli() {
     fi
 }
 
-install_claude_agents() {
-    run_module "install_claude_agents"
-}
-
-install_openspec_suite() {
-    install_openspec_cli || return 1
-    install_claude_agents || {
-        echo -e "${YELLOW}[UYARI]${NC} Agents kurulumu başarısız oldu; CLI kurulu durumda."
-        return 1
-    }
-    echo -e "${GREEN}[BAŞARILI]${NC} OpenSpec CLI + Contains Studio ajanları yüklendi."
-}
-
 main() {
-    install_openspec_suite "$@"
+    install_openspec_cli "$@"
 }
 
 main "$@"

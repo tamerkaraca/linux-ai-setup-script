@@ -165,6 +165,8 @@ init_translation_tables() {
     ["log_system_install_basics"]="Installing core tools, compression utilities, and build helpers..."
     ["log_install_packages"]="Installing: %s"
     ["log_install_devtools"]="Installing development tools: %s"
+    ["log_install_user_prefix"]="Installing %s into user prefix: %s"
+    ["log_install_user_fail"]="%s could not be installed into user prefix."
     ["log_system_update_done"]="System update and base package installation completed!"
     ["log_python_install_title"]="Starting Python installation..."
     ["log_python_already"]="Python already installed: %s"
@@ -273,6 +275,8 @@ init_translation_tables() {
     ["log_system_install_basics"]="Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
     ["log_install_packages"]="Kuruluyor: %s"
     ["log_install_devtools"]="Geliştirme araçları kuruluyor: %s"
+    ["log_install_user_prefix"]="%s kullanıcı prefixine kuruluyor: %s"
+    ["log_install_user_fail"]="%s kullanıcı prefixine kurulamadı."
     ["log_system_update_done"]="Sistem güncelleme ve temel paket kurulumu tamamlandı!"
     ["log_python_install_title"]="Python kurulumu başlatılıyor..."
     ["log_python_already"]="Python zaten kurulu: %s"
@@ -398,6 +402,27 @@ detect_package_manager() {
     echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate_fmt log_pkg_manager_detected "$PKG_MANAGER")"
 }
 
+dnf_group_install() {
+    local group_name="$1"
+    local dnf_bin="dnf"
+    if command -v dnf &>/dev/null; then
+        dnf_bin="dnf"
+    elif command -v dnf5 &>/dev/null; then
+        dnf_bin="dnf5"
+    fi
+
+    local group_cmd="groupinstall"
+    if "$dnf_bin" --version 2>/dev/null | head -n1 | grep -qi "dnf5"; then
+        group_cmd="group install"
+    fi
+
+    if [ "$group_cmd" = "groupinstall" ]; then
+        sudo "$dnf_bin" groupinstall "$group_name" -y
+    else
+        sudo "$dnf_bin" group install -y "$group_name"
+    fi
+}
+
 update_system() {
     echo -e "\n${YELLOW}${INFO_TAG}${NC} $(translate log_system_update_start)"
     eval "$UPDATE_CMD"
@@ -414,7 +439,7 @@ update_system() {
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
-        sudo dnf groupinstall "Development Tools" -y
+        dnf_group_install "Development Tools"
         
     elif [ "$PKG_MANAGER" = "pacman" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
@@ -647,6 +672,24 @@ ensure_path_contains_dir() {
     hash -r 2>/dev/null || true
 }
 
+locate_npm_binary() {
+    local bin_name="$1"
+    if command -v "$bin_name" >/dev/null 2>&1; then
+        command -v "$bin_name"
+        return 0
+    fi
+    if [ -n "${NPM_LAST_INSTALL_PREFIX:-}" ] && [ -x "${NPM_LAST_INSTALL_PREFIX}/bin/$bin_name" ]; then
+        echo "${NPM_LAST_INSTALL_PREFIX}/bin/$bin_name"
+        return 0
+    fi
+    local user_prefix="${NPM_USER_PREFIX:-$HOME/.local}"
+    if [ -x "${user_prefix}/bin/$bin_name" ]; then
+        echo "${user_prefix}/bin/$bin_name"
+        return 0
+    fi
+    return 1
+}
+
 # Kullanıcı bazlı npm prefix dizinini hazırlar ve yolunu döner.
 npm_prepare_user_prefix() {
     local prefix="${NPM_USER_PREFIX:-$HOME/.local}"
@@ -674,6 +717,7 @@ npm_install_global_with_fallback() {
     if [ -n "$default_prefix" ] && [ -d "$default_prefix" ] && [ -w "$default_prefix" ]; then
         if npm install -g "$package"; then
             NPM_LAST_INSTALL_PREFIX="$default_prefix"
+            ensure_path_contains_dir "${default_prefix}/bin" "npm global prefix"
             return 0
         fi
         echo -e "${YELLOW}${WARN_TAG}${NC} ${display_name} varsayılan prefixte kurulamadı. Kullanıcı dizinine düşülüyor..."
@@ -682,14 +726,18 @@ npm_install_global_with_fallback() {
     fi
 
     fallback_prefix=$(npm_prepare_user_prefix)
-    echo -e "${YELLOW}${INFO_TAG}${NC} ${display_name} kullanıcı prefixine kuruluyor: ${fallback_prefix}"
+    local install_user_msg
+    install_user_msg="$(translate_fmt log_install_user_prefix "$display_name" "$fallback_prefix")"
+    echo -e "${YELLOW}${INFO_TAG}${NC} ${install_user_msg}"
     if npm install -g --prefix "$fallback_prefix" "$package"; then
         NPM_LAST_INSTALL_PREFIX="$fallback_prefix"
         ensure_path_contains_dir "${fallback_prefix}/bin" "npm user prefix"
         return 0
     fi
 
-    echo -e "${RED}${ERROR_TAG}${NC} ${display_name} kullanıcı prefixine kurulamadı."
+    local install_fail_msg
+    install_fail_msg="$(translate_fmt log_install_user_fail "$display_name")"
+    echo -e "${RED}${ERROR_TAG}${NC} ${install_fail_msg}"
     return 1
 }
 

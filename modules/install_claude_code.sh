@@ -30,18 +30,54 @@ supporting_tty() {
     return 1
 }
 
+declare -A CLAUDE_TEXT_EN=(
+    ["install_title"]="Starting Claude Code installation..."
+    ["install_prefix"]="Install prefix: %s"
+    ["require_login_prompt"]="You need to sign in to Claude Code now."
+    ["run_claude_login"]="Please run 'claude login' and finish authentication."
+    ["press_enter"]="Press Enter to continue..."
+    ["skip_auth_all"]="Authentication skipped in 'Install All' mode."
+    ["manual_login"]="Please run '${GREEN}claude login${NC}' manually later."
+    ["tty_missing"]="No TTY detected; cannot run 'claude login' in-script."
+    ["login_hint"]="Tip: run 'claude login' directly in your terminal."
+    ["login_error"]="'claude login' failed. Ink-based UIs may require raw terminal mode."
+    ["install_done"]="Claude Code installation completed!"
+)
+
+declare -A CLAUDE_TEXT_TR=(
+    ["install_title"]="Claude Code kurulumu başlatılıyor..."
+    ["install_prefix"]="Kurulum prefix'i: %s"
+    ["require_login_prompt"]="Şimdi Claude Code'a giriş yapmanız gerekiyor."
+    ["run_claude_login"]="Lütfen 'claude login' komutunu çalıştırın ve oturumu tamamlayın."
+    ["press_enter"]="Devam etmek için Enter'a basın..."
+    ["skip_auth_all"]="'Tümünü Kur' modunda kimlik doğrulama atlandı."
+    ["manual_login"]="Lütfen daha sonra '${GREEN}claude login${NC}' komutunu manuel olarak çalıştırın."
+    ["tty_missing"]="TTY bulunamadı; 'claude login' script içinde çalıştırılamıyor."
+    ["login_hint"]="İpucu: Terminalinizde doğrudan 'claude login' komutunu çalıştırın."
+    ["login_error"]="'claude login' sırasında hata oluştu. Ink arayüzleri ham terminal moduna ihtiyaç duyabilir."
+    ["install_done"]="Claude Code kurulumu tamamlandı!"
+)
+
+claude_text() {
+    local key="$1"
+    local default_value="${CLAUDE_TEXT_EN[$key]:-$key}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        echo "${CLAUDE_TEXT_TR[$key]:-$default_value}"
+    else
+        echo "$default_value"
+    fi
+}
+
 run_claude_login() {
     if ! supporting_tty; then
-        echo -e "${YELLOW}${WARN_TAG}${NC} Geçerli oturumda TTY bulunamadı; 'claude login' CLI içinde çalıştırılamıyor."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen kurulumdan sonra manuel olarak 'claude login' komutunu çalıştırın."
+        echo -e "${YELLOW}${WARN_TAG}${NC} $(claude_text tty_missing)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(claude_text manual_login)"
         return 0
     fi
 
-    # CLI'nin ham moda geçebilmesi için giriş/çıkışı doğrudan terminale yönlendir
     if ! claude login </dev/tty >/dev/tty 2>&1; then
-        echo -e "${RED}${ERROR_TAG}${NC} 'claude login' çalıştırılırken bir hata oluştu."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Yukarıdaki hata, Ink tabanlı arayüzlerin ham moda ihtiyaç duymasından kaynaklanabilir."
-        echo -e "${YELLOW}[İPUCU]${NC} Terminalinizde doğrudan 'claude login' komutunu çalıştırarak tekrar deneyin."
+        echo -e "${RED}${ERROR_TAG}${NC} $(claude_text login_error)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(claude_text login_hint)"
         return 1
     fi
 }
@@ -50,7 +86,7 @@ run_claude_login() {
 install_claude_code() {
     local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}${INFO_TAG}${NC} Claude Code kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(claude_text install_title)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     require_node_version 20 "Claude Code CLI" || return 1
@@ -66,26 +102,30 @@ install_claude_code() {
     fi
 
     if [ -n "${NPM_LAST_INSTALL_PREFIX}" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Kurulum prefix'i: ${NPM_LAST_INSTALL_PREFIX}"
+        local claude_prefix_msg claude_prefix_fmt
+        claude_prefix_fmt="$(claude_text install_prefix)"
+        # shellcheck disable=SC2059
+        claude_prefix_msg="$(printf "$claude_prefix_fmt" "${NPM_LAST_INSTALL_PREFIX}")"
+        echo -e "${YELLOW}${INFO_TAG}${NC} ${claude_prefix_msg}"
     fi
 
     echo -e "${GREEN}${SUCCESS_TAG}${NC} Claude Code sürümü: $(claude --version)"
     
     if [ "$interactive_mode" = true ]; then
-        echo -e "\n${YELLOW}${INFO_TAG}${NC} Şimdi Claude Code'a giriş yapmanız gerekiyor."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen 'claude login' komutunu çalıştırın ve oturum açın."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} $(claude_text require_login_prompt)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(claude_text run_claude_login)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(claude_text press_enter)\n"
 
         run_claude_login || true
 
-        echo -e "\n${YELLOW}${INFO_TAG}${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -r -p "Devam etmek için Enter'a basın..." </dev/tty
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} $(claude_text press_enter)"
+        read -r -p "" </dev/tty
     else
-        echo -e "\n${YELLOW}${INFO_TAG}${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen daha sonra manuel olarak '${GREEN}claude login${NC}' komutunu çalıştırın."
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} $(claude_text skip_auth_all)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(claude_text manual_login)"
     fi
     
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} Claude Code kurulumu tamamlandı!"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} $(claude_text install_done)"
 }
 
 # Ana kurulum akışı

@@ -16,46 +16,96 @@ fi
 : "${CYAN:=$'\033[0;36m'}"
 : "${NC:=$'\033[0m'}"
 
+declare -A GEMINI_TEXT_EN=(
+    ["install_title"]="Starting Gemini CLI installation..."
+    ["npm_missing"]="The npm command was not found. Please install Node.js first."
+    ["install_fail"]="Gemini CLI npm installation failed."
+    ["prefix_notice"]="Install prefix: %s"
+    ["version_info"]="Gemini CLI version: %s"
+    ["interactive_intro"]="You need to sign in to Gemini CLI now."
+    ["interactive_command"]="Please run 'gemini auth' and complete the flow."
+    ["interactive_wait"]="Press Enter once authentication is complete."
+    ["manual_skip"]="Authentication skipped in 'Install All' mode."
+    ["manual_reminder"]="Please run '${GREEN}gemini auth${NC}' manually later."
+    ["manual_hint"]="Manual authentication may be required."
+    ["install_done"]="Gemini CLI installation completed!"
+    ["auth_prompt"]="Press Enter to continue..."
+)
+
+declare -A GEMINI_TEXT_TR=(
+    ["install_title"]="Gemini CLI kurulumu başlatılıyor..."
+    ["npm_missing"]="npm komutu bulunamadı. Lütfen önce Node.js kurun."
+    ["install_fail"]="Gemini CLI npm paketinin kurulumu başarısız oldu."
+    ["prefix_notice"]="Kurulum prefix'i: %s"
+    ["version_info"]="Gemini CLI sürümü: %s"
+    ["interactive_intro"]="Şimdi Gemini CLI'ya giriş yapmanız gerekiyor."
+    ["interactive_command"]="Lütfen 'gemini auth' komutunu çalıştırıp oturumu tamamlayın."
+    ["interactive_wait"]="Kimlik doğrulama tamamlanınca Enter'a basın."
+    ["manual_skip"]="'Tümünü Kur' modunda kimlik doğrulama atlandı."
+    ["manual_reminder"]="Lütfen daha sonra '${GREEN}gemini auth${NC}' komutunu manuel olarak çalıştırın."
+    ["manual_hint"]="Manuel oturum açma gerekebilir."
+    ["install_done"]="Gemini CLI kurulumu tamamlandı!"
+    ["auth_prompt"]="Devam etmek için Enter'a basın..."
+)
+
+gemini_text() {
+    local key="$1"
+    local default_value="${GEMINI_TEXT_EN[$key]:-$key}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${GEMINI_TEXT_TR[$key]:-$default_value}"
+    else
+        printf "%s" "$default_value"
+    fi
+}
+
 # Gemini CLI kurulumu
 install_gemini_cli() {
     local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}${INFO_TAG}${NC} Gemini CLI kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(gemini_text install_title)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     require_node_version 20 "Gemini CLI" || return 1
 
     if ! command -v npm >/dev/null 2>&1; then
-        echo -e "${RED}${ERROR_TAG}${NC} npm komutu bulunamadı. Lütfen Node.js kurulumu sonrası 'npm' erişilebilir olsun."
+        echo -e "${RED}${ERROR_TAG}${NC} $(gemini_text npm_missing)"
         return 1
     fi
 
     if ! npm_install_global_with_fallback "@google/gemini-cli" "Gemini CLI"; then
-        echo -e "${RED}${ERROR_TAG}${NC} Gemini CLI npm paketinin kurulumu başarısız oldu."
+        echo -e "${RED}${ERROR_TAG}${NC} $(gemini_text install_fail)"
         return 1
     fi
 
     if [ -n "${NPM_LAST_INSTALL_PREFIX}" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Kurulum prefix'i: ${NPM_LAST_INSTALL_PREFIX}"
+        local gemini_prefix_fmt
+        gemini_prefix_fmt="$(gemini_text prefix_notice)"
+        # shellcheck disable=SC2059
+        printf -v gemini_prefix_msg "$gemini_prefix_fmt" "${NPM_LAST_INSTALL_PREFIX}"
+        echo -e "${YELLOW}${INFO_TAG}${NC} ${gemini_prefix_msg}"
     fi
 
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} Gemini CLI sürümü: $(gemini --version)"
+    local gemini_version_fmt
+    gemini_version_fmt="$(gemini_text version_info)"
+    # shellcheck disable=SC2059
+    printf -v gemini_version_msg "$gemini_version_fmt" "$(gemini --version)"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} ${gemini_version_msg}"
     
     if [ "$interactive_mode" = true ]; then
-        echo -e "\n${YELLOW}${INFO_TAG}${NC} Şimdi Gemini CLI'ya giriş yapmanız gerekiyor."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen 'gemini auth' veya ilgili oturum açma komutunu çalıştırın."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} $(gemini_text interactive_intro)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(gemini_text interactive_command)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(gemini_text interactive_wait)\n"
         
-        gemini auth </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${INFO_TAG}${NC} Manuel oturum açma gerekebilir."
+        gemini auth </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${INFO_TAG}${NC} $(gemini_text manual_hint)"
         
-        echo -e "\n${YELLOW}${INFO_TAG}${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
-        read -r -p "Devam etmek için Enter'a basın..." </dev/tty
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} $(gemini_text auth_prompt)"
+        read -r -p "" </dev/tty
     else
-        echo -e "\n${YELLOW}${INFO_TAG}${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
-        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen daha sonra manuel olarak '${GREEN}gemini auth${NC}' komutunu çalıştırın."
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} $(gemini_text manual_skip)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(gemini_text manual_reminder)"
     fi
 
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} Gemini CLI kurulumu tamamlandı!"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} $(gemini_text install_done)"
 }
 
 # Ana kurulum akışı

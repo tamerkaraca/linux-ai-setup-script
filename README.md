@@ -534,6 +534,23 @@ Ek Bilgiler:
 - **CLI yenileme:** Moonshot seçeneği, resmi dokümana uygun olarak Node.js ≥ 18 doğrulaması yapar ve gerekirse `@anthropic-ai/claude-code` paketini npm ile yeniden kurmayı teklif eder.
 - **Sonuç:** `~/.claude/settings.json` dosyası yeniden oluşturulur; token, base URL, timeout ve varsayılan modeller güncellenir, böylece `claude` komutu seçtiğiniz sağlayıcıyı anında kullanır.
 
+#### OpenSpec CLI (AI CLI Seçenek 11)
+
+AI CLI menüsündeki `11` numaralı seçenek, [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) aracını npm üzerinden kurar (`npm install -g @fission-ai/openspec`). OpenSpec CLI, spesifikasyon odaklı geliştirme akışını Claude Code, Gemini CLI, Cursor vb. araçlara taşır; API anahtarı gerektirmez. (Contains Studio veya Wes Hobson ajanları için `12` ve `13` numaralı seçenekleri kullanın.)
+
+Kurulum adımları:
+
+1. Node.js ≥ 18 ve `npm` varlığını doğrular, ardından CLI’ı global olarak yükler.
+2. Kullanım hatırlatmaları basar:
+
+```bash
+openspec init          # depo içinde OpenSpec klasörünü başlatır
+openspec plan          # değişiklik planı oluşturur
+openspec sync          # spesifikasyonları güncel tutar
+```
+
+CLI kurulduktan sonra spesifikasyon odaklı akışı kullanabilir; ihtiyaç halinde Contains Studio veya Wes Hobson ajanlarını yüklemek için `12`/`13` numaralı seçenekleri çalıştırabilirsiniz.
+
 #### Claude Code İçin Contains Studio Ajanları (Seçenek 12)
 
 AI CLI menüsündeki `12` numaralı seçenek, [Contains Studio agents](https://github.com/contains-studio/agents) deposunu klonlayarak tüm `.md` ajan tanımlarını `~/.claude/agents/` dizinine kopyalar. Kurulumdan sonra Claude Code’u yeniden başlatarak yeni ajanların görünmesini sağlayabilirsiniz.
@@ -562,23 +579,6 @@ cp -r agents/* ~/.claude/agents/
 ```
 
 Böylece Contains Studio paketine ek olarak Wes Hobson’un ajan kitaplığı da kullanılabilir hale gelir.
-
-#### OpenSpec CLI (AI CLI Seçenek 11)
-
-AI CLI menüsündeki `11` numaralı seçenek, [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) aracını npm üzerinden kurar (`npm install -g @fission-ai/openspec`). OpenSpec CLI, spesifikasyon odaklı geliştirme akışını Claude Code, Gemini CLI, Cursor vb. araçlara taşır; API anahtarı gerektirmez. (Contains Studio ajanları için aynı menüdeki `12` numaralı seçeneği kullanın.)
-
-Kurulum adımları:
-
-1. Node.js ≥ 18 ve `npm` varlığını doğrular, ardından CLI’ı global olarak yükler.
-2. Kullanım hatırlatmaları basar:
-
-```bash
-openspec init          # depo içinde OpenSpec klasörünü başlatır
-openspec plan          # değişiklik planı oluşturur
-openspec sync          # spesifikasyonları güncel tutar
-```
-
-CLI kurulduktan sonra spesifikasyon odaklı akışı kullanabilir; ihtiyaç halinde Contains Studio ajanlarını yüklemek için `12` numaralı seçeneği çalıştırabilirsiniz.
 
 Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut anahtarlarınızı maskeleyerek hızlıca rota değiştirmenize olanak tanır.
 

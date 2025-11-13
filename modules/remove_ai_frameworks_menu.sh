@@ -9,22 +9,14 @@ fi
 [ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
 CURRENT_LANG="${LANGUAGE:-en}"
-if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="${INFO_TAG}"
-    WARN_TAG="${WARN_TAG}"
-    ERROR_TAG="${ERROR_TAG}"
-else
-    INFO_TAG="[INFO]"
-    WARN_TAG="[WARNING]"
-    ERROR_TAG="[ERROR]"
-fi
+
 
 declare -A RM_TEXT_EN=(
     ["menu_title"]="AI Framework Removal Menu"
     ["option1"]="Remove SuperGemini Framework"
     ["option2"]="Remove SuperQwen Framework"
     ["option3"]="Remove SuperClaude Framework"
-    ["option4"]="Remove all AI frameworks"
+    ["optionA"]="Remove all AI frameworks"
     ["option0"]="Return to main menu"
     ["hint"]="Use commas for multiple selections (e.g., 1,3)."
     ["prompt"]="Your choice"
@@ -38,7 +30,7 @@ declare -A RM_TEXT_TR=(
     ["option1"]="SuperGemini Framework'ü kaldır"
     ["option2"]="SuperQwen Framework'ü kaldır"
     ["option3"]="SuperClaude Framework'ü kaldır"
-    ["option4"]="Tüm AI Frameworklerini kaldır"
+    ["optionA"]="Tüm AI Frameworklerini kaldır"
     ["option0"]="Ana menüye dön"
     ["hint"]="Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,3)."
     ["prompt"]="Seçiminiz"
@@ -79,7 +71,7 @@ remove_ai_frameworks_menu() {
         echo -e "  ${GREEN}1${NC} - $(rm_text option1)"
         echo -e "  ${GREEN}2${NC} - $(rm_text option2)"
         echo -e "  ${GREEN}3${NC} - $(rm_text option3)"
-        echo -e "  ${GREEN}4${NC} - $(rm_text option4)"
+        echo -e "  ${GREEN}A${NC} - $(rm_text optionA)"
         echo -e "  ${RED}0${NC} - $(rm_text option0)"
         echo -e "\n${YELLOW}${INFO_TAG}${NC} $(rm_text hint)"
 
@@ -98,7 +90,7 @@ remove_ai_frameworks_menu() {
                 1) run_module "remove_supergemini" ;;
                 2) run_module "remove_superqwen" ;;
                 3) run_module "remove_superclaude" ;;
-                4) 
+                A|a) 
                     run_module "remove_supergemini"
                     run_module "remove_superqwen"
                     run_module "remove_superclaude"

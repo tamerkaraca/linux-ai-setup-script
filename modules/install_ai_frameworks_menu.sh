@@ -68,19 +68,27 @@ run_module() {
     shift
 
     if [ -f "$local_path" ]; then
-        printf -v msg "$(ai_fw_menu_text module_running_local)" "$module_name"
-        echo -e "${CYAN}${INFO_TAG}${NC} $msg"
+        local running_msg_format
+        running_msg_format="$(ai_fw_menu_text module_running_local)"
+        local running_msg="${running_msg_format//\%s/$module_name}"
+        echo -e "${CYAN}${INFO_TAG}${NC} $running_msg"
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            printf -v msg "$(ai_fw_menu_text module_error)" "$module_name"
-            echo -e "${RED}${ERROR_TAG}${NC} $msg"
+            local error_msg_format
+            error_msg_format="$(ai_fw_menu_text module_error)"
+            local error_msg="${error_msg_format//\%s/$module_name}"
+            echo -e "${RED}${ERROR_TAG}${NC} $error_msg"
             return 1
         fi
     else
-        printf -v msg "$(ai_fw_menu_text module_downloading)" "$module_name"
-        echo -e "${CYAN}${INFO_TAG}${NC} $msg"
+        local downloading_msg_format
+        downloading_msg_format="$(ai_fw_menu_text module_downloading)"
+        local downloading_msg="${downloading_msg_format//\%s/$module_name}"
+        echo -e "${CYAN}${INFO_TAG}${NC} $downloading_msg"
         if ! curl -fsSL "$module_url" | PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash -s -- "$@"; then
-            printf -v msg "$(ai_fw_menu_text module_error)" "$module_name"
-            echo -e "${RED}${ERROR_TAG}${NC} $msg"
+            local error_msg_format
+            error_msg_format="$(ai_fw_menu_text module_error)"
+            local error_msg="${error_msg_format//\%s/$module_name}"
+            echo -e "${RED}${ERROR_TAG}${NC} $error_msg"
             return 1
         fi
     fi

@@ -37,7 +37,7 @@ panel_line_raw() {
 }
 
 print_heading_panel() {
-    local -a titles=($@)
+    local -a titles=("$@")
     local border_top="╔════════════════════════════════════════════════════════════════════════╗"
     local border_bottom="╚════════════════════════════════════════════════════════════════════════╝"
     echo -e "${BLUE}${border_top}${NC}"

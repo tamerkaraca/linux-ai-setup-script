@@ -89,20 +89,28 @@ configure_git() {
     # Eğer yeni bir değer girildiyse güncelle
     if [ -n "$GIT_USER_NAME" ]; then
         git config --global user.name "$GIT_USER_NAME"
-        printf -v msg "$(git_config_text name_set)" "$GIT_USER_NAME"
+        local msg_format
+        msg_format="$(git_config_text name_set)"
+        local msg="${msg_format//\%s/$GIT_USER_NAME}"
         echo -e "${GREEN}${SUCCESS_TAG}${NC} $msg"
     else
-        printf -v msg "$(git_config_text name_kept)" "${current_name:-$(git_config_text not_set)}"
+        local msg_format
+        msg_format="$(git_config_text name_kept)"
+        local msg="${msg_format//\%s/${current_name:-$(git_config_text not_set)}}"
         echo -e "${YELLOW}${INFO_TAG}${NC} $msg"
     fi
 
     # Eğer yeni bir değer girildiyse güncelle
     if [ -n "$GIT_USER_EMAIL" ]; then
         git config --global user.email "$GIT_USER_EMAIL"
-        printf -v msg "$(git_config_text email_set)" "$GIT_USER_EMAIL"
+        local msg_format
+        msg_format="$(git_config_text email_set)"
+        local msg="${msg_format//\%s/$GIT_USER_EMAIL}"
         echo -e "${GREEN}${SUCCESS_TAG}${NC} $msg"
     else
-        printf -v msg "$(git_config_text email_kept)" "${current_email:-$(git_config_text not_set)}"
+        local msg_format
+        msg_format="$(git_config_text email_kept)"
+        local msg="${msg_format//\%s/${current_email:-$(git_config_text not_set)}}"
         echo -e "${YELLOW}${INFO_TAG}${NC} $msg"
     fi
 

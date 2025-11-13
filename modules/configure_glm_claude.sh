@@ -17,17 +17,7 @@ CLAUDE_DIR="$HOME/.claude"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
 CURRENT_LANG="${LANGUAGE:-en}"
 
-if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="${INFO_TAG}"
-    WARN_TAG="${WARN_TAG}"
-    ERROR_TAG="${ERROR_TAG}"
-    SUCCESS_TAG="${SUCCESS_TAG}"
-else
-    INFO_TAG="[INFO]"
-    WARN_TAG="[WARNING]"
-    ERROR_TAG="[ERROR]"
-    SUCCESS_TAG="[SUCCESS]"
-fi
+
 
 declare -A GL_TEXT_EN=(
     ["glm_title"]="Starting GLM-4.6 configuration for Claude Code..."
@@ -190,7 +180,8 @@ configure_glm_provider() {
     current_api_key=$(read_current_env "ANTHROPIC_AUTH_TOKEN")
     local GLM_BASE_URL="$default_base_url"
 
-    local masked_key_display="$(gl_text api_masked_default)"
+    local masked_key_display
+    masked_key_display="$(gl_text api_masked_default)"
     if [ -n "$current_api_key" ]; then
         masked_key_display=$(mask_secret "$current_api_key")
     fi
@@ -280,7 +271,8 @@ configure_kimi_provider() {
     local current_api_key
     current_api_key=$(read_current_env "ANTHROPIC_AUTH_TOKEN")
 
-    local masked="$(gl_text api_masked_default)"
+    local masked
+    masked="$(gl_text api_masked_default)"
     if [ -n "$current_api_key" ]; then
         masked=$(mask_secret "$current_api_key")
     fi

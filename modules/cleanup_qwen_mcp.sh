@@ -83,7 +83,9 @@ cleanup_qwen_mcp() {
     fi
     
     if [ ! -f "$SETTINGS_FILE" ]; then
-        printf -v msg "$(cleanup_qwen_text settings_not_found)" "$SETTINGS_FILE"
+        local msg_format
+        msg_format="$(cleanup_qwen_text settings_not_found)"
+        local msg="${msg_format//\%s/$SETTINGS_FILE}"
         echo -e "${YELLOW}${INFO_TAG}${NC} $msg"
         return 0
     fi
@@ -125,36 +127,47 @@ cleanup_qwen_mcp() {
     for choice in "${SELECTED_INDICES[@]}"; do
         choice=$(echo "$choice" | tr -d ' ')
         if ! [[ "$choice" =~ ^[1-9][0-9]*$ ]]; then
-            printf -v msg "$(cleanup_qwen_text invalid_selection)" "$choice"
+            local msg_format
+            msg_format="$(cleanup_qwen_text invalid_selection)"
+            local msg="${msg_format//\%s/$choice}"
             echo -e "${RED}${ERROR_TAG}${NC} $msg"
             continue
         fi
 
         local idx=$((choice - 1))
         if [ $idx -lt 0 ] || [ $idx -ge ${#mcp_servers[@]} ]; then
-            printf -v msg "$(cleanup_qwen_text unsupported_selection)" "$choice"
+            local msg_format
+            msg_format="$(cleanup_qwen_text unsupported_selection)"
+            local msg="${msg_format//\%s/$choice}"
             echo -e "${RED}${ERROR_TAG}${NC} $msg"
             continue
         fi
 
         local server_to_remove="${mcp_servers[$idx]}"
-        printf -v msg "$(cleanup_qwen_text removing_server)" "$server_to_remove"
+        local msg_format
+        msg_format="$(cleanup_qwen_text removing_server)"
+        local msg="${msg_format//\%s/$server_to_remove}"
         echo -e "${YELLOW}${INFO_TAG}${NC} $msg"
         
-        jq "del(.mcpServers.\"$server_to_remove\")" "$temp_file" > "$temp_file.tmp" && mv "$temp_file.tmp" "$temp_file"
-        if [ $? -eq 0 ]; then
-            printf -v msg "$(cleanup_qwen_text server_removed)" "$server_to_remove"
+        if jq "del(.mcpServers.\"$server_to_remove\")" "$temp_file" > "$temp_file.tmp" && mv "$temp_file.tmp" "$temp_file"; then
+            local msg_format
+            msg_format="$(cleanup_qwen_text server_removed)"
+            local msg="${msg_format//\%s/$server_to_remove}"
             echo -e "${GREEN}${SUCCESS_TAG}${NC} $msg"
             changes_made=true
         else
-            printf -v msg "$(cleanup_qwen_text server_remove_error)" "$server_to_remove"
+            local msg_format
+            msg_format="$(cleanup_qwen_text server_remove_error)"
+            local msg="${msg_format//\%s/$server_to_remove}"
             echo -e "${RED}${ERROR_TAG}${NC} $msg"
         fi
     done
 
     if [ "$changes_made" = true ]; then
         mv "$temp_file" "$SETTINGS_FILE"
-        printf -v msg "$(cleanup_qwen_text changes_saved)" "$SETTINGS_FILE"
+        local msg_format
+        msg_format="$(cleanup_qwen_text changes_saved)"
+        local msg="${msg_format//\%s/$SETTINGS_FILE}"
         echo -e "${GREEN}${SUCCESS_TAG}${NC} $msg"
     else
         rm -f "$temp_file"

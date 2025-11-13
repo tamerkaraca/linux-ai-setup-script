@@ -32,6 +32,7 @@ supporting_tty() {
 
 declare -A CLAUDE_TEXT_EN=(
     ["install_title"]="Starting Claude Code installation..."
+    ["install_prefix"]="Install prefix: %s"
     ["require_login_prompt"]="You need to sign in to Claude Code now."
     ["run_claude_login"]="Please run 'claude login' and finish authentication."
     ["press_enter"]="Press Enter to continue..."
@@ -45,6 +46,7 @@ declare -A CLAUDE_TEXT_EN=(
 
 declare -A CLAUDE_TEXT_TR=(
     ["install_title"]="Claude Code kurulumu başlatılıyor..."
+    ["install_prefix"]="Kurulum prefix'i: %s"
     ["require_login_prompt"]="Şimdi Claude Code'a giriş yapmanız gerekiyor."
     ["run_claude_login"]="Lütfen 'claude login' komutunu çalıştırın ve oturumu tamamlayın."
     ["press_enter"]="Devam etmek için Enter'a basın..."
@@ -100,7 +102,11 @@ install_claude_code() {
     fi
 
     if [ -n "${NPM_LAST_INSTALL_PREFIX}" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Kurulum prefix'i: ${NPM_LAST_INSTALL_PREFIX}"
+        local claude_prefix_msg claude_prefix_fmt
+        claude_prefix_fmt="$(claude_text install_prefix)"
+        # shellcheck disable=SC2059
+        claude_prefix_msg="$(printf "$claude_prefix_fmt" "${NPM_LAST_INSTALL_PREFIX}")"
+        echo -e "${YELLOW}${INFO_TAG}${NC} ${claude_prefix_msg}"
     fi
 
     echo -e "${GREEN}${SUCCESS_TAG}${NC} Claude Code sürümü: $(claude --version)"

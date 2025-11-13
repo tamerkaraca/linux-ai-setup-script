@@ -49,21 +49,23 @@ BASE_URL="${BASE_URL:-${SCRIPT_BASE_URL}/modules}"
 export BASE_URL
 
 REMOTE_MODULE_DIR=""
+export REMOTE_MODULE_DIR
 
 prepare_remote_module_dir() {
-    if [ -n "$REMOTE_MODULE_DIR" ]; then
+    if [ -n "${REMOTE_MODULE_DIR:-}" ]; then
         return 0
     fi
     REMOTE_MODULE_DIR="$(mktemp -d)"
     mkdir -p "$REMOTE_MODULE_DIR/modules"
     curl -fsSL "${SCRIPT_BASE_URL}/modules/utils.sh" -o "$REMOTE_MODULE_DIR/modules/utils.sh" || return 1
     curl -fsSL "${SCRIPT_BASE_URL}/modules/banner.sh" -o "$REMOTE_MODULE_DIR/modules/banner.sh" || true
+    export REMOTE_MODULE_DIR
     return 0
 }
 
 cleanup_remote_modules() {
-    if [ -n "$REMOTE_MODULE_DIR" ] && [ -d "$REMOTE_MODULE_DIR" ]; then
-        rm -rf "$REMOTE_MODULE_DIR"
+    if [ -n "${REMOTE_MODULE_DIR:-}" ] && [ -d "${REMOTE_MODULE_DIR:-}" ]; then
+        rm -rf "${REMOTE_MODULE_DIR}"
     fi
 }
 trap cleanup_remote_modules EXIT
@@ -76,26 +78,26 @@ run_module() {
     shift
 
     if [ -f "$local_path" ]; then
-        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü yerel dosyadan çalıştırılıyor..."
+        echo -e "${CYAN}${INFO_TAG}${NC} $(translate_fmt log_module_local "$module_name")"
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} $(translate_fmt log_module_error "$module_name")"
             return 1
         fi
     else
-        echo -e "${CYAN}${INFO_TAG}${NC} $module_name modülü indiriliyor ve çalıştırılıyor..."
+        echo -e "${CYAN}${INFO_TAG}${NC} $(translate_fmt log_module_remote "$module_name")"
         prepare_remote_module_dir || {
-            echo -e "${RED}${ERROR_TAG}${NC} Uzaktan modül dizini hazırlanamadı."
+            echo -e "${RED}${ERROR_TAG}${NC} $(translate log_remote_prepare_failed)"
             return 1
         }
-        local remote_file="$REMOTE_MODULE_DIR/${module_name}.sh"
+        local remote_file="${REMOTE_MODULE_DIR}/${module_name}.sh"
         if [ ! -f "$remote_file" ]; then
             if ! curl -fsSL "$module_url" -o "$remote_file"; then
-                echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü indirilemedi."
+                echo -e "${RED}${ERROR_TAG}${NC} $(translate_fmt log_module_download_failed "$module_name")"
                 return 1
             fi
         fi
         if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
-            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} $(translate_fmt log_module_error "$module_name")"
             return 1
         fi
     fi

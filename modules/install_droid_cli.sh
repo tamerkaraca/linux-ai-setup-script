@@ -12,12 +12,7 @@ fi
 [ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
 CURRENT_LANG="${LANGUAGE:-en}"
-if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="${INFO_TAG}"
-    WARN_TAG="${WARN_TAG}"
-    ERROR_TAG="${ERROR_TAG}"
-    SUCCESS_TAG="${SUCCESS_TAG}"
-else
+if [ "$CURRENT_LANG" != "tr" ]; then
     INFO_TAG="[INFO]"
     WARN_TAG="[WARNING]"
     ERROR_TAG="[ERROR]"
@@ -38,6 +33,7 @@ declare -A DROID_TEXT_EN=(
     [xdg_check]="Checking for xdg-utils (required on Linux)..."
     [xdg_install]="Installing xdg-utils automatically..."
     [xdg_manual]="xdg-utils is missing. Please install it manually (e.g., sudo apt-get install xdg-utils) and rerun this option."
+    [xdg_note]="Linux users: Ensure xdg-utils is installed for proper functionality. Install with: sudo apt-get install xdg-utils"
 )
 
 declare -A DROID_TEXT_TR=(
@@ -54,6 +50,7 @@ declare -A DROID_TEXT_TR=(
     [xdg_check]="Linux ortamında xdg-utils paketi kontrol ediliyor..."
     [xdg_install]="xdg-utils paketi otomatik kuruluyor..."
     [xdg_manual]="xdg-utils bulunamadı. Lütfen manuel olarak kurun (örn: sudo apt-get install xdg-utils) ve menüyü tekrar çalıştırın."
+    [xdg_note]="Linux kullanıcıları için: Droid'in doğru çalışması adına xdg-utils paketini kurun. Örnek komut: sudo apt-get install xdg-utils"
 )
 
 droid_text() {
@@ -94,6 +91,7 @@ install_droid_cli() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}${INFO_TAG}${NC} $(droid_text title)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(droid_text xdg_note)"
 
     if command -v droid >/dev/null 2>&1; then
         echo -e "${GREEN}${SUCCESS_TAG}${NC} $(droid_text already_installed): $(droid --version 2>/dev/null || echo \"unknown version\")"

@@ -43,6 +43,14 @@ declare -A KILOCODE_TEXT_EN=(
     ["batch_skip"]="Configuration steps were skipped in batch mode."
     ["batch_note"]="After installation, run '%s' and '%s' manually."
     ["install_done"]="Kilocode CLI installation completed! Docs: %s"
+    ["python_compat_warning"]="Python %s detected. Kilocode CLI may fail due to missing distutils module."
+    ["python_compat_attempt"]="Attempting installation with fallback options..."
+    ["alt_install_no_native"]="Attempting installation without native dependencies..."
+    ["alt_install_python312"]="Trying with Python 3.12..."
+    ["alt_install_no_optional"]="Trying with npm --no-optional..."
+    ["alt_install_failed"]="All installation methods failed"
+    ["alt_install_suggest"]="Consider installing Python 3.12 or using a different Node.js version"
+    ["alt_install_suggest_cmd"]="Consider installing Python 3.12: sudo apt install python3.12 python3.12-distutils"
 )
 
 declare -A KILOCODE_TEXT_TR=(
@@ -69,6 +77,14 @@ declare -A KILOCODE_TEXT_TR=(
     ["batch_skip"]="Toplu kurulum modunda konfigürasyon adımları atlandı."
     ["batch_note"]="Kurulum sonrası '%s' ve '%s' komutlarını manuel çalıştırmayı unutmayın."
     ["install_done"]="Kilocode CLI kurulumu tamamlandı! Doküman: %s"
+    ["python_compat_warning"]="Python %s tespit edildi. Kilocode CLI eksik distutils modülü nedeniyle başarısız olabilir."
+    ["python_compat_attempt"]="Alternatif kurulum seçenekleri deneniyor..."
+    ["alt_install_no_native"]="Native bağımlılıklar olmadan kurulum deneniyor..."
+    ["alt_install_python312"]="Python 3.12 ile deneniyor..."
+    ["alt_install_no_optional"]="npm --no-optional ile deneniyor..."
+    ["alt_install_failed"]="Tüm kurulum yöntemleri başarısız oldu"
+    ["alt_install_suggest"]="Python 3.12 kurmayı veya farklı Node.js sürümü kullanmayı düşünün"
+    ["alt_install_suggest_cmd"]="Python 3.12 kurmayı düşünün: sudo apt install python3.12 python3.12-distutils"
 )
 
 kilocode_text() {
@@ -100,6 +116,24 @@ ensure_kilocode_npm_available() {
     fi
     echo -e "${RED}${ERROR_TAG}${NC} $(kilocode_text npm_missing)"
     return 1
+}
+
+check_python_compatibility() {
+    # Check for Python 3.13+ which lacks distutils
+    if command -v python3 >/dev/null 2>&1; then
+        local python_version
+        python_version=$(python3 --version 2>/dev/null | sed -E 's/Python ([0-9]+\.[0-9]+).*/\1/')
+        # Check if version is 3.13 or higher
+        if [[ "${python_version}" == "3.13" ]] || [[ "${python_version}" == "3.14" ]] || [[ "${python_version}" == "3.15" ]]; then
+            local compat_warn_msg compat_attempt_msg
+            kilocode_printf compat_warn_msg python_compat_warning "$python_version"
+            echo -e "${YELLOW}${WARN_TAG}${NC} ${compat_warn_msg}"
+            kilocode_printf compat_attempt_msg python_compat_attempt
+            echo -e "${YELLOW}${INFO_TAG}${NC} ${compat_attempt_msg}"
+            return 1
+        fi
+    fi
+    return 0
 }
 
 install_kilocode_cli() {
@@ -149,12 +183,57 @@ install_kilocode_cli() {
     require_node_version "$KILOCODE_MIN_NODE_VERSION" "Kilocode CLI" || return 1
     ensure_kilocode_npm_available || return 1
 
-    echo -e "${YELLOW}${INFO_TAG}${NC} $(kilocode_text install_start)"
-    if ! npm_install_global_with_fallback "$package_spec" "Kilocode CLI"; then
-        local kilo_fail_msg
-        kilocode_printf kilo_fail_msg install_fail "$package_spec"
-        echo -e "${RED}${ERROR_TAG}${NC} ${kilo_fail_msg}"
-        return 1
+    # Check Python compatibility for node-gyp
+    if ! check_python_compatibility; then
+        local no_native_msg python312_msg no_optional_msg all_failed_msg suggest_msg suggest_cmd_msg
+        
+        # Try with --ignore-scripts to skip sqlite3 compilation
+        kilocode_printf no_native_msg alt_install_no_native
+        echo -e "${YELLOW}${INFO_TAG}${NC} ${no_native_msg}"
+        if npm install -g --ignore-scripts "$package_spec" 2>/dev/null; then
+            echo -e "${GREEN}${SUCCESS_TAG}${NC} Kilocode CLI installed successfully (without native dependencies)"
+        else
+            # Try with different Python version if available
+            if command -v python3.12 >/dev/null 2>&1; then
+                kilocode_printf python312_msg alt_install_python312
+                echo -e "${YELLOW}${INFO_TAG}${NC} ${python312_msg}"
+                PYTHON=/usr/bin/python3.12 npm install -g "$package_spec" 2>/dev/null || {
+                    kilocode_printf no_optional_msg alt_install_no_optional
+                    echo -e "${YELLOW}${INFO_TAG}${NC} ${no_optional_msg}"
+                    npm install -g --no-optional "$package_spec" 2>/dev/null || {
+                        kilocode_printf all_failed_msg alt_install_failed
+                        kilocode_printf suggest_msg alt_install_suggest
+                        echo -e "${RED}${ERROR_TAG}${NC} ${all_failed_msg}"
+                        echo -e "${YELLOW}${INFO_TAG}${NC} ${suggest_msg}"
+                        local kilo_fail_msg
+                        kilocode_printf kilo_fail_msg install_fail "$package_spec"
+                        echo -e "${RED}${ERROR_TAG}${NC} ${kilo_fail_msg}"
+                        return 1
+                    }
+                }
+            else
+                kilocode_printf no_optional_msg alt_install_no_optional
+                echo -e "${YELLOW}${INFO_TAG}${NC} ${no_optional_msg}"
+                if npm install -g --no-optional "$package_spec"; then
+                    echo -e "${GREEN}${SUCCESS_TAG}${NC} Kilocode CLI installed successfully (without optional dependencies)"
+                else
+                    local kilo_fail_msg
+                    kilocode_printf kilo_fail_msg install_fail "$package_spec"
+                    echo -e "${RED}${ERROR_TAG}${NC} ${kilo_fail_msg}"
+                    kilocode_printf suggest_cmd_msg alt_install_suggest_cmd
+                    echo -e "${YELLOW}${INFO_TAG}${NC} ${suggest_cmd_msg}"
+                    return 1
+                fi
+            fi
+        fi
+    else
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(kilocode_text install_start)"
+        if ! npm_install_global_with_fallback "$package_spec" "Kilocode CLI"; then
+            local kilo_fail_msg
+            kilocode_printf kilo_fail_msg install_fail "$package_spec"
+            echo -e "${RED}${ERROR_TAG}${NC} ${kilo_fail_msg}"
+            return 1
+        fi
     fi
 
     if [ -n "${NPM_LAST_INSTALL_PREFIX:-}" ]; then

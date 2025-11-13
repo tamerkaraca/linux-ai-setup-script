@@ -21,12 +21,30 @@ detect_system_language() {
     fi
 }
 
+refresh_language_tags() {
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        INFO_TAG="[BİLGİ]"
+        WARN_TAG="[UYARI]"
+        ERROR_TAG="[HATA]"
+        SUCCESS_TAG="[BAŞARILI]"
+        NOTE_TAG="[NOT]"
+    else
+        INFO_TAG="[INFO]"
+        WARN_TAG="[WARNING]"
+        ERROR_TAG="[ERROR]"
+        SUCCESS_TAG="[SUCCESS]"
+        NOTE_TAG="[NOTE]"
+    fi
+    export INFO_TAG WARN_TAG ERROR_TAG SUCCESS_TAG NOTE_TAG
+}
+
 set_language() {
     local target_lang="$1"
     for lang in "${SUPPORTED_LANGUAGES[@]}"; do
         if [ "$lang" = "$target_lang" ]; then
             LANGUAGE="$lang"
             export LANGUAGE
+            refresh_language_tags
             return 0
         fi
     done
@@ -37,21 +55,7 @@ if [ -z "${LANGUAGE:-}" ]; then
     LANGUAGE="$(detect_system_language)"
 fi
 export LANGUAGE
-
-if [ "$LANGUAGE" = "tr" ]; then
-    INFO_TAG="${INFO_TAG}"
-    WARN_TAG="${WARN_TAG}"
-    ERROR_TAG="${ERROR_TAG}"
-    SUCCESS_TAG="${SUCCESS_TAG}"
-    NOTE_TAG="${NOTE_TAG}"
-else
-    INFO_TAG="[INFO]"
-    WARN_TAG="[WARNING]"
-    ERROR_TAG="[ERROR]"
-    SUCCESS_TAG="[SUCCESS]"
-    NOTE_TAG="[NOTE]"
-fi
-export INFO_TAG WARN_TAG ERROR_TAG SUCCESS_TAG NOTE_TAG
+refresh_language_tags
 
 get_language_label() {
     case "$1" in
@@ -114,6 +118,8 @@ init_translation_tables() {
     ["ai_option17"]="Install every CLI"
     ["ai_option_return"]="Return to main menu"
     ["ai_prompt_install_more"]="Install another AI CLI? (y/n) [n]:"
+    ["ai_summary_title"]="Login tips for installed CLIs:"
+    ["ai_summary_default_hint"]="Follow the CLI documentation for authentication."
     ["fw_menu_title"]="AI Framework Installation Menu"
     ["fw_menu_hint"]="Use commas for multiple selections (e.g., 1,2)."
     ["fw_option1"]="SuperGemini Framework"
@@ -122,6 +128,11 @@ init_translation_tables() {
     ["fw_option4"]="Install every framework"
     ["fw_option_return"]="Return to main menu"
     ["fw_prompt_install_more"]="Install another AI framework? (y/n) [n]:"
+    ["log_module_local"]="Running %s module from local files..."
+    ["log_module_remote"]="Downloading %s module and running it..."
+    ["log_module_error"]="An error occurred while running %s."
+    ["log_remote_prepare_failed"]="The remote module workspace could not be prepared."
+    ["log_module_download_failed"]="The %s module could not be downloaded."
     )
 
     declare -gA TEXT_TR=(
@@ -177,6 +188,8 @@ init_translation_tables() {
     ["ai_option17"]="Tüm CLI araçlarını kur"
     ["ai_option_return"]="Ana menüye dön"
     ["ai_prompt_install_more"]="Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]:"
+    ["ai_summary_title"]="Kurulan CLI araçları için giriş komutları:"
+    ["ai_summary_default_hint"]="Kimlik doğrulama adımları için ilgili CLI dokümanını izleyin."
     ["fw_menu_title"]="AI Framework Kurulum Menüsü"
     ["fw_menu_hint"]="Birden fazla seçim için virgül kullanın (örn: 1,2)."
     ["fw_option1"]="SuperGemini Framework"
@@ -185,19 +198,37 @@ init_translation_tables() {
     ["fw_option4"]="Tüm AI frameworklerini kur"
     ["fw_option_return"]="Ana menüye dön"
     ["fw_prompt_install_more"]="Başka bir AI framework kurmak ister misiniz? (e/h) [h]:"
+    ["log_module_local"]="%s modülü yerel dosyadan çalıştırılıyor..."
+    ["log_module_remote"]="%s modülü indiriliyor ve çalıştırılıyor..."
+    ["log_module_error"]="%s modülü çalıştırılırken bir hata oluştu."
+    ["log_remote_prepare_failed"]="Uzaktan modül çalışma alanı hazırlanamadı."
+    ["log_module_download_failed"]="%s modülü indirilemedi."
     )
 }
 
 init_translation_tables
 
-translate() {
+_translate_value() {
     local key="$1"
     local default_value="${TEXT_EN[$key]:-$key}"
     if [ "$LANGUAGE" = "tr" ]; then
-        echo "${TEXT_TR[$key]:-$default_value}"
+        printf "%s" "${TEXT_TR[$key]:-$default_value}"
     else
-        echo "$default_value"
+        printf "%s" "$default_value"
     fi
+}
+
+translate() {
+    _translate_value "$1"
+}
+
+translate_fmt() {
+    local key="$1"
+    shift || true
+    local template
+    template="$(_translate_value "$key")"
+    # shellcheck disable=SC2059
+    printf "$template" "$@"
 }
 
 # Modül indirmeleri için temel URL (ortak kullanılır, gerekirse dışarıdan BASE_URL override edilebilir)
@@ -348,8 +379,7 @@ install_pip() {
     
     if ! command -v python3 &> /dev/null; then
         echo -e "${YELLOW}${WARN_TAG}${NC} Python kurulu değil, önce Python kuruluyor..."
-        install_python
-        if [ $? -ne 0 ]; then
+        if ! install_python; then
             echo -e "${RED}${ERROR_TAG}${NC} Python kurulumu başarısız oldu, Pip kurulamıyor."
             return 1
         fi
@@ -370,23 +400,28 @@ install_pip() {
         echo -e "${GREEN}${SUCCESS_TAG}${NC} Pip, get-pip.py ile kuruldu."
     fi
 
+    local pip_status=0
     # Pip'i güncelleme
     if ! $pip_upgrade_cmd 2>&1 | grep -q "externally-managed-environment"; then
         # Başarılı veya başka bir hata, externally-managed-environment değil
-        $pip_upgrade_cmd
+        if ! $pip_upgrade_cmd; then
+            pip_status=$?
+        fi
     else
         # externally-managed-environment hatası, --break-system-packages ile dene
         echo -e "${YELLOW}${INFO_TAG}${NC} Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
-        $pip_upgrade_cmd --break-system-packages
+        if ! $pip_upgrade_cmd --break-system-packages; then
+            pip_status=$?
+        fi
     fi
 
     # Eğer güncelleme başarısız olursa
-    if [ $? -ne 0 ]; then
+    if [ $pip_status -ne 0 ]; then
         echo -e "${RED}${ERROR_TAG}${NC} Pip güncellemesi başarısız!"
         return 1
     fi
     
-    if [ $? -eq 0 ]; then
+    if [ $pip_status -eq 0 ]; then
         echo -e "${GREEN}${SUCCESS_TAG}${NC} Pip sürümü: $(python3 -m pip --version)"
         echo -e "\n${CYAN}${INFO_TAG}${NC} Pip Kullanım İpuçları:"
         echo -e "  ${GREEN}•${NC} Paket kurma: ${GREEN}pip install paket_adi${NC}"

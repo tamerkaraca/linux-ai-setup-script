@@ -9,8 +9,6 @@
 : "${BOLD:=$'\033[1m'}"
 
 HEADING_WIDTH=70
-BANNER_AI_TITLE="AI CLI ARACLARI"
-BANNER_DEV_TITLE="GELISTIRME ARACLARI"
 
 center_text() {
     local text="$1"
@@ -52,21 +50,42 @@ print_heading_panel() {
 print_info_panel() {
     local version="$1"
     local repo="$2"
+    local info_title="Script Bilgileri"
+    local version_label="Versiyon"
+    local developer_label="Geliştirici"
+    local github_label="GitHub Hesabı"
+    local repo_label="Depo"
+
+    if [ "${LANGUAGE:-en}" = "en" ]; then
+        info_title="Script Information"
+        version_label="Version"
+        developer_label="Developer"
+        github_label="GitHub Account"
+        repo_label="Repository"
+    fi
 
     echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
-    panel_line_raw "${BOLD}Script Bilgileri${NC}"
+    panel_line_raw "$(center_text "${BOLD}${info_title}${NC}" "$HEADING_WIDTH")"
     echo -e "${BLUE}╠════════════════════════════════════════════════════════════════════════╣${NC}"
-    panel_line_raw "Versiyon      : ${GREEN}${version}${NC}"
-    panel_line_raw "Geliştirici   : ${GREEN}Tamer KARACA${NC}"
-    panel_line_raw "GitHub Hesabı : ${CYAN}@tamerkaraca${NC}"
-    panel_line_raw "Depo          : ${CYAN}${repo}${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${version_label}" "${GREEN}${version}${NC}" "45" "" "${BLUE}║${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${developer_label}" "${GREEN}Tamer KARACA${NC}" "41" "" "${BLUE}║${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${github_label}" "${CYAN}@tamerkaraca${NC}" "43" "" "${BLUE}║${NC}"
+    printf "%s %-15s: %s%*s%s\n" "${BLUE}║${NC}" "${repo_label}" "${CYAN}${repo}${NC}" "8" "" "${BLUE}║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
 }
 
 render_setup_banner() {
     local version="$1"
     local repo="$2"
-    print_heading_panel "$BANNER_AI_TITLE" "$BANNER_DEV_TITLE"
+    local ai_title="AI CLI ARACLARI"
+    local dev_title="GELISTIRME ARACLARI"
+
+    if [ "${LANGUAGE:-en}" = "en" ]; then
+        ai_title="AI CLI TOOLS"
+        dev_title="DEVELOPMENT TOOLS"
+    fi
+
+    print_heading_panel "$ai_title" "$dev_title"
     print_info_panel "$version" "$repo"
     echo
 }

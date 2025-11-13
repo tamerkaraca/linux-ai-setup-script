@@ -5,22 +5,14 @@
 source "./modules/utils.sh"
 
 CURRENT_LANG="${LANGUAGE:-en}"
-if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="${INFO_TAG}"
-    WARN_TAG="${WARN_TAG}"
-    ERROR_TAG="${ERROR_TAG}"
-else
-    INFO_TAG="[INFO]"
-    WARN_TAG="[WARNING]"
-    ERROR_TAG="[ERROR]"
-fi
+
 
 declare -A MCP_TEXT_EN=(
     [menu_title]="MCP Server Management Menu"
     [option1]="Manage SuperGemini MCP settings"
     [option2]="Manage SuperQwen MCP settings"
     [option3]="Manage SuperClaude MCP settings"
-    [option4]="List all MCP servers"
+    [optionA]="List all MCP servers"
     [option0]="Return to main menu"
     [hint]="Use commas for multiple selections (e.g., 1,2)."
     [prompt]="Your choice"
@@ -40,7 +32,7 @@ declare -A MCP_TEXT_TR=(
     [option1]="SuperGemini MCP sunucularını yönet"
     [option2]="SuperQwen MCP sunucularını yönet"
     [option3]="SuperClaude MCP sunucularını yönet"
-    [option4]="Tüm MCP sunucularını listele"
+    [optionA]="Tüm MCP sunucularını listele"
     [option0]="Ana menüye dön"
     [hint]="Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,2)."
     [prompt]="Seçiminiz"
@@ -160,7 +152,7 @@ manage_mcp_servers_menu() {
         echo -e "  ${GREEN}1${NC} - $(mcp_text option1)"
         echo -e "  ${GREEN}2${NC} - $(mcp_text option2)"
         echo -e "  ${GREEN}3${NC} - $(mcp_text option3)"
-        echo -e "  ${GREEN}4${NC} - $(mcp_text option4)"
+        echo -e "  ${GREEN}A${NC} - $(mcp_text optionA)"
         echo -e "  ${RED}0${NC} - $(mcp_text option0)"
         echo -e "\n${YELLOW}${INFO_TAG}${NC} $(mcp_text hint)"
 
@@ -179,7 +171,7 @@ manage_mcp_servers_menu() {
                 1) run_module "cleanup_magic_mcp" ;;
                 2) run_module "cleanup_qwen_mcp" ;;
                 3) run_module "cleanup_claude_mcp" ;;
-                4)
+                A|a)
                     list_all_mcp_servers
                     continue 2
                     ;;

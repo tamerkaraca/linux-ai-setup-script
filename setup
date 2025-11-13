@@ -1,27 +1,127 @@
 #!/bin/bash
+set -euo pipefail
 
 # Windows CRLF düzeltme kontrolü
 if [ -f "$0" ]; then
     if file "$0" | grep -q "CRLF"; then
-        echo "Windows satır sonu karakterleri tespit edildi, düzeltiliyor..."
+        echo "Windows line endings detected, fixing..."
         
-        if command -v dos2unix &> /dev/null; then
+        if command -v dos2unix &> /dev/null;
+        then
             dos2unix "$0"
-        elif command -v sed &> /dev/null; then
+        elif command -v sed &> /dev/null;
+        then
             sed -i 's/\r$//' "$0"
-        elif command -v tr &> /dev/null; then
+        elif command -v tr &> /dev/null;
+        then
             tr -d '\r' < "$0" > "$0.tmp" && mv "$0.tmp" "$0"
         fi
         
         chmod +x "$0"
         
-        echo "Düzeltme tamamlandı, script yeniden başlatılıyor..."
+        echo "Fix complete, restarting script..."
         exec bash "$0" "$@"
     fi
 fi
 
 SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main}"
 export SCRIPT_BASE_URL
+
+# --- Start Multi-language Setup ---
+declare -A SETUP_TEXT_EN=(
+    ["log_module_local"]="Running module '%s' from local file..."
+    ["log_module_error"]="An error occurred while running the '%s' module."
+    ["log_module_remote"]="Downloading and running module '%s'..."
+    ["log_remote_prepare_failed"]="Failed to prepare remote module directory."
+    ["log_module_download_failed"]="Failed to download module '%s'."
+    ["menu_language_option"]="Language Settings"
+    ["menu_current_language"]="Current Language"
+    ["prompt_choice"]="Your choice"
+    ["info_language_switched"]="Language has been set."
+    ["warning_invalid_choice"]="Invalid choice"
+    ["menu_title"]="Main Menu"
+    ["menu_option1"]="Update System and Install Basic Packages"
+    ["menu_option2"]="Install Python Tools (Python, Pip, Pipx, UV)"
+    ["menu_option3"]="Install Node.js Tools (Node, NPM, NVM)"
+    ["menu_option4"]="Install AI CLI Tools"
+    ["menu_option5"]="Install AI Frameworks"
+    ["menu_option6"]="Configure Git Global Settings"
+    ["menu_option7"]="Configure GLM/Claude Provider"
+    ["menu_option8"]="Install Auxiliary AI Tools (OpenSpec, Agents, etc.)"
+    ["menu_option9"]="Install PHP and Composer"
+    ["menu_option10"]="Install GitHub CLI"
+    ["menu_option11"]="Remove AI Frameworks"
+    ["menu_option12"]="Manage MCP Servers"
+    ["menu_optionA"]="Install Everything (Recommended)"
+    ["menu_option0"]="Exit"
+    ["menu_multi_hint"]="You can make multiple selections with commas (e.g., 1,2,5)."
+    ["warning_no_selection"]="No selection made. Please try again."
+    ["info_returning"]="Exiting..."
+    ["prompt_press_enter"]="Press Enter to continue..."
+    ["prompt_install_php"]="Install PHP and Composer? (y/n)"
+    ["crlf_detected"]="Windows line endings detected, fixing..."
+    ["crlf_restarting"]="Fix complete, restarting script..."
+    ["curl_missing"]="'curl' command not found; cannot load module '%s'."
+    ["module_load_failed"]="Failed to load module from %s."
+)
+
+declare -A SETUP_TEXT_TR=(
+    ["log_module_local"]="'%s' modülü yerel dosyadan çalıştırılıyor..."
+    ["log_module_error"]="'%s' modülü çalıştırılırken bir hata oluştu."
+    ["log_module_remote"]="'%s' modülü indiriliyor ve çalıştırılıyor..."
+    ["log_remote_prepare_failed"]="Uzak modül dizini hazırlanamadı."
+    ["log_module_download_failed"]="'%s' modülü indirilemedi."
+    ["menu_language_option"]="Dil Ayarları"
+    ["menu_current_language"]="Mevcut Dil"
+    ["prompt_choice"]="Seçiminiz"
+    ["info_language_switched"]="Dil ayarlandı."
+    ["warning_invalid_choice"]="Geçersiz seçim"
+    ["menu_title"]="Ana Menü"
+    ["menu_option1"]="Sistemi Güncelle ve Temel Paketleri Kur"
+    ["menu_option2"]="Python Araçlarını Kur (Python, Pip, Pipx, UV)"
+    ["menu_option3"]="Node.js Araçlarını Kur (Node, NPM, NVM)"
+    ["menu_option4"]="AI CLI Araçlarını Kur"
+    ["menu_option5"]="AI Framework'lerini Kur"
+    ["menu_option6"]="Git Global Ayarlarını Yapılandır"
+    ["menu_option7"]="GLM/Claude Sağlayıcısını Yapılandır"
+    ["menu_option8"]="Yardımcı AI Araçlarını Kur (OpenSpec, Ajanlar, vb.)"
+    ["menu_option9"]="PHP ve Composer Kur"
+    ["menu_option10"]="GitHub CLI Kur"
+    ["menu_option11"]="AI Framework'lerini Kaldır"
+    ["menu_option12"]="MCP Sunucularını Yönet"
+    ["menu_optionA"]="Tümünü Kur (Önerilen)"
+    ["menu_option0"]="Çıkış"
+    ["menu_multi_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2,5)."
+    ["warning_no_selection"]="Hiçbir seçim yapılmadı. Lütfen tekrar deneyin."
+    ["info_returning"]="Çıkılıyor..."
+    ["prompt_press_enter"]="Devam etmek için Enter'a basın..."
+    ["prompt_install_php"]="PHP ve Composer kurulsun mu? (e/h)"
+    ["crlf_detected"]="Windows satır sonu karakterleri tespit edildi, düzeltiliyor..."
+    ["crlf_restarting"]="Düzeltme tamamlandı, script yeniden başlatılıyor..."
+    ["curl_missing"]="'curl' komutu bulunamadı; '%s' modülü yüklenemiyor."
+    ["module_load_failed"]="'%s' adresinden modül yüklenemedi."
+)
+
+setup_text() {
+    local key="$1"
+    local default_value="${SETUP_TEXT_EN[$key]:-$key}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${SETUP_TEXT_TR[$key]:-$default_value}"
+    else
+        printf "%s" "$default_value"
+    fi
+}
+export -f setup_text
+
+setup_text_fmt() {
+    local key="$1"
+    shift
+    local fmt
+    fmt=$(setup_text "$key")
+    printf "$fmt" "$@"
+}
+export -f setup_text_fmt
+# --- End Multi-language Setup ---
 
 source_module() {
     local local_path="$1"
@@ -30,14 +130,15 @@ source_module() {
         # shellcheck source=/dev/null
         source "$local_path"
     else
-        if ! command -v curl &> /dev/null; then
-            echo "${ERROR_TAG} 'curl' komutu bulunamadı; $remote_rel_path dosyası yüklenemiyor."
+        if ! command -v curl &> /dev/null;
+        then
+            echo "${ERROR_TAG} $(setup_text_fmt curl_missing "$remote_rel_path")"
             exit 1
         fi
         local remote_url="${SCRIPT_BASE_URL}/${remote_rel_path}"
         # shellcheck disable=SC1090
         source <(curl -fsSL "$remote_url") || {
-            echo "${ERROR_TAG} $remote_url dosyası yüklenemedi."
+            echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
             exit 1
         }
     fi
@@ -78,26 +179,26 @@ run_module() {
     shift
 
     if [ -f "$local_path" ]; then
-        echo -e "${CYAN}${INFO_TAG}${NC} $(translate_fmt log_module_local "$module_name")"
+        echo -e "${CYAN}${INFO_TAG}${NC} Running module '$module_name' from local file..."
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            echo -e "${RED}${ERROR_TAG}${NC} $(translate_fmt log_module_error "$module_name")"
+            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
             return 1
         fi
     else
-        echo -e "${CYAN}${INFO_TAG}${NC} $(translate_fmt log_module_remote "$module_name")"
+        echo -e "${CYAN}${INFO_TAG}${NC} Downloading and running module '$module_name'..."
         prepare_remote_module_dir || {
-            echo -e "${RED}${ERROR_TAG}${NC} $(translate log_remote_prepare_failed)"
+            echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
         }
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.sh"
         if [ ! -f "$remote_file" ]; then
             if ! curl -fsSL "$module_url" -o "$remote_file"; then
-                echo -e "${RED}${ERROR_TAG}${NC} $(translate_fmt log_module_download_failed "$module_name")"
+                echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
                 return 1
             fi
         fi
         if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
-            echo -e "${RED}${ERROR_TAG}${NC} $(translate_fmt log_module_error "$module_name")"
+            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
             return 1
         fi
     fi
@@ -110,19 +211,19 @@ export -f cleanup_remote_modules
 language_menu() {
     clear
     echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${BLUE}║ $(translate menu_language_option) ║${NC}"
+    echo -e "${BLUE}║ $(setup_text menu_language_option) ║${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
     echo -e "  ${GREEN}1${NC} - English"
     echo -e "  ${GREEN}2${NC} - Türkçe"
-    echo -e "\n$(translate menu_current_language): $(get_language_label "$LANGUAGE")"
-    read -r -p "$(translate prompt_choice): " lang_choice </dev/tty
+    echo -e "\n$(setup_text menu_current_language): $(get_language_label "$LANGUAGE")"
+    read -r -p "$(setup_text prompt_choice): " lang_choice </dev/tty
     case "$lang_choice" in
         1)
-            set_language "en" && echo -e "${GREEN}$(translate info_language_switched)${NC}" ;;
+            set_language "en" && echo -e "${GREEN}$(setup_text info_language_switched)${NC}" ;;
         2)
-            set_language "tr" && echo -e "${GREEN}$(translate info_language_switched)${NC}" ;;
+            set_language "tr" && echo -e "${GREEN}$(setup_text info_language_switched)${NC}" ;;
         *)
-            echo -e "${YELLOW}$(translate warning_invalid_choice): ${lang_choice}${NC}" ;;
+            echo -e "${YELLOW}$(setup_text warning_invalid_choice): ${lang_choice}${NC}" ;;
     esac
     sleep 1
 }
@@ -136,28 +237,29 @@ main_menu() {
         render_setup_banner "1.0.1" "https://github.com/tamerkaraca/linux-ai-setup-script"
 
         echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        printf "${BLUE}║%*s║${NC}\n" -43 " $(translate menu_title) "
+        printf "${BLUE}║%*s║${NC}\n" -43 " $(setup_text menu_title) "
         echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
-        echo -e "  ${GREEN}1${NC} - $(translate menu_option1)"
-        echo -e "  ${GREEN}2${NC} - $(translate menu_option2)"
-        echo -e "  ${GREEN}3${NC} - $(translate menu_option3)"
-        echo -e "  ${GREEN}4${NC} - $(translate menu_option4)"
-        echo -e "  ${GREEN}5${NC} - $(translate menu_option5)"
-        echo -e "  ${GREEN}6${NC} - $(translate menu_option6)"
-        echo -e "  ${GREEN}7${NC} - $(translate menu_option7)"
-        echo -e "  ${GREEN}8${NC} - $(translate menu_option8)"
-        echo -e "  ${GREEN}9${NC} - $(translate menu_option9)"
-        echo -e "  ${GREEN}10${NC} - $(translate menu_option10)"
-        echo -e "  ${GREEN}11${NC} - $(translate menu_option11)"
-        echo -e "  ${GREEN}A${NC} - $(translate menu_optionA)"
-        echo -e "  ${GREEN}L${NC} - $(translate menu_language_option) ($(get_language_label "$LANGUAGE"))"
-        echo -e "  ${RED}0${NC} - $(translate menu_option0)"
-        echo -e "\n${YELLOW}$(translate menu_multi_hint)${NC}"
+        echo -e "  ${GREEN}1${NC} - $(setup_text menu_option1)"
+        echo -e "  ${GREEN}2${NC} - $(setup_text menu_option2)"
+        echo -e "  ${GREEN}3${NC} - $(setup_text menu_option3)"
+        echo -e "  ${GREEN}4${NC} - $(setup_text menu_option4)"
+        echo -e "  ${GREEN}5${NC} - $(setup_text menu_option5)"
+        echo -e "  ${GREEN}6${NC} - $(setup_text menu_option6)"
+        echo -e "  ${GREEN}7${NC} - $(setup_text menu_option7)"
+        echo -e "  ${GREEN}8${NC} - $(setup_text menu_option8)"
+        echo -e "  ${GREEN}9${NC} - $(setup_text menu_option9)"
+        echo -e "  ${GREEN}10${NC} - $(setup_text menu_option10)"
+        echo -e "  ${GREEN}11${NC} - $(setup_text menu_option11)"
+        echo -e "  ${GREEN}12${NC} - $(setup_text menu_option12)"
+        echo -e "  ${GREEN}A${NC} - $(setup_text menu_optionA)"
+        echo -e "  ${GREEN}L${NC} - $(setup_text menu_language_option) ($(get_language_label "$LANGUAGE"))"
+        echo -e "  ${RED}0${NC} - $(setup_text menu_option0)"
+        echo -e "\n${YELLOW}$(setup_text menu_multi_hint)${NC}"
         echo
-        read -r -p "${YELLOW}$(translate prompt_choice):${NC} " choice_input </dev/tty
+        read -r -p "${YELLOW}$(setup_text prompt_choice):${NC} " choice_input </dev/tty
 
         if [ -z "$(echo "$choice_input" | tr -d '[:space:]')" ]; then
-            echo -e "${YELLOW}$(translate warning_no_selection)${NC}"
+            echo -e "${YELLOW}$(setup_text warning_no_selection)${NC}"
             sleep 1
             continue
         fi
@@ -172,49 +274,50 @@ main_menu() {
 
             case "$choice" in
                 1) update_system ;;
-                2) run_module "install_python_tools" ;; # Bu modül Python, Pip, Pipx, UV kuracak
+                2) run_module "install_python_tools" ;;
                 3) run_module "install_node_menu" ;;
                 4) run_module "install_ai_cli_tools_menu" ;;
                 5) run_module "install_ai_frameworks_menu" ;;
                 6) run_module "configure_git" ;;
                 7) run_module "configure_glm_claude" ;;
-                8) run_module "install_php_composer" ;;
-                9) run_module "install_github_cli" ;;
-                10) run_module "remove_ai_frameworks_menu" ;;
-                11) run_module "manage_mcp_servers_menu" ;;
+                8) run_module "install_aux_tools_menu" ;;
+                9) run_module "install_php_composer" ;;
+                10) run_module "install_github_cli" ;;
+                11) run_module "remove_ai_frameworks_menu" ;;
+                12) run_module "manage_mcp_servers_menu" ;;
                 L)
                     language_menu
-                    ;;
+                    ;; 
                 A)
                     update_system
                     run_module "install_python_tools"
                     run_module "install_node_menu" "all"
-                    run_module "install_ai_cli_tools_menu" "all" # "all" parametresi ile tüm CLI araçlarını kur
-                    run_module "install_ai_frameworks_menu" "all" # "all" parametresi ile tüm frameworkleri kur
+                    run_module "install_ai_cli_tools_menu" "all"
+                    run_module "install_aux_tools_menu" "all"
+                    run_module "install_ai_frameworks_menu" "all"
                     run_module "configure_git"
                     run_module "configure_glm_claude"
                     run_module "install_github_cli"
-                    echo -e "\n${YELLOW}PHP ve Composer kurulsun mu? (e/h)${NC}"
+                    echo -e "\n${YELLOW}$(setup_text prompt_install_php)${NC}"
                     read -r install_php_choice </dev/tty
                     if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
                         run_module "install_php_composer"
                     fi
-                    ;;
+                    ;; 
                 0)
-                    echo -e "${GREEN}$(translate info_returning)${NC}"
+                    echo -e "${GREEN}$(setup_text info_returning)${NC}"
                     exit_menu=true
                     break
-                    ;;
+                    ;; 
                 *)
-                    echo -e "${RED}$(translate warning_invalid_choice): $raw_choice${NC}"
-                    ;;
+                    echo -e "${RED}$(setup_text warning_invalid_choice): $raw_choice${NC}" ;;
             esac
         done
 
         if [ "$exit_menu" = true ]; then
             exit 0
         fi
-        echo -e "\n${YELLOW}$(translate prompt_press_enter)${NC}"
+        echo -e "\n${YELLOW}$(setup_text prompt_press_enter)${NC}"
         read -r </dev/tty
     done
 }

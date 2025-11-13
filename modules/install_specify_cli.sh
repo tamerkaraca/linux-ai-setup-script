@@ -1,7 +1,7 @@
 #!/bin/bash
 # Windows CRLF düzeltme kontrolü
 if [ -f "$0" ]; then
-    if file "$0" | grep -q "CRLF"; then
+    if command -v file &>/dev/null && file "$0" | grep -q "CRLF"; then
         if command -v dos2unix &> /dev/null; then dos2unix "$0"; elif command -v sed &> /dev/null; then sed -i 's/\r$//' "$0"; fi
         exec bash "$0" "$@"
     fi
@@ -22,7 +22,7 @@ fi
 : "${CYAN:=\033[0;36m}"
 : "${NC:=\033[0m}"
 
-declare -A SPECIFY_TEXT_EN (
+declare -A SPECIFY_TEXT_EN=(
     ["install_title"]="Installing specify-cli (from github/spec-kit)..."
     ["uv_missing"]="'uv' command not found. Please install Python Tools (Main Menu -> 2) first."
     ["installing"]="Installing 'specify-cli' via 'uv tool install' from git..."
@@ -33,7 +33,7 @@ declare -A SPECIFY_TEXT_EN (
     ["usage_note"]="You can now use 'specify' to manage your project specs."
 )
 
-declare -A SPECIFY_TEXT_TR (
+declare -A SPECIFY_TEXT_TR=(
     ["install_title"]="specify-cli (github/spec-kit'ten) kuruluyor..."
     ["uv_missing"]="'uv' komutu bulunamadı. Lütfen önce Python Araçlarını (Ana Menü -> 2) kurun."
     ["installing"]="'specify-cli' git üzerinden 'uv tool install' ile kuruluyor..."
@@ -80,7 +80,9 @@ install_specify_cli() {
 
     local version_info
     version_info=$(specify --version 2>/dev/null || echo "unknown")
-    printf -v version_msg "$(specify_text version_info)" "$version_info"
+    local version_msg_format
+    version_msg_format="$(specify_text version_info)"
+    local version_msg="${version_msg_format//\%s/$version_info}"
     echo -e "${GREEN}${SUCCESS_TAG}${NC} $version_msg"
     
     echo -e "${GREEN}${SUCCESS_TAG}${NC} $(specify_text install_done)"

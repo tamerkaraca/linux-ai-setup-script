@@ -25,7 +25,7 @@ declare -A AUX_MENU_TEXT_EN=(
     ["option2"]="specify-cli (from github/spec-kit)"
     ["option3"]="Contains Studio Agents (for Claude)"
     ["option4"]="Wes Hobson Agents (for Claude)"
-    ["option5"]="Install All Auxiliary Tools"
+    ["optionA"]="Install All Auxiliary Tools"
     ["option_return"]="Return to Main Menu"
     ["menu_hint"]="You can make multiple selections with commas (e.g., 1,3)."
     ["prompt_choice"]="Your choice"
@@ -40,7 +40,7 @@ declare -A AUX_MENU_TEXT_TR=(
     ["option2"]="specify-cli (github/spec-kit'ten)"
     ["option3"]="Contains Studio Agents (Claude için)"
     ["option4"]="Wes Hobson Agents (Claude için)"
-    ["option5"]="Tüm Yardımcı Araçları Kur"
+    ["optionA"]="Tüm Yardımcı Araçları Kur"
     ["option_return"]="Ana Menüye Dön"
     ["menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,3)."
     ["prompt_choice"]="Seçiminiz"
@@ -73,7 +73,7 @@ install_aux_tools_menu() {
             echo -e "  ${GREEN}2${NC} - $(aux_menu_text option2)"
             echo -e "  ${GREEN}3${NC} - $(aux_menu_text option3)"
             echo -e "  ${GREEN}4${NC} - $(aux_menu_text option4)"
-            echo -e "  ${GREEN}5${NC} - $(aux_menu_text option5)"
+            echo -e "  ${GREEN}A${NC} - $(aux_menu_text optionA)"
             echo -e "  ${RED}0${NC} - $(aux_menu_text option_return)"
             echo -e "\n${YELLOW}$(aux_menu_text menu_hint)${NC}"
 
@@ -83,7 +83,7 @@ install_aux_tools_menu() {
                 break
             fi
         else
-            choices="5" # Install all
+            choices="A" # Install all
         fi
 
         local all_installed=false
@@ -96,7 +96,7 @@ install_aux_tools_menu() {
                 2) run_module "install_specify_cli" ;;
                 3) run_module "install_claude_agents" "contains" ;;
                 4) run_module "install_claude_agents" "wshobson" ;;
-                5) 
+                A|a) 
                     run_module "install_openspec_cli"
                     run_module "install_specify_cli"
                     run_module "install_claude_agents" "contains"

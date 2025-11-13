@@ -97,6 +97,7 @@ bash -n setup && shellcheck setup  # optional
 | `10` | Remove AI frameworks (Super* uninstall + cleanup). |
 | `11` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
 | `12` | Install Contains Studio Claude Code agents into `~/.claude/agents`. |
+| `13` | Install OpenSpec CLI + agents bundle (from Fission AI repo). |
 | `A` | Install everything sequentially (skips interactive logins, prints summaries). |
 | `0` | Exit. |
 
@@ -252,6 +253,24 @@ cp -r agents/* ~/.claude/agents/
 
 The repository organizes agents by department (engineering, design, marketing, operations, etc.), so they immediately appear inside Claude Code’s “Agents” sidebar.
 
+#### OpenSpec CLI + Agents Bundle (Option 13)
+
+Option `13` installs the [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) globally via npm and then syncs the Contains Studio agents. The CLI (`openspec`) adds spec-driven workflows to Claude Code, Gemini CLI, Cursor, and other AI assistants without needing API keys.
+
+What the installer does:
+
+1. Ensures Node.js ≥ 18 and `npm` are available, then runs `npm install -g @fission-ai/openspec`.
+2. Verifies `git` and pulls the Contains Studio agents into `~/.claude/agents/` (same as option `12`).
+3. Prints usage reminders:
+
+```bash
+openspec init          # initialize specs in your repo
+openspec plan          # draft proposals
+openspec sync          # update local specs/changes
+```
+
+With the CLI and agents installed, you can draft specs, share proposals, and let Claude Code’s new sub-agents execute the agreed tasks.
+
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
 
@@ -364,6 +383,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `10` | AI Framework kaldırma menüsü. |
 | `11` | MCP sunucularını listeleme/temizleme. |
 | `12` | Contains Studio Claude Code ajan paketini `~/.claude/agents/` içine kurar. |
+| `13` | OpenSpec CLI + ajan paketini (Fission AI) kurar. |
 | `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
 | `0` | Çıkış. |
 
@@ -523,6 +543,24 @@ cp -r agents/* ~/.claude/agents/
 ```
 
 Depo, ajanları departmanlara göre (engineering, design, marketing vb.) sınıflandırdığı için Claude Code’un “Agents” panelinde kategorize bir şekilde listelenir.
+
+#### OpenSpec CLI + Ajan Paketi (Seçenek 13)
+
+`13` numaralı seçenek, [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) aracını npm üzerinden kurar (`npm install -g @fission-ai/openspec`) ve ardından Contains Studio ajan paketini senkronize eder. OpenSpec CLI, spesifikasyon odaklı geliştirme akışını Claude Code, Gemini CLI, Cursor vb. araçlara taşır; API anahtarı gerektirmez.
+
+Kurulum adımları:
+
+1. Node.js ≥ 18 ve `npm` varlığını doğrular, ardından CLI’ı global olarak yükler.
+2. `git` kontrolü yapar ve Contains Studio ajanlarını `~/.claude/agents/` dizinine kopyalar.
+3. Kullanım hatırlatmaları basar:
+
+```bash
+openspec init          # depo içinde OpenSpec klasörünü başlatır
+openspec plan          # değişiklik planı oluşturur
+openspec sync          # spesifikasyonları güncel tutar
+```
+
+Bu sayede hem OpenSpec CLI komutlarını hem de Claude Code ajanlarını aynı menü seçeneği ile hazır hale getirebilirsiniz.
 
 Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut anahtarlarınızı maskeleyerek hızlıca rota değiştirmenize olanak tanır.
 

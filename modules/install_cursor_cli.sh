@@ -86,18 +86,23 @@ install_cursor_cli() {
     reload_shell_configs silent
     hash -r 2>/dev/null || true
 
-    if ! command -v cursor-agent >/dev/null 2>&1; then
+    local cursor_cmd=""
+    if cursor_cmd="$(locate_npm_binary "cursor-agent")"; then
+        :
+    elif cursor_cmd="$(locate_npm_binary "cursor")"; then
+        echo -e "${YELLOW}${WARN_TAG}${NC} 'cursor-agent' yerine '${cursor_cmd##*/}' komutu bulundu; bu komut kullanılacak."
+    else
         echo -e "${RED}${ERROR_TAG}${NC} 'cursor-agent' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
         return 1
     fi
 
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} Cursor Agent CLI sürümü: $(cursor-agent --version 2>/dev/null)"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Cursor Agent CLI sürümü: $("$cursor_cmd" --version 2>/dev/null)"
 
     if [ "$interactive_mode" = true ]; then
         echo -e "\n${YELLOW}${INFO_TAG}${NC} Cursor hesabınızla oturum açmanız gerekiyor."
         echo -e "${CYAN}  cursor-agent login${NC} komutunu çalıştırarak tarayıcı üzerinden giriş yapın."
         if [ -r /dev/tty ] && [ -w /dev/tty ]; then
-            cursor-agent login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${WARN_TAG}${NC} Oturum açma sırasında bir hata oluştu. Gerekirse manuel olarak 'cursor-agent login' çalıştırın."
+            "$cursor_cmd" login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${WARN_TAG}${NC} Oturum açma sırasında bir hata oluştu. Gerekirse manuel olarak 'cursor-agent login' çalıştırın."
         else
             echo -e "${YELLOW}${WARN_TAG}${NC} TTY erişimi yok. Lütfen manuel olarak 'cursor-agent login' çalıştırın."
         fi

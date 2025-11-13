@@ -3,6 +3,8 @@ set -euo pipefail
 
 : "${NPM_LAST_INSTALL_PREFIX:=}"
 : "${CLINE_NPM_PACKAGE:=@cline/cli}"
+: "${CLINE_NPM_PACKAGE_CANDIDATES:=@cline/cli cline-cli cline}"
+: "${CLINE_MANUAL_URL:=https://cline.bot/cline-cli}"
 : "${CLINE_MIN_NODE_VERSION:=18}"
 
 UTILS_PATH="./modules/utils.sh"
@@ -34,6 +36,7 @@ install_cline_cli() {
     local interactive_mode="true"
     local dry_run="false"
     local package_spec="${CLINE_NPM_PACKAGE}"
+    local custom_package="false"
 
     if [[ $# -gt 0 && "$1" != --* ]]; then
         interactive_mode="$1"
@@ -51,6 +54,7 @@ install_cline_cli() {
                     return 1
                 fi
                 package_spec="$2"
+                custom_package="true"
                 shift
                 ;;
             *)
@@ -75,8 +79,28 @@ install_cline_cli() {
     ensure_cline_npm_available || return 1
 
     echo -e "${YELLOW}${INFO_TAG}${NC} Cline CLI npm paketinin kurulumu başlatılıyor..."
-    if ! npm_install_global_with_fallback "$package_spec" "Cline CLI"; then
-        echo -e "${RED}${ERROR_TAG}${NC} Cline CLI kurulumu başarısız oldu. Paket: ${package_spec}"
+
+    local -a package_candidates=()
+    if [ "$custom_package" = "true" ]; then
+        package_candidates=("$package_spec")
+    else
+        read -r -a package_candidates <<< "${CLINE_NPM_PACKAGE_CANDIDATES}"
+    fi
+
+    local installed_package=""
+    for candidate in "${package_candidates[@]}"; do
+        [ -z "$candidate" ] && continue
+        echo -e "${YELLOW}${INFO_TAG}${NC} npm install -g ${candidate}"
+        if npm_install_global_with_fallback "$candidate" "Cline CLI (${candidate})"; then
+            installed_package="$candidate"
+            package_spec="$candidate"
+            break
+        fi
+        echo -e "${YELLOW}${WARN_TAG}${NC} ${candidate} paketi kurulamadı, bir sonraki aday denenecek."
+    done
+
+    if [ -z "$installed_package" ]; then
+        echo -e "${RED}${ERROR_TAG}${NC} Cline CLI paketleri kurulamadı. Lütfen resmi dökümandaki ( ${CLINE_MANUAL_URL} ) adımları izleyin."
         return 1
     fi
 
@@ -86,18 +110,26 @@ install_cline_cli() {
     reload_shell_configs silent
     hash -r 2>/dev/null || true
 
-    if ! command -v cline >/dev/null 2>&1; then
+    local cline_cmd=""
+    for bin_name in cline cline-cli; do
+        if cline_cmd="$(locate_npm_binary "$bin_name")"; then
+            break
+        fi
+    done
+
+    if [ -z "$cline_cmd" ]; then
         echo -e "${RED}${ERROR_TAG}${NC} 'cline' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Manuel kurulum rehberi: ${CLINE_MANUAL_URL}"
         return 1
     fi
 
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} Cline CLI sürümü: $(cline --version 2>/dev/null)"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Cline CLI sürümü: $("$cline_cmd" --version 2>/dev/null)"
 
     if [ "$interactive_mode" = true ]; then
         echo -e "\n${YELLOW}${INFO_TAG}${NC} Cline hesabınızla oturum açmanız gerekiyor."
         echo -e "${CYAN}  cline login${NC} komutunu çalıştırarak tarayıcı üzerinden giriş yapın."
         if [ -r /dev/tty ] && [ -w /dev/tty ]; then
-            cline login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${WARN_TAG}${NC} Oturum açma sırasında bir hata oluştu. Gerekirse manuel olarak 'cline login' çalıştırın."
+            "$cline_cmd" login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${WARN_TAG}${NC} Oturum açma sırasında bir hata oluştu. Gerekirse manuel olarak 'cline login' çalıştırın."
         else
             echo -e "${YELLOW}${WARN_TAG}${NC} TTY erişimi yok. Lütfen manuel olarak 'cline login' çalıştırın."
         fi

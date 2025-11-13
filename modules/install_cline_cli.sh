@@ -2,8 +2,8 @@
 set -euo pipefail
 
 : "${NPM_LAST_INSTALL_PREFIX:=}"
-: "${CLINE_NPM_PACKAGE:=@cline/cli}"
-: "${CLINE_NPM_PACKAGE_CANDIDATES:=@cline/cli cline-cli cline}"
+: "${CLINE_NPM_PACKAGE:=cline}"
+: "${CLINE_NPM_PACKAGE_CANDIDATES:=cline @cline/cli cline-cli}"
 : "${CLINE_MANUAL_URL:=https://cline.bot/cline-cli}"
 : "${CLINE_MIN_NODE_VERSION:=18}"
 
@@ -30,6 +30,49 @@ ensure_cline_npm_available() {
     fi
     echo -e "${RED}${ERROR_TAG}${NC} npm komutu bulunamadı. Lütfen 'Ana Menü -> 3' ile Node.js kurulumu yapın."
     return 1
+}
+
+ensure_cline_build_prereqs() {
+    local missing=()
+    for tool in make g++ python3; do
+        if ! command -v "$tool" >/dev/null 2>&1; then
+            missing+=("$tool")
+        fi
+    done
+
+    if [ ${#missing[@]} -eq 0 ]; then
+        return 0
+    fi
+
+    if [ -z "${PKG_MANAGER:-}" ]; then
+        detect_package_manager
+    fi
+
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        echo -e "${YELLOW}${INFO_TAG}${NC} Cline CLI için gerekli derleme araçları kuruluyor: ${missing[*]}"
+    else
+        echo -e "${YELLOW}${INFO_TAG}${NC} Installing required native build tools for Cline CLI: ${missing[*]}"
+    fi
+    case "$PKG_MANAGER" in
+        apt)
+            sudo apt update -y >/dev/null 2>&1 || true
+            sudo apt install -y build-essential python3 python3-dev >/dev/null 2>&1
+            ;;
+        dnf|dnf5)
+            sudo "${PKG_MANAGER}" install -y @'Development Tools' python3 python3-devel make gcc-c++ >/dev/null 2>&1 || \
+            sudo "${PKG_MANAGER}" group install -y "Development Tools" >/dev/null 2>&1
+            ;;
+        yum)
+            sudo yum groupinstall -y "Development Tools" >/dev/null 2>&1
+            sudo yum install -y python3 python3-devel >/dev/null 2>&1
+            ;;
+        pacman)
+            sudo pacman -Sy --noconfirm base-devel python >/dev/null 2>&1
+            ;;
+        *)
+            echo -e "${YELLOW}${WARN_TAG}${NC} Derleme araçları otomatik kurulamadı. Lütfen 'make', 'g++' ve 'python3' komutlarının mevcut olduğundan emin olun."
+            ;;
+    esac
 }
 
 install_cline_cli() {
@@ -86,6 +129,8 @@ install_cline_cli() {
     else
         read -r -a package_candidates <<< "${CLINE_NPM_PACKAGE_CANDIDATES}"
     fi
+
+    ensure_cline_build_prereqs
 
     local installed_package=""
     for candidate in "${package_candidates[@]}"; do

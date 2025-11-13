@@ -18,9 +18,11 @@ require_git() {
     fi
 }
 
-install_claude_agents() {
+install_agents_repo() {
+    local repo_url="$1"
+    local label="$2"
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Contains Studio Claude Code agent paketi kuruluyor..."
+    echo -e "${YELLOW}[BİLGİ]${NC} ${label} ajan paketi kuruluyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     require_git || return 1
@@ -29,8 +31,8 @@ install_claude_agents() {
     temp_dir="$(mktemp -d)"
     trap 'rm -rf "$temp_dir"' RETURN
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Git deposu indiriliyor: ${CLAUDE_AGENTS_REPO}"
-    if ! git clone --depth=1 "$CLAUDE_AGENTS_REPO" "$temp_dir/agents" >/dev/null 2>&1; then
+    echo -e "${YELLOW}[BİLGİ]${NC} Git deposu indiriliyor: ${repo_url}"
+    if ! git clone --depth=1 "$repo_url" "$temp_dir/agents" >/dev/null 2>&1; then
         echo -e "${RED}[HATA]${NC} Agents deposu klonlanamadı."
         return 1
     fi
@@ -51,15 +53,35 @@ install_claude_agents() {
     local agent_count
     agent_count=$(find "$CLAUDE_AGENTS_DIR" -type f -name "*.md" | wc -l | tr -d ' ')
 
-    echo -e "\n${GREEN}[BAŞARILI]${NC} Contains Studio ajanları yüklendi (${agent_count} dosya)."
+    echo -e "\n${GREEN}[BAŞARILI]${NC} ${label} ajanları yüklendi (${agent_count} dosya)."
     echo -e "${YELLOW}[BİLGİ]${NC} Konum: ${CLAUDE_AGENTS_DIR}"
     echo -e "${YELLOW}[BİLGİ]${NC} Değişikliklerin görünmesi için Claude Code'u yeniden başlatın."
-    echo -e "${CYAN}Referans:${NC} https://github.com/contains-studio/agents"
+    echo -e "${CYAN}Referans:${NC} ${repo_url}"
     trap - RETURN
 }
 
+install_claude_agents() {
+    install_agents_repo "https://github.com/contains-studio/agents.git" "Contains Studio"
+}
+
+install_wshobson_agents() {
+    install_agents_repo "https://github.com/wshobson/agents.git" "Wes Hobson"
+}
+
 main() {
-    install_claude_agents "$@"
+    local target="${1:-contains}"
+    case "$target" in
+        contains|studio)
+            install_claude_agents
+            ;;
+        wshobson|wes)
+            install_wshobson_agents
+            ;;
+        *)
+            echo -e "${YELLOW}[BİLGİ]${NC} Bilinmeyen hedef '${target}'. 'contains' veya 'wshobson' kullanın."
+            return 1
+            ;;
+    esac
 }
 
 main "$@"

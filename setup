@@ -127,7 +127,6 @@ main_menu() {
         echo -e "  ${GREEN}9${NC} - GitHub CLI Kurulumu"
         echo -e "  ${GREEN}10${NC} - AI Frameworklerini Kaldır"
         echo -e "  ${GREEN}11${NC} - MCP Sunucu Yönetimi"
-        echo -e "  ${GREEN}12${NC} - Claude Code Agents Paketi (Contains Studio)"
         echo -e "  ${GREEN}A${NC} - Hepsini Kur (Sırayla)"
         echo -e "  ${RED}0${NC} - Çıkış"
         echo -e "\n${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırabilirsiniz (örn: 1,4,5)."
@@ -160,7 +159,6 @@ main_menu() {
                 9) run_module "install_github_cli" ;;
                 10) run_module "remove_ai_frameworks_menu" ;;
                 11) run_module "manage_mcp_servers_menu" ;;
-                12) run_module "install_claude_agents" ;;
                 A)
                     update_system
                     run_module "install_python_tools"

@@ -108,95 +108,95 @@ install_ai_cli_tools_menu() {
                 if ! run_module "install_claude_code" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             2)
                 label="Gemini CLI"
                 login_hint="gemini auth"
                 if ! run_module "install_gemini_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             3)
                 label="OpenCode CLI"
                 login_hint="opencode login"
                 if ! run_module "install_opencode_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             4)
                 label="Qoder CLI"
                 login_hint="qoder login"
                 if ! run_module "install_qoder_cli" "$interactive" "--tool" "qoder"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             5)
                 label="Qwen CLI"
                 login_hint="qwen login"
                 if ! run_module "install_qwen_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             6)
                 label="OpenAI Codex CLI"
                 login_hint="codex (Sign in with ChatGPT or OPENAI_API_KEY)"
                 if ! run_module "install_codex_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             7)
                 label="Cursor Agent CLI"
                 login_hint="cursor-agent login"
                 if ! run_module "install_cursor_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             8)
                 label="Cline CLI"
                 login_hint="cline login"
                 if ! run_module "install_cline_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             9)
                 label="Aider CLI"
                 login_hint="aider --help (Export API keys)"
                 if ! run_module "install_aider_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             10)
                 label="GitHub Copilot CLI"
                 login_hint="copilot auth login && copilot auth activate"
                 if ! run_module "install_copilot_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             11)
                 label="Kilocode CLI"
                 login_hint="kilocode config"
                 if ! run_module "install_kilocode_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             12)
                 label="Auggie CLI"
                 login_hint="auggie login"
                 if ! run_module "install_auggie_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             13)
                 label="Droid CLI"
                 login_hint="droid (per Factory quickstart)"
                 if ! run_module "install_droid_cli" "$interactive"; then
                     success=1
                 fi
-                ;;;;
+                ;;
             *)
                 echo -e "${RED}$(ai_cli_menu_text warning_invalid_choice): $option${NC}"
                 success=1
-                ;;;
+                ;;
 esac
 
         if [ $success -eq 0 ] && [ -n "$label" ]; then
@@ -270,21 +270,21 @@ esac
             case $choice in
                 1|2|3|4|5|6|7|8|9|10|11|12|13)
                     run_cli_choice "$choice" "$interactive_flag" || true
-                    ;;;;
+                    ;;
                 A)
                     batch_context=true
                     for sub_choice in {1..13}; do
                         run_cli_choice "$sub_choice" "false" || true
                     done
                     all_installed=true
-                    ;;;;
+                    ;;
                 0)
                     exit_menu=true
                     break
-                    ;;;;
+                    ;;
                 *)
                     echo -e "${RED}$(ai_cli_menu_text warning_invalid_choice): $choice${NC}"
-                    ;;;
+                    ;;
 esac
         done
 
@@ -317,14 +317,14 @@ esac
                             if [ "${LANGUAGE:-en}" = "tr" ]; then
                                 summary_hint="codex (ChatGPT ile oturum açın veya OPENAI_API_KEY kullanın)"
                             fi
-                            ;;;;
+                            ;;
                         "cursor-agent login") summary_hint="cursor-agent login" ;; 
                         "cline login") summary_hint="cline login" ;; 
                         "aider --help (Export API keys)")
                             if [ "${LANGUAGE:-en}" = "tr" ]; then
                                 summary_hint="aider --help (API anahtarlarını export edin)"
                             fi
-                            ;;;;
+                            ;;
                         "copilot auth login && copilot auth activate") summary_hint="copilot auth login && copilot auth activate" ;; 
                         "kilocode config") summary_hint="kilocode config" ;; 
                         "auggie login") summary_hint="auggie login" ;; 
@@ -332,7 +332,7 @@ esac
                             if [ "${LANGUAGE:-en}" = "tr" ]; then
                                 summary_hint="droid (Factory quickstart'a göre)"
                             fi
-                            ;;;;
+                            ;;
                     esac
                     echo -e "  ${GREEN}•${NC} ${summary_label}: ${GREEN}${summary_hint}${NC}"
                 else

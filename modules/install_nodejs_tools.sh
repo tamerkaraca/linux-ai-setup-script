@@ -39,8 +39,11 @@ install_nvm() {
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
     echo -e "${YELLOW}[BİLGİ]${NC} Node.js LTS sürümü kuruluyor..."
-    nvm install --lts
-    nvm use --lts >/dev/null
+    (
+        set +u
+        nvm install --lts
+        nvm use --lts >/dev/null
+    )
 
     echo -e "\n${GREEN}[BAŞARILI]${NC} Node.js sürümü: $(node -v)"
     echo -e "${GREEN}[BAŞARILI]${NC} npm sürümü: $(npm -v)"

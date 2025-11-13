@@ -1,5 +1,10 @@
 #!/bin/bash
-set -euo pipefail
+set -eu
+if set -o | grep -Eq '^pipefail[[:space:]]+on$'; then
+    :
+else
+    set -o pipefail 2>/dev/null || true
+fi
 
 UTILS_PATH="./modules/utils.sh"
 if [ ! -f "$UTILS_PATH" ] && [ -n "${BASH_SOURCE[0]:-}" ]; then
@@ -89,7 +94,8 @@ main() {
         [ "${#choices[@]}" -gt 1 ] && batch_context=true
 
         for raw in "${choices[@]}"; do
-            local choice="$(echo "$raw" | tr -d '[:space:]')"
+            local choice
+            choice="$(echo "$raw" | tr -d '[:space:]')"
             [ -z "$choice" ] && continue
             if [ "$choice" = "0" ]; then
                 batch_context=false

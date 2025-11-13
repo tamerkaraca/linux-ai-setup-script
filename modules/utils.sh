@@ -327,40 +327,17 @@ translate() {
 
 translate_fmt() {
     local key="$1"
-    shift || true
     local template
     template="$(_translate_value "$key")"
-    # shellcheck disable=SC2059
-    printf "$template" "$@"
-}
-
-# Lightweight helper for ad-hoc bilingual strings without registering keys.
-translate_pair() {
-    local en_text="$1"
-    local tr_text="${2:-$1}"
-    if [ "${LANGUAGE:-en}" = "tr" ]; then
-        printf "%s" "$tr_text"
+    shift
+    if [ "$#" -gt 0 ]; then
+        # shellcheck disable=SC2059
+        printf "$template" "$@"
     else
-        printf "%s" "$en_text"
+        printf "%s" "$template"
     fi
 }
 
-translate_pair_fmt() {
-    local en_text="$1"
-    local tr_text="${2:-$1}"
-    shift 2 || true
-    local template="$en_text"
-    if [ "${LANGUAGE:-en}" = "tr" ]; then
-        template="$tr_text"
-    fi
-    # shellcheck disable=SC2059
-    printf "$template" "$@"
-}
-
-# Modül indirmeleri için temel URL (ortak kullanılır, gerekirse dışarıdan BASE_URL override edilebilir)
-BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules}"
-
-# Ortak yardımcı fonksiyonlar
 reload_shell_configs() {
     local mode="${1:-verbose}"
     local candidates=()
@@ -398,6 +375,22 @@ reload_shell_configs() {
     fi
 }
 
+declare -gA DNF5_GROUP_CANONICAL=(
+    ["Development Tools"]="development-tools"
+)
+
+dnf5_group_canonical_name() {
+    local group_name="$1"
+    local canonical="${DNF5_GROUP_CANONICAL[$group_name]:-}"
+    if [ -n "$canonical" ]; then
+        printf "%s" "$canonical"
+        return
+    fi
+    canonical="${group_name,,}"
+    canonical="${canonical// /-}"
+    printf "%s" "$canonical"
+}
+
 detect_package_manager() {
     echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_detect_pkg_manager)"
     
@@ -427,22 +420,48 @@ detect_package_manager() {
 
 dnf_group_install() {
     local group_name="$1"
-    local dnf_bin="dnf"
+    echo "DEBUG: dnf_group_install called with group_name=$group_name"
+    local dnf_bin=""
+    local is_dnf5=false
+
     if command -v dnf &>/dev/null; then
         dnf_bin="dnf"
+        if "$dnf_bin" --version 2>/dev/null | grep -qi "dnf5"; then
+            is_dnf5=true
+        fi
     elif command -v dnf5 &>/dev/null; then
         dnf_bin="dnf5"
-    fi
-
-    local group_cmd="groupinstall"
-    if "$dnf_bin" --version 2>/dev/null | head -n1 | grep -qi "dnf5"; then
-        group_cmd="group install"
-    fi
-
-    if [ "$group_cmd" = "groupinstall" ]; then
-        sudo "$dnf_bin" groupinstall "$group_name" -y
+        is_dnf5=true
     else
-        sudo "$dnf_bin" group install -y "$group_name"
+        echo -e "${RED}${ERROR_TAG}${NC} No dnf or dnf5 found for group install."
+        return 1
+    fi
+    echo "DEBUG: dnf_bin=$dnf_bin, is_dnf5=$is_dnf5"
+
+    if [ "$is_dnf5" = true ]; then
+        # dnf5 removed groupinstall subcommand in favor of @group install syntax.
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "$group_name") using ${dnf_bin} install @ syntax."
+        local canonical_group
+        canonical_group="$(dnf5_group_canonical_name "$group_name")"
+        if sudo "$dnf_bin" install -y @"$canonical_group"; then
+            return 0
+        fi
+
+        # Fallback: try to install the plugin that provides groupinstall (dnf5-command(groupinstall))
+        echo -e "${YELLOW}${WARN_TAG}${NC} ${dnf_bin} @group install failed; attempting to install groupinstall provider..."
+        if sudo "$dnf_bin" install -y "dnf5-command(groupinstall)" 2>/dev/null \
+           || sudo "$dnf_bin" install -y "dnf-command(groupinstall)" 2>/dev/null; then
+            if sudo "$dnf_bin" groupinstall "$group_name" -y 2>/dev/null; then
+                return 0
+            fi
+        fi
+
+        echo -e "${YELLOW}${WARN_TAG}${NC} ${dnf_bin} could not install the group via @ or plugin. Please install group packages manually."
+        return 1
+    else
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "$group_name")"
+        sudo "$dnf_bin" groupinstall "$group_name" -y
+        return $?
     fi
 }
 

@@ -234,7 +234,7 @@ main_menu() {
 
     while true; do
         clear
-        render_setup_banner "1.0.1" "https://github.com/tamerkaraca/linux-ai-setup-script"
+        render_setup_banner "$SCRIPT_VERSION" "https://github.com/tamerkaraca/linux-ai-setup-script"
 
         echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
         printf "${BLUE}║%*s║${NC}\n" -43 " $(setup_text menu_title) "

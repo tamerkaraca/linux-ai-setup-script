@@ -29,6 +29,77 @@ ensure_pipx_available() {
     install_pipx
 }
 
+ensure_aider_build_prereqs() {
+    if [ -z "${PKG_MANAGER:-}" ]; then
+        detect_package_manager
+    fi
+
+    local packages=()
+    case "${PKG_MANAGER}" in
+        apt)
+            packages=(build-essential python3-dev python3-venv)
+            ;;
+        dnf|dnf5)
+            packages=(gcc gcc-c++ make python3-devel)
+            ;;
+        yum)
+            packages=(gcc gcc-c++ make python3-devel)
+            ;;
+        pacman)
+            packages=(base-devel python)
+            ;;
+        *)
+            return 0
+            ;;
+    esac
+
+    local missing=()
+    for pkg in "${packages[@]}"; do
+        case "${PKG_MANAGER}" in
+            apt)
+                dpkg -s "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
+                ;;
+            dnf|dnf5|yum)
+                rpm -q "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
+                ;;
+            pacman)
+                pacman -Qi "$pkg" >/dev/null 2>&1 || missing+=("$pkg")
+                ;;
+        esac
+    done
+
+    if [ ${#missing[@]} -eq 0 ]; then
+        return 0
+    fi
+
+    local install_cmd="${INSTALL_CMD:-}"
+    if [ -z "$install_cmd" ]; then
+        case "${PKG_MANAGER}" in
+            apt)
+                install_cmd="sudo apt install -y"
+                ;;
+            dnf|dnf5)
+                install_cmd="sudo ${PKG_MANAGER} install -y"
+                ;;
+            yum)
+                install_cmd="sudo yum install -y"
+                ;;
+            pacman)
+                install_cmd="sudo pacman -S --noconfirm"
+                ;;
+        esac
+    fi
+
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        echo -e "${YELLOW}${INFO_TAG}${NC} Aider için gerekli derleme paketleri yükleniyor: ${missing[*]}"
+    else
+        echo -e "${YELLOW}${INFO_TAG}${NC} Installing required build packages for Aider: ${missing[*]}"
+    fi
+    if [ -n "$install_cmd" ]; then
+        $install_cmd "${missing[@]}" >/dev/null 2>&1 || $install_cmd "${missing[@]}"
+    fi
+}
+
 install_aider_cli() {
     local interactive_mode="true"
     local dry_run="false"
@@ -65,6 +136,8 @@ install_aider_cli() {
         echo -e "${RED}${ERROR_TAG}${NC} Pipx kurulamadı; Aider CLI yüklenemiyor."
         return 1
     }
+
+    ensure_aider_build_prereqs || true
 
     echo -e "${YELLOW}${INFO_TAG}${NC} pipx ile 'aider-chat' paketi kuruluyor..."
     if ! pipx install aider-chat >/dev/null 2>&1 && ! pipx install aider-chat; then

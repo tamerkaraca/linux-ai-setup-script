@@ -165,6 +165,8 @@ init_translation_tables() {
     ["log_system_install_basics"]="Installing core tools, compression utilities, and build helpers..."
     ["log_install_packages"]="Installing: %s"
     ["log_install_devtools"]="Installing development tools: %s"
+    ["log_install_user_prefix"]="Installing %s into user prefix: %s"
+    ["log_install_user_fail"]="%s could not be installed into user prefix."
     ["log_system_update_done"]="System update and base package installation completed!"
     ["log_python_install_title"]="Starting Python installation..."
     ["log_python_already"]="Python already installed: %s"
@@ -273,6 +275,8 @@ init_translation_tables() {
     ["log_system_install_basics"]="Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
     ["log_install_packages"]="Kuruluyor: %s"
     ["log_install_devtools"]="Geliştirme araçları kuruluyor: %s"
+    ["log_install_user_prefix"]="%s kullanıcı prefixine kuruluyor: %s"
+    ["log_install_user_fail"]="%s kullanıcı prefixine kurulamadı."
     ["log_system_update_done"]="Sistem güncelleme ve temel paket kurulumu tamamlandı!"
     ["log_python_install_title"]="Python kurulumu başlatılıyor..."
     ["log_python_already"]="Python zaten kurulu: %s"
@@ -722,14 +726,18 @@ npm_install_global_with_fallback() {
     fi
 
     fallback_prefix=$(npm_prepare_user_prefix)
-    echo -e "${YELLOW}${INFO_TAG}${NC} ${display_name} kullanıcı prefixine kuruluyor: ${fallback_prefix}"
+    local install_user_msg
+    install_user_msg="$(translate_fmt log_install_user_prefix "$display_name" "$fallback_prefix")"
+    echo -e "${YELLOW}${INFO_TAG}${NC} ${install_user_msg}"
     if npm install -g --prefix "$fallback_prefix" "$package"; then
         NPM_LAST_INSTALL_PREFIX="$fallback_prefix"
         ensure_path_contains_dir "${fallback_prefix}/bin" "npm user prefix"
         return 0
     fi
 
-    echo -e "${RED}${ERROR_TAG}${NC} ${display_name} kullanıcı prefixine kurulamadı."
+    local install_fail_msg
+    install_fail_msg="$(translate_fmt log_install_user_fail "$display_name")"
+    echo -e "${RED}${ERROR_TAG}${NC} ${install_fail_msg}"
     return 1
 }
 

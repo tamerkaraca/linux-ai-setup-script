@@ -12,6 +12,29 @@ export RED GREEN YELLOW BLUE CYAN NC
 # Dil ve yerelleştirme ayarları
 SUPPORTED_LANGUAGES=(en tr)
 
+nounset_is_enabled() {
+    if set -o | grep -Eq '^nounset[[:space:]]+on$'; then
+        return 0
+    fi
+    return 1
+}
+
+source_shell_config() {
+    local file="$1"
+    [ -f "$file" ] || return 1
+    local nounset_restore=0
+    if nounset_is_enabled; then
+        nounset_restore=1
+        set +u
+    fi
+    # shellcheck source=/dev/null
+    . "$file"
+    if [ $nounset_restore -eq 1 ]; then
+        set -u
+    fi
+    return 0
+}
+
 detect_system_language() {
     local locale_value="${LC_ALL:-${LANG:-}}"
     if [[ "$locale_value" =~ ^tr ]]; then
@@ -331,9 +354,9 @@ reload_shell_configs() {
 
     local sourced_file=""
     for rc_file in "${candidates[@]}"; do
-        if [ -f "$rc_file" ]; then
-            # shellcheck source=/dev/null
-            . "$rc_file" && sourced_file="$rc_file" && break
+        if source_shell_config "$rc_file"; then
+            sourced_file="$rc_file"
+            break
         fi
     done
 

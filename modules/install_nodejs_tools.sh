@@ -230,8 +230,7 @@ main() {
     for rc_file in "${rc_files[@]}"; do
         if [ -f "$rc_file" ]; then
             echo -e "${YELLOW}${INFO_TAG}${NC} $(node_text_fmt env_apply "$rc_file")"
-            # shellcheck source=/dev/null
-            . "$rc_file"
+            source_shell_config "$rc_file" || true
         fi
     done
 

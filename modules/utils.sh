@@ -133,6 +133,44 @@ init_translation_tables() {
     ["log_module_error"]="An error occurred while running %s."
     ["log_remote_prepare_failed"]="The remote module workspace could not be prepared."
     ["log_module_download_failed"]="The %s module could not be downloaded."
+    ["log_shell_reload_success"]="Shell configurations auto-loaded (%s)."
+    ["log_shell_reload_missing"]="Shell configuration files were not found; restart your terminal if needed."
+    ["log_detect_pkg_manager"]="Detecting operating system and package manager..."
+    ["log_pkg_manager_missing"]="No supported package manager was found!"
+    ["log_pkg_manager_detected"]="Package manager: %s"
+    ["log_system_update_start"]="Updating the system..."
+    ["log_system_install_basics"]="Installing core tools, compression utilities, and build helpers..."
+    ["log_install_packages"]="Installing: %s"
+    ["log_install_devtools"]="Installing development tools: %s"
+    ["log_system_update_done"]="System update and base package installation completed!"
+    ["log_python_install_title"]="Starting Python installation..."
+    ["log_python_already"]="Python already installed: %s"
+    ["log_python_installing"]="Installing Python 3..."
+    ["log_python_success"]="Python installation completed: %s"
+    ["log_python_failed"]="Python installation failed!"
+    ["log_pip_title"]="Starting Pip installation/update..."
+    ["log_python_missing_for_pip"]="Python is missing, installing it first..."
+    ["log_pip_upgrading"]="Upgrading pip..."
+    ["log_pip_missing"]="Pip not found. Trying get-pip.py..."
+    ["log_pip_getpip_failed"]="Pip installation via get-pip.py failed!"
+    ["log_pip_getpip_success"]="Pip installed via get-pip.py."
+    ["log_pip_external_retry"]="Externally-managed-environment detected, retrying with --break-system-packages..."
+    ["log_pip_upgrade_failed"]="Pip upgrade failed!"
+    ["log_pip_version"]="Pip version: %s"
+    ["log_pip_tips_header"]="Pip usage tips:"
+    ["log_pip_tip_install"]="  • Install package: pip install <name>"
+    ["log_pip_tip_venv"]="  • Use virtual environments (recommended): python3 -m venv myenv && source myenv/bin/activate"
+    ["log_pip_tip_system"]="  • System-wide install: pip install --break-system-packages <name>"
+    ["log_pip_tip_note"]="  • Note: modern systems recommend using virtual environments (PEP 668)."
+    ["log_pipx_title"]="Starting Pipx installation..."
+    ["log_python_missing_for_pipx"]="Python is missing, installing it first..."
+    ["log_pipx_pkg_install"]="Installing pipx via package manager..."
+    ["log_pipx_pkg_missing"]="Package not found, falling back to manual installation..."
+    ["log_pipx_external_retry"]="Externally-managed-environment detected, trying alternate method..."
+    ["log_break_system_packages_retry"]="Retrying install with --break-system-packages..."
+    ["log_pipx_success"]="Pipx installation completed: %s"
+    ["log_pipx_manual_hint"]="Manual installation: sudo apt install pipx"
+    ["log_pipx_failed"]="Pipx installation failed!"
     )
 
     declare -gA TEXT_TR=(
@@ -203,6 +241,44 @@ init_translation_tables() {
     ["log_module_error"]="%s modülü çalıştırılırken bir hata oluştu."
     ["log_remote_prepare_failed"]="Uzaktan modül çalışma alanı hazırlanamadı."
     ["log_module_download_failed"]="%s modülü indirilemedi."
+    ["log_shell_reload_success"]="Shell yapılandırmaları otomatik olarak yüklendi (%s)."
+    ["log_shell_reload_missing"]="Shell yapılandırma dosyaları bulunamadı; gerekirse terminalinizi yeniden başlatın."
+    ["log_detect_pkg_manager"]="İşletim sistemi ve paket yöneticisi tespit ediliyor..."
+    ["log_pkg_manager_missing"]="Desteklenen bir paket yöneticisi bulunamadı!"
+    ["log_pkg_manager_detected"]="Paket yöneticisi: %s"
+    ["log_system_update_start"]="Sistem güncelleniyor..."
+    ["log_system_install_basics"]="Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
+    ["log_install_packages"]="Kuruluyor: %s"
+    ["log_install_devtools"]="Geliştirme araçları kuruluyor: %s"
+    ["log_system_update_done"]="Sistem güncelleme ve temel paket kurulumu tamamlandı!"
+    ["log_python_install_title"]="Python kurulumu başlatılıyor..."
+    ["log_python_already"]="Python zaten kurulu: %s"
+    ["log_python_installing"]="Python3 kuruluyor..."
+    ["log_python_success"]="Python kurulumu tamamlandı: %s"
+    ["log_python_failed"]="Python kurulumu başarısız!"
+    ["log_pip_title"]="Pip kurulumu/güncellemesi başlatılıyor..."
+    ["log_python_missing_for_pip"]="Python kurulu değil, önce Python kuruluyor..."
+    ["log_pip_upgrading"]="Pip güncelleniyor..."
+    ["log_pip_missing"]="Pip bulunamadı. get-pip.py ile kurulum deneniyor..."
+    ["log_pip_getpip_failed"]="get-pip.py ile Pip kurulumu başarısız!"
+    ["log_pip_getpip_success"]="Pip, get-pip.py ile kuruldu."
+    ["log_pip_external_retry"]="Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
+    ["log_pip_upgrade_failed"]="Pip güncellemesi başarısız!"
+    ["log_pip_version"]="Pip sürümü: %s"
+    ["log_pip_tips_header"]="Pip kullanım ipuçları:"
+    ["log_pip_tip_install"]="  • Paket kurma: pip install paket_adi"
+    ["log_pip_tip_venv"]="  • Sanal ortam (önerilir): python3 -m venv myenv && source myenv/bin/activate"
+    ["log_pip_tip_system"]="  • Sistem geneli kurulum: pip install --break-system-packages paket_adi"
+    ["log_pip_tip_note"]="  • Not: Modern sistemlerde sanal ortam (PEP 668) önerilir."
+    ["log_pipx_title"]="Pipx kurulumu başlatılıyor..."
+    ["log_python_missing_for_pipx"]="Python kurulu değil, önce Python kuruluyor..."
+    ["log_pipx_pkg_install"]="Sistem paket yöneticisi ile pipx kuruluyor..."
+    ["log_pipx_pkg_missing"]="Sistem paketi bulunamadı, manuel kurulum yapılıyor..."
+    ["log_pipx_external_retry"]="Externally-managed-environment hatası, alternatif yöntem deneniyor..."
+    ["log_break_system_packages_retry"]="--break-system-packages ile kurulum deneniyor..."
+    ["log_pipx_success"]="Pipx kurulumu tamamlandı: %s"
+    ["log_pipx_manual_hint"]="Manuel kurulum için: sudo apt install pipx"
+    ["log_pipx_failed"]="Pipx kurulumu başarısız!"
     )
 }
 
@@ -266,14 +342,14 @@ reload_shell_configs() {
     fi
 
     if [ -n "$sourced_file" ]; then
-        echo -e "${GREEN}${INFO_TAG}${NC} Shell yapılandırmaları otomatik olarak yüklendi (${sourced_file})."
+        echo -e "${GREEN}${INFO_TAG}${NC} $(translate_fmt log_shell_reload_success "$sourced_file")"
     else
-        echo -e "${YELLOW}${WARN_TAG}${NC} Shell yapılandırma dosyaları bulunamadı; gerekirse terminalinizi yeniden başlatın."
+        echo -e "${YELLOW}${WARN_TAG}${NC} $(translate log_shell_reload_missing)"
     fi
 }
 
 detect_package_manager() {
-    echo -e "${YELLOW}${INFO_TAG}${NC} İşletim sistemi ve paket yöneticisi tespit ediliyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_detect_pkg_manager)"
     
     if command -v dnf &> /dev/null; then
         PKG_MANAGER="dnf"
@@ -292,44 +368,45 @@ detect_package_manager() {
         UPDATE_CMD="sudo pacman -Syu --noconfirm"
         INSTALL_CMD="sudo pacman -S --noconfirm"
     else
-        echo -e "${RED}${ERROR_TAG}${NC} Desteklenen bir paket yöneticisi bulunamadı!"
+        echo -e "${RED}${ERROR_TAG}${NC} $(translate log_pkg_manager_missing)"
         exit 1
     fi
     
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} Paket yöneticisi: $PKG_MANAGER"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate_fmt log_pkg_manager_detected "$PKG_MANAGER")"
 }
 
 update_system() {
-    echo -e "\n${YELLOW}${INFO_TAG}${NC} Sistem güncelleniyor..."
+    echo -e "\n${YELLOW}${INFO_TAG}${NC} $(translate log_system_update_start)"
     eval "$UPDATE_CMD"
     
-    echo -e "${YELLOW}${INFO_TAG}${NC} Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_system_install_basics)"
     
     if [ "$PKG_MANAGER" = "apt" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip-full"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip-full")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip-full
-        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (build-essential) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "build-essential")"
         eval "$INSTALL_CMD" build-essential
         
     elif [ "$PKG_MANAGER" = "dnf" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
-        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (Development Tools) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
         sudo dnf groupinstall "Development Tools" -y
         
     elif [ "$PKG_MANAGER" = "pacman" ]; then
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
-        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (base-devel) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "base-devel")"
         sudo pacman -S base-devel --noconfirm
         
     elif [ "$PKG_MANAGER" = "yum" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Kuruluyor: curl, wget, git, jq, zip, unzip, p7zip"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
-        echo -e "${YELLOW}${INFO_TAG}${NC} Geliştirme araçları (Development Tools) kuruluyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
         sudo yum groupinstall "Development Tools" -y
     fi
     
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} Sistem güncelleme ve temel paket kurulumu tamamlandı!"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate log_system_update_done)"
 }
 
 mask_secret() {
@@ -352,21 +429,21 @@ mask_secret() {
 # Python kurulumu
 install_python() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}${INFO_TAG}${NC} Python kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_python_install_title)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if command -v python3 &> /dev/null; then
-        echo -e "${GREEN}${SUCCESS_TAG}${NC} Python zaten kurulu: $(python3 --version)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate_fmt log_python_already "$(python3 --version)")"
         return 0
     fi
     
-    echo -e "${YELLOW}${INFO_TAG}${NC} Python3 kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_python_installing)"
     eval "$INSTALL_CMD" python3 python3-pip python3-venv
     
     if command -v python3 &> /dev/null; then
-        echo -e "${GREEN}${SUCCESS_TAG}${NC} Python kurulumu tamamlandı: $(python3 --version)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate_fmt log_python_success "$(python3 --version)")"
     else
-        echo -e "${RED}${ERROR_TAG}${NC} Python kurulumu başarısız!"
+        echo -e "${RED}${ERROR_TAG}${NC} $(translate log_python_failed)"
         return 1
     fi
 }
@@ -374,30 +451,30 @@ install_python() {
 # Pip kurulumu/güncelleme
 install_pip() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}${INFO_TAG}${NC} Pip kurulumu/güncelleme başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pip_title)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if ! command -v python3 &> /dev/null; then
-        echo -e "${YELLOW}${WARN_TAG}${NC} Python kurulu değil, önce Python kuruluyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} $(translate log_python_missing_for_pip)"
         if ! install_python; then
-            echo -e "${RED}${ERROR_TAG}${NC} Python kurulumu başarısız oldu, Pip kurulamıyor."
+            echo -e "${RED}${ERROR_TAG}${NC} $(translate log_python_failed)"
             return 1
         fi
     fi
     
-    echo -e "${YELLOW}${INFO_TAG}${NC} Pip güncelleniyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pip_upgrading)"
     
     local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
     local pip_install_fallback_cmd="curl -sS https://bootstrap.pypa.io/get-pip.py | python3"
 
     # Pip'in python3 modülü olarak mevcut olup olmadığını kontrol et
     if ! python3 -m pip --version &> /dev/null; then
-        echo -e "${YELLOW}${WARN_TAG}${NC} Pip bulunamadı. get-pip.py ile kurulum deneniyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} $(translate log_pip_missing)"
         if ! $pip_install_fallback_cmd; then
-            echo -e "${RED}${ERROR_TAG}${NC} get-pip.py ile Pip kurulumu başarısız!"
+            echo -e "${RED}${ERROR_TAG}${NC} $(translate log_pip_getpip_failed)"
             return 1
         fi
-        echo -e "${GREEN}${SUCCESS_TAG}${NC} Pip, get-pip.py ile kuruldu."
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate log_pip_getpip_success)"
     fi
 
     local pip_status=0
@@ -409,7 +486,7 @@ install_pip() {
         fi
     else
         # externally-managed-environment hatası, --break-system-packages ile dene
-        echo -e "${YELLOW}${INFO_TAG}${NC} Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pip_external_retry)"
         if ! $pip_upgrade_cmd --break-system-packages; then
             pip_status=$?
         fi
@@ -417,19 +494,19 @@ install_pip() {
 
     # Eğer güncelleme başarısız olursa
     if [ $pip_status -ne 0 ]; then
-        echo -e "${RED}${ERROR_TAG}${NC} Pip güncellemesi başarısız!"
+        echo -e "${RED}${ERROR_TAG}${NC} $(translate log_pip_upgrade_failed)"
         return 1
     fi
     
     if [ $pip_status -eq 0 ]; then
-        echo -e "${GREEN}${SUCCESS_TAG}${NC} Pip sürümü: $(python3 -m pip --version)"
-        echo -e "\n${CYAN}${INFO_TAG}${NC} Pip Kullanım İpuçları:"
-        echo -e "  ${GREEN}•${NC} Paket kurma: ${GREEN}pip install paket_adi${NC}"
-        echo -e "  ${GREEN}•${NC} Sanal ortamda kurma (önerilen): ${GREEN}python3 -m venv myenv && source myenv/bin/activate${NC}"
-        echo -e "  ${GREEN}•${NC} Sistem geneli kurma: ${GREEN}pip install --break-system-packages paket_adi${NC}"
-        echo -e "  ${YELLOW}•${NC} Not: Modern sistemlerde sanal ortam kullanımı önerilir (PEP 668)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate_fmt log_pip_version "$(python3 -m pip --version)")"
+        echo -e "\n${CYAN}${INFO_TAG}${NC} $(translate log_pip_tips_header)"
+        echo -e "${GREEN}$(translate log_pip_tip_install)${NC}"
+        echo -e "${GREEN}$(translate log_pip_tip_venv)${NC}"
+        echo -e "${GREEN}$(translate log_pip_tip_system)${NC}"
+        echo -e "${YELLOW}$(translate log_pip_tip_note)${NC}"
     else
-        echo -e "${RED}${ERROR_TAG}${NC} Pip güncellemesi başarısız!"
+        echo -e "${RED}${ERROR_TAG}${NC} $(translate log_pip_upgrade_failed)"
         return 1
     fi
 }
@@ -437,15 +514,15 @@ install_pip() {
 # Pipx kurulumu
 install_pipx() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}${INFO_TAG}${NC} Pipx kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_title)"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if ! command -v python3 &> /dev/null; then
-        echo -e "${YELLOW}${WARN_TAG}${NC} Python kurulu değil, önce Python kuruluyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} $(translate log_python_missing_for_pipx)"
         install_python
     fi
     
-    echo -e "${YELLOW}${INFO_TAG}${NC} Sistem paket yöneticisi ile pipx kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_pkg_install)"
     
     if [ "$PKG_MANAGER" = "apt" ]; then
         eval "$INSTALL_CMD" pipx
@@ -458,10 +535,10 @@ install_pipx() {
     fi
     
     if ! command -v pipx &> /dev/null; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Sistem paketi bulunamadı, manuel kurulum yapılıyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_pkg_missing)"
         
         if python3 -m pip install --user pipx 2>&1 | grep -q "externally-managed-environment"; then
-            echo -e "${YELLOW}${INFO_TAG}${NC} Externally-managed-environment hatası, alternatif yöntem deneniyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_external_retry)"
             
             TEMP_VENV="/tmp/pipx_install_venv"
             rm -rf "$TEMP_VENV"
@@ -478,7 +555,7 @@ install_pipx() {
             rm -rf "$TEMP_VENV"
             
             if ! command -v pipx &> /dev/null; then
-                echo -e "${YELLOW}${WARN_TAG}${NC} --break-system-packages ile kurulum deneniyor..."
+                echo -e "${YELLOW}${WARN_TAG}${NC} $(translate log_break_system_packages_retry)"
                 python3 -m pip install --user --break-system-packages pipx
             fi
         else
@@ -505,10 +582,10 @@ install_pipx() {
     reload_shell_configs
     
     if command -v pipx &> /dev/null; then
-        echo -e "${GREEN}${SUCCESS_TAG}${NC} Pipx kurulumu tamamlandı: $(pipx --version 2>/dev/null || echo 'kuruldu')"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate_fmt log_pipx_success "$(pipx --version 2>/dev/null || echo 'installed')")"
     else
-        echo -e "${RED}${ERROR_TAG}${NC} Pipx kurulumu başarısız!"
-        echo -e "${YELLOW}${INFO_TAG}${NC} Manuel kurulum için: sudo apt install pipx"
+        echo -e "${RED}${ERROR_TAG}${NC} $(translate log_pipx_failed)"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_manual_hint)"
         return 1
     fi
 }

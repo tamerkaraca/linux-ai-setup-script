@@ -35,6 +35,9 @@ declare -A DROID_TEXT_EN=(
     [tip_exec]="• Headless/CI mode: droid exec \"<command>\""
     [tip_docs]="• Docs: https://docs.factory.ai/cli/getting-started/quickstart"
     [path_warn]="Droid CLI executable not found on PATH. Please reopen your terminal or follow the official docs."
+    [xdg_check]="Checking for xdg-utils (required on Linux)..."
+    [xdg_install]="Installing xdg-utils automatically..."
+    [xdg_manual]="xdg-utils is missing. Please install it manually (e.g., sudo apt-get install xdg-utils) and rerun this option."
 )
 
 declare -A DROID_TEXT_TR=(
@@ -48,6 +51,9 @@ declare -A DROID_TEXT_TR=(
     [tip_exec]="• Headless/CI modu: droid exec \"<komut>\""
     [tip_docs]="• Doküman: https://docs.factory.ai/cli/getting-started/quickstart"
     [path_warn]="Droid CLI komutu PATH içinde bulunamadı. Terminalinizi kapatıp açın veya resmi dokümandaki adımları izleyin."
+    [xdg_check]="Linux ortamında xdg-utils paketi kontrol ediliyor..."
+    [xdg_install]="xdg-utils paketi otomatik kuruluyor..."
+    [xdg_manual]="xdg-utils bulunamadı. Lütfen manuel olarak kurun (örn: sudo apt-get install xdg-utils) ve menüyü tekrar çalıştırın."
 )
 
 droid_text() {
@@ -60,6 +66,30 @@ droid_text() {
     fi
 }
 
+droid_ensure_xdg_utils() {
+    if command -v xdg-open >/dev/null 2>&1; then
+        return 0
+    fi
+
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(droid_text xdg_check)"
+
+    case "${PKG_MANAGER:-}" in
+        apt|dnf|yum|pacman)
+            echo -e "${YELLOW}${INFO_TAG}${NC} $(droid_text xdg_install)"
+            if ! eval "$INSTALL_CMD xdg-utils"; then
+                echo -e "${YELLOW}${WARN_TAG}${NC} $(droid_text xdg_manual)"
+                return 1
+            fi
+            ;;
+        *)
+            echo -e "${YELLOW}${WARN_TAG}${NC} $(droid_text xdg_manual)"
+            return 1
+            ;;
+    esac
+
+    return 0
+}
+
 install_droid_cli() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}${INFO_TAG}${NC} $(droid_text title)"
@@ -69,6 +99,8 @@ install_droid_cli() {
         echo -e "${GREEN}${SUCCESS_TAG}${NC} $(droid_text already_installed): $(droid --version 2>/dev/null || echo \"unknown version\")"
         return 0
     fi
+
+    droid_ensure_xdg_utils || true
 
     echo -e "\n${YELLOW}${INFO_TAG}${NC} $(droid_text curl_note)"
     echo -e "  ${GREEN}curl -fsSL ${INSTALL_SCRIPT_URL} | sh${NC}\n"

@@ -10,8 +10,7 @@ if [ -f "$0" ]; then
             dos2unix "$0"
         elif command -v sed &> /dev/null; then
             sed -i 's/\r$//' "$0"
-        elif command -v tr &> /dev/null; then
-            tr -d '\r' < "$0" > "$0.tmp" && mv "$0.tmp" "$0"
+        elif command -v tr &> /dev/null;            tr -d '\r' < "$0" > "$0.tmp" && mv "$0.tmp" "$0"
         fi
         
         chmod +x "$0"

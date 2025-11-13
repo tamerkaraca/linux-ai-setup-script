@@ -8,17 +8,7 @@ fi
 [ -f "$UTILS_PATH" ] && source "$UTILS_PATH"
 
 CURRENT_LANG="${LANGUAGE:-en}"
-if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="${INFO_TAG}"
-    WARN_TAG="${WARN_TAG}"
-    ERROR_TAG="${ERROR_TAG}"
-    SUCCESS_TAG="${SUCCESS_TAG}"
-else
-    INFO_TAG="[INFO]"
-    WARN_TAG="[WARNING]"
-    ERROR_TAG="[ERROR]"
-    SUCCESS_TAG="[SUCCESS]"
-fi
+
 
 declare -A GH_TEXT_EN=(
     [title]="Starting GitHub CLI (gh) installation (see https://github.com/cli/cli)"

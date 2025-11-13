@@ -21,6 +21,26 @@ ensure_npm_available_local() {
     return 1
 }
 
+ensure_modern_npm_local() {
+    local min_version="9.0.0"
+    local current_version
+    current_version=$(npm -v 2>/dev/null | tr -d '[:space:]')
+    if [ -z "$current_version" ]; then
+        echo -e "${RED}[HATA]${NC} npm sürümü okunamadı."
+        return 1
+    fi
+    if [ "$(printf '%s\n%s\n' "$current_version" "$min_version" | sort -V | head -n1)" = "$min_version" ]; then
+        return 0
+    fi
+    echo -e "${YELLOW}[BİLGİ]${NC} npm sürümü güncelleniyor (mevcut: ${current_version}, hedef: ${min_version}+)."
+    if npm install -g npm@latest >/dev/null 2>&1; then
+        echo -e "${GREEN}[BİLGİ]${NC} npm güncellendi: $(npm -v 2>/dev/null)"
+        return 0
+    fi
+    echo -e "${RED}[HATA]${NC} npm güncellemesi başarısız oldu."
+    return 1
+}
+
 install_openspec_cli() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}[BİLGİ]${NC} OpenSpec CLI kurulumu başlatılıyor..."
@@ -28,7 +48,7 @@ install_openspec_cli() {
 
     require_node_version 18 || return 1
     ensure_npm_available_local || return 1
-    ensure_modern_npm false || return 1
+    ensure_modern_npm_local || return 1
 
     if npm_install_global_with_fallback "@fission-ai/openspec" "OpenSpec CLI"; then
         echo -e "${GREEN}[BAŞARILI]${NC} OpenSpec CLI kuruldu: $(openspec --version 2>/dev/null)"

@@ -18,7 +18,7 @@ fi
 
 ensure_npm_ready() {
     if ! command -v npm >/dev/null 2>&1; then
-        echo -e "${RED}[HATA]${NC} npm bulunamadı. Lütfen önce Node.js modülünü çalıştırın."
+        echo -e "${RED}${ERROR_TAG}${NC} npm bulunamadı. Lütfen önce Node.js modülünü çalıştırın."
         return 1
     fi
     return 0
@@ -50,46 +50,46 @@ EOF
 install_opencode_cli() {
     local interactive_mode=${1:-true}
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} OpenCode CLI kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} OpenCode CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     require_node_version 20 "OpenCode CLI" || return 1
     ensure_npm_ready || return 1
 
     if ! npm_install_global_with_fallback "opencode-ai" "OpenCode CLI" true; then
-        echo -e "${RED}[HATA]${NC} OpenCode CLI npm paketinin kurulumu başarısız oldu."
+        echo -e "${RED}${ERROR_TAG}${NC} OpenCode CLI npm paketinin kurulumu başarısız oldu."
         return 1
     fi
 
     local install_prefix="${NPM_LAST_INSTALL_PREFIX:-$(npm_prepare_user_prefix)}"
-    ensure_opencode_binary "$install_prefix" || echo -e "${YELLOW}[UYARI]${NC} OpenCode binary dosyası oluşturulamadı; npm prefixinizi kontrol edin."
+    ensure_opencode_binary "$install_prefix" || echo -e "${YELLOW}${WARN_TAG}${NC} OpenCode binary dosyası oluşturulamadı; npm prefixinizi kontrol edin."
 
     if ! command -v opencode >/dev/null 2>&1 && [ -x "${install_prefix}/bin/opencode" ]; then
         ensure_path_contains_dir "${install_prefix}/bin" "OpenCode CLI"
     fi
 
     if command -v opencode >/dev/null 2>&1; then
-        echo -e "${GREEN}[BAŞARILI]${NC} OpenCode CLI sürümü: $(opencode --version)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} OpenCode CLI sürümü: $(opencode --version)"
     else
-        echo -e "${RED}[HATA]${NC} 'opencode' komutu bulunamadı. Terminalinizi yeniden başlatın veya PATH ayarlarınızı kontrol edin."
+        echo -e "${RED}${ERROR_TAG}${NC} 'opencode' komutu bulunamadı. Terminalinizi yeniden başlatın veya PATH ayarlarınızı kontrol edin."
         return 1
     fi
 
     if [ "$interactive_mode" = true ]; then
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Şimdi OpenCode CLI'ya giriş yapmanız gerekiyor."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'opencode login' komutunu çalıştırın."
-        echo -e "${YELLOW}[BİLGİ]${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} Şimdi OpenCode CLI'ya giriş yapmanız gerekiyor."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen 'opencode login' komutunu çalıştırın."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Oturum açma tamamlandığında buraya dönün ve Enter'a basın.\n"
 
-        opencode login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}[BİLGİ]${NC} Manuel oturum açma gerekebilir."
+        opencode login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${INFO_TAG}${NC} Manuel oturum açma gerekebilir."
 
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} Oturum açma işlemi tamamlandı mı? (Enter'a basarak devam edin)"
         read -r -p "Devam etmek için Enter'a basın..." </dev/tty
     else
-        echo -e "\n${YELLOW}[BİLGİ]${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen daha sonra manuel olarak '${GREEN}opencode login${NC}' komutunu çalıştırın."
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} 'Tümünü Kur' modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen daha sonra manuel olarak '${GREEN}opencode login${NC}' komutunu çalıştırın."
     fi
 
-    echo -e "${GREEN}[BAŞARILI]${NC} OpenCode CLI kurulumu tamamlandı!"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} OpenCode CLI kurulumu tamamlandı!"
 }
 
 main() {

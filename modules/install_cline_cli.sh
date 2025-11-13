@@ -26,7 +26,7 @@ ensure_cline_npm_available() {
     if bootstrap_node_runtime; then
         return 0
     fi
-    echo -e "${RED}[HATA]${NC} npm komutu bulunamadı. Lütfen 'Ana Menü -> 3' ile Node.js kurulumu yapın."
+    echo -e "${RED}${ERROR_TAG}${NC} npm komutu bulunamadı. Lütfen 'Ana Menü -> 3' ile Node.js kurulumu yapın."
     return 1
 }
 
@@ -47,36 +47,36 @@ install_cline_cli() {
                 ;;
             --package)
                 if [ -z "${2:-}" ]; then
-                    echo -e "${RED}[HATA]${NC} '--package' seçeneği bir değer gerektirir."
+                    echo -e "${RED}${ERROR_TAG}${NC} '--package' seçeneği bir değer gerektirir."
                     return 1
                 fi
                 package_spec="$2"
                 shift
                 ;;
             *)
-                echo -e "${YELLOW}[UYARI]${NC} Bilinmeyen argüman: $1"
+                echo -e "${YELLOW}${WARN_TAG}${NC} Bilinmeyen argüman: $1"
                 ;;
         esac
         shift || true
     done
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Cline CLI kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Cline CLI kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if [ "$dry_run" = true ]; then
         echo -e "${YELLOW}[DRY-RUN]${NC} Node.js >= ${CLINE_MIN_NODE_VERSION} doğrulanacak."
         echo -e "${YELLOW}[DRY-RUN]${NC} npm install -g ${package_spec}"
-        echo -e "${YELLOW}[BİLGİ]${NC} Dry-run modunda kimlik doğrulama adımları atlanır."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Dry-run modunda kimlik doğrulama adımları atlanır."
         return 0
     fi
 
     require_node_version "$CLINE_MIN_NODE_VERSION" "Cline CLI" || return 1
     ensure_cline_npm_available || return 1
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Cline CLI npm paketinin kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Cline CLI npm paketinin kurulumu başlatılıyor..."
     if ! npm_install_global_with_fallback "$package_spec" "Cline CLI"; then
-        echo -e "${RED}[HATA]${NC} Cline CLI kurulumu başarısız oldu. Paket: ${package_spec}"
+        echo -e "${RED}${ERROR_TAG}${NC} Cline CLI kurulumu başarısız oldu. Paket: ${package_spec}"
         return 1
     fi
 
@@ -87,27 +87,27 @@ install_cline_cli() {
     hash -r 2>/dev/null || true
 
     if ! command -v cline >/dev/null 2>&1; then
-        echo -e "${RED}[HATA]${NC} 'cline' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
+        echo -e "${RED}${ERROR_TAG}${NC} 'cline' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
         return 1
     fi
 
-    echo -e "${GREEN}[BAŞARILI]${NC} Cline CLI sürümü: $(cline --version 2>/dev/null)"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Cline CLI sürümü: $(cline --version 2>/dev/null)"
 
     if [ "$interactive_mode" = true ]; then
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Cline hesabınızla oturum açmanız gerekiyor."
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} Cline hesabınızla oturum açmanız gerekiyor."
         echo -e "${CYAN}  cline login${NC} komutunu çalıştırarak tarayıcı üzerinden giriş yapın."
         if [ -r /dev/tty ] && [ -w /dev/tty ]; then
-            cline login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}[UYARI]${NC} Oturum açma sırasında bir hata oluştu. Gerekirse manuel olarak 'cline login' çalıştırın."
+            cline login </dev/tty >/dev/tty 2>&1 || echo -e "${YELLOW}${WARN_TAG}${NC} Oturum açma sırasında bir hata oluştu. Gerekirse manuel olarak 'cline login' çalıştırın."
         else
-            echo -e "${YELLOW}[UYARI]${NC} TTY erişimi yok. Lütfen manuel olarak 'cline login' çalıştırın."
+            echo -e "${YELLOW}${WARN_TAG}${NC} TTY erişimi yok. Lütfen manuel olarak 'cline login' çalıştırın."
         fi
         read -r -p "Devam etmek için Enter'a basın..." </dev/tty || true
     else
-        echo -e "\n${YELLOW}[BİLGİ]${NC} Toplu kurulum modunda kimlik doğrulama atlandı."
-        echo -e "${YELLOW}[BİLGİ]${NC} Kurulum sonrası '${GREEN}cline login${NC}' komutunu manuel olarak çalıştırmayı unutmayın."
+        echo -e "\n${YELLOW}${INFO_TAG}${NC} Toplu kurulum modunda kimlik doğrulama atlandı."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Kurulum sonrası '${GREEN}cline login${NC}' komutunu manuel olarak çalıştırmayı unutmayın."
     fi
 
-    echo -e "${GREEN}[BAŞARILI]${NC} Cline CLI kurulumu tamamlandı!"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Cline CLI kurulumu tamamlandı!"
 }
 
 main() {

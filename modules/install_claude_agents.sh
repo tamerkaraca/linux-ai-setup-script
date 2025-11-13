@@ -13,7 +13,7 @@ fi
 
 require_git() {
     if ! command -v git >/dev/null 2>&1; then
-        echo -e "${RED}[HATA]${NC} 'git' komutu bulunamadı. Lütfen önce git kurun."
+        echo -e "${RED}${ERROR_TAG}${NC} 'git' komutu bulunamadı. Lütfen önce git kurun."
         return 1
     fi
 }
@@ -22,7 +22,7 @@ install_agents_repo() {
     local repo_url="$1"
     local label="$2"
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} ${label} ajan paketi kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} ${label} ajan paketi kuruluyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     require_git || return 1
@@ -31,18 +31,18 @@ install_agents_repo() {
     temp_dir="$(mktemp -d)"
     trap 'rm -rf "$temp_dir"' RETURN
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Git deposu indiriliyor: ${repo_url}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} Git deposu indiriliyor: ${repo_url}"
     if ! git clone --depth=1 "$repo_url" "$temp_dir/agents" >/dev/null 2>&1; then
-        echo -e "${RED}[HATA]${NC} Agents deposu klonlanamadı."
+        echo -e "${RED}${ERROR_TAG}${NC} Agents deposu klonlanamadı."
         return 1
     fi
 
     mkdir -p "$CLAUDE_AGENTS_DIR"
     if [ -n "$(ls -A "$CLAUDE_AGENTS_DIR" 2>/dev/null)" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} ${CLAUDE_AGENTS_DIR} klasöründeki mevcut ajanlar güncellenecek."
+        echo -e "${YELLOW}${INFO_TAG}${NC} ${CLAUDE_AGENTS_DIR} klasöründeki mevcut ajanlar güncellenecek."
     fi
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Ajan dosyaları kopyalanıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Ajan dosyaları kopyalanıyor..."
     if command -v rsync >/dev/null 2>&1; then
         rsync -a --delete "$temp_dir/agents"/ "$CLAUDE_AGENTS_DIR"/
     else
@@ -53,9 +53,9 @@ install_agents_repo() {
     local agent_count
     agent_count=$(find "$CLAUDE_AGENTS_DIR" -type f -name "*.md" | wc -l | tr -d ' ')
 
-    echo -e "\n${GREEN}[BAŞARILI]${NC} ${label} ajanları yüklendi (${agent_count} dosya)."
-    echo -e "${YELLOW}[BİLGİ]${NC} Konum: ${CLAUDE_AGENTS_DIR}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Değişikliklerin görünmesi için Claude Code'u yeniden başlatın."
+    echo -e "\n${GREEN}${SUCCESS_TAG}${NC} ${label} ajanları yüklendi (${agent_count} dosya)."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Konum: ${CLAUDE_AGENTS_DIR}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} Değişikliklerin görünmesi için Claude Code'u yeniden başlatın."
     echo -e "${CYAN}Referans:${NC} ${repo_url}"
     trap - RETURN
 }
@@ -78,7 +78,7 @@ main() {
             install_wshobson_agents
             ;;
         *)
-            echo -e "${YELLOW}[BİLGİ]${NC} Bilinmeyen hedef '${target}'. 'contains' veya 'wshobson' kullanın."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Bilinmeyen hedef '${target}'. 'contains' veya 'wshobson' kullanın."
             return 1
             ;;
     esac

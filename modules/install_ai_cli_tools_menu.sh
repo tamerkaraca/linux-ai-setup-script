@@ -10,7 +10,7 @@ if ! declare -f run_module >/dev/null 2>&1; then
         local module_url="${BASE_URL}/${module_name}.sh"
         shift
         if ! curl -fsSL "$module_url" | LANGUAGE="$LANGUAGE" bash -s -- "$@"; then
-            echo -e "${RED}[HATA]${NC} $module_name modülü çalıştırılırken bir hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
             return 1
         fi
     }
@@ -247,7 +247,7 @@ install_ai_cli_tools_menu() {
 
         if [ "$batch_context" = true ] && [ "${#CLI_SUMMARY[@]}" -gt 0 ]; then
             echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            echo -e "${YELLOW}[BİLGİ]${NC} Kurulan CLI araçları için giriş komutları:"
+            echo -e "${YELLOW}${INFO_TAG}${NC} Kurulan CLI araçları için giriş komutları:"
             echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
             declare -A PRINTED_HINTS=()
             for summary_entry in "${CLI_SUMMARY[@]}"; do

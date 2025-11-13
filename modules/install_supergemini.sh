@@ -19,14 +19,14 @@ fi
 # SuperGemini Framework kurulumu (Pipx ile)
 install_supergemini() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini Framework (Pipx) kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} SuperGemini Framework (Pipx) kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if ! command -v pipx &> /dev/null; then
-        echo -e "${YELLOW}[UYARI]${NC} SuperGemini için önce Pipx kuruluyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} SuperGemini için önce Pipx kuruluyor..."
         install_pipx
         if ! command -v pipx &> /dev/null; then
-            echo -e "${RED}[HATA]${NC} Pipx kurulumu başarısız, SuperGemini kurulamaz."
+            echo -e "${RED}${ERROR_TAG}${NC} Pipx kurulumu başarısız, SuperGemini kurulamaz."
             return 1
         fi
     fi
@@ -34,18 +34,18 @@ install_supergemini() {
     reload_shell_configs silent
     export PATH="$HOME/.local/bin:$PATH"
 
-    echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini indiriliyor ve kuruluyor (pipx)..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} SuperGemini indiriliyor ve kuruluyor (pipx)..."
     pipx install SuperGemini
     
     export PATH="$HOME/.local/bin:$PATH"
     
     if ! command -v SuperGemini &> /dev/null; then
-        echo -e "${RED}[HATA]${NC} SuperGemini (pipx) kurulumu başarısız!"
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen terminali yeniden başlatıp tekrar deneyin."
+        echo -e "${RED}${ERROR_TAG}${NC} SuperGemini (pipx) kurulumu başarısız!"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen terminali yeniden başlatıp tekrar deneyin."
         return 1
     fi
     
-    echo -e "${GREEN}[BAŞARILI]${NC} SuperGemini (pipx) kurulumu tamamlandı."
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperGemini (pipx) kurulumu tamamlandı."
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}   SuperGemini Yapılandırma Profili Seçin:${NC}"
@@ -58,21 +58,21 @@ install_supergemini() {
     SETUP_CMD=""
     case $setup_choice in
         2)
-            echo -e "${YELLOW}[BİLGİ]${NC} Minimal profil ile kurulum yapılıyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Minimal profil ile kurulum yapılıyor..."
             SETUP_CMD="SuperGemini install --profile minimal --yes"
             ;; 
         3)
-            echo -e "${YELLOW}[BİLGİ]${NC} Full profil ile kurulum yapılıyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Full profil ile kurulum yapılıyor..."
             SETUP_CMD="SuperGemini install --profile full --yes"
             ;; 
         *)
-            echo -e "${YELLOW}[BİLGİ]${NC} Express (önerilen) profil ile kurulum yapılıyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} Express (önerilen) profil ile kurulum yapılıyor..."
             SETUP_CMD="SuperGemini install --yes"
             ;; 
     esac
     
-    echo -e "${YELLOW}[BİLGİ]${NC} $SETUP_CMD komutu çalıştırılıyor..."
-    echo -e "${YELLOW}[BİLGİ]${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} $SETUP_CMD komutu çalıştırılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
     
     local install_success="true"
     if [ "$setup_choice" = "2" ]; then
@@ -90,10 +90,10 @@ install_supergemini() {
     fi
     
     if [ "$install_success" != "true" ]; then
-        echo -e "${RED}[HATA]${NC} SuperGemini 'install' komutu başarısız!"
-        echo -e "${YELLOW}[BİLGİ]${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperGemini install${NC}' komutuyla yapılandırabilirsiniz."
+        echo -e "${RED}${ERROR_TAG}${NC} SuperGemini 'install' komutu başarısız!"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperGemini install${NC}' komutuyla yapılandırabilirsiniz."
     else
-        echo -e "${GREEN}[BAŞARILI]${NC} SuperGemini yapılandırması tamamlandı!"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperGemini yapılandırması tamamlandı!"
     fi
 
     echo -e "\n${CYAN}╔═══════════════════════════════════════════════╗${NC}"
@@ -111,7 +111,7 @@ install_supergemini() {
     echo -e "${GREEN}1.${NC} Gemini API Key: ${CYAN}https://makersuite.google.com/app/apikey${NC}"
     echo -e "${GREEN}2.${NC} Anthropic API Key: ${CYAN}https://console.anthropic.com/${NC}"
     echo -e "${GREEN}3.${NC} OpenAI API Key: ${CYAN}https://platform.openai.com/api-keys${NC}"
-    echo -e "\n${YELLOW}[BİLGİ]${NC} 'SuperGemini install' komutu sizden bu anahtarları isteyecektir."
+    echo -e "\n${YELLOW}${INFO_TAG}${NC} 'SuperGemini install' komutu sizden bu anahtarları isteyecektir."
 }
 
 # Ana kurulum akışı

@@ -17,7 +17,7 @@ fi
 
 install_nvm() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} NVM kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} NVM kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.40.3/install.sh | bash
@@ -38,23 +38,23 @@ install_nvm() {
 
     [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Node.js LTS sürümü kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Node.js LTS sürümü kuruluyor..."
     (
         set +u
         nvm install --lts
         nvm use --lts >/dev/null
     )
 
-    echo -e "\n${GREEN}[BAŞARILI]${NC} Node.js sürümü: $(node -v)"
-    echo -e "${GREEN}[BAŞARILI]${NC} npm sürümü: $(npm -v)"
+    echo -e "\n${GREEN}${SUCCESS_TAG}${NC} Node.js sürümü: $(node -v)"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} npm sürümü: $(npm -v)"
 }
 
 install_bun() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Bun.js kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Bun.js kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
-    echo -e "${YELLOW}[BİLGİ]${NC} Bun resmi scripti ile kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Bun resmi scripti ile kuruluyor..."
     curl -fsSL https://bun.sh/install | bash
 
     export BUN_INSTALL="$HOME/.bun"
@@ -74,32 +74,32 @@ install_bun() {
     reload_shell_configs silent
 
     if command -v bun >/dev/null 2>&1; then
-        echo -e "${GREEN}[BAŞARILI]${NC} Bun.js kuruldu: $(bun --version)"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Bun.js kuruldu: $(bun --version)"
     else
-        echo -e "${RED}[HATA]${NC} Bun.js kurulumu başarısız oldu."
+        echo -e "${RED}${ERROR_TAG}${NC} Bun.js kurulumu başarısız oldu."
         return 1
     fi
 }
 
 install_node_extras() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} Node CLI ek paketleri yükleniyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Node CLI ek paketleri yükleniyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     if ! command -v node >/dev/null 2>&1; then
-        echo -e "${RED}[HATA]${NC} Node.js bulunamadı. Lütfen önce NVM/Node kurulumunu çalıştırın."
+        echo -e "${RED}${ERROR_TAG}${NC} Node.js bulunamadı. Lütfen önce NVM/Node kurulumunu çalıştırın."
         return 1
     fi
 
-    echo -e "${YELLOW}[BİLGİ]${NC} corepack etkinleştiriliyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} corepack etkinleştiriliyor..."
     corepack enable || true
 
-    echo -e "${YELLOW}[BİLGİ]${NC} pnpm ve yarn global olarak kuruluyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} pnpm ve yarn global olarak kuruluyor..."
     if ! npm install -g pnpm yarn >/dev/null 2>&1; then
-        echo -e "${YELLOW}[UYARI]${NC} pnpm/yarn kurulurken bir hata oluştu."
+        echo -e "${YELLOW}${WARN_TAG}${NC} pnpm/yarn kurulurken bir hata oluştu."
     fi
 
-    echo -e "${GREEN}[BAŞARILI]${NC} Ek Node araçları yapılandırıldı."
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Ek Node araçları yapılandırıldı."
 }
 
 main() {
@@ -132,7 +132,7 @@ main() {
                 install_bun_flag="false"
                 ;;
             *)
-                echo -e "${YELLOW}[UYARI]${NC} Bilinmeyen argüman: $1"
+                echo -e "${YELLOW}${WARN_TAG}${NC} Bilinmeyen argüman: $1"
                 ;;
         esac
         shift || true
@@ -155,13 +155,13 @@ main() {
     local rc_files=("$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.bash_profile" "$HOME/.profile")
     for rc_file in "${rc_files[@]}"; do
         if [ -f "$rc_file" ]; then
-            echo -e "${YELLOW}[BİLGİ]${NC} Güncellenen ortam değişkenleri uygulanıyor: source ${rc_file}"
+            echo -e "${YELLOW}${INFO_TAG}${NC} Güncellenen ortam değişkenleri uygulanıyor: source ${rc_file}"
             # shellcheck source=/dev/null
             . "$rc_file"
         fi
     done
 
-    echo -e "${GREEN}[BAŞARILI]${NC} Node.js ve ilgili araçların kurulumu tamamlandı!"
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} Node.js ve ilgili araçların kurulumu tamamlandı!"
 }
 
 main "$@"

@@ -12,6 +12,53 @@ else
     fi
 fi
 
+CURRENT_LANG="${LANGUAGE:-en}"
+if [ "$CURRENT_LANG" = "tr" ]; then
+    INFO_TAG="[BİLGİ]"
+    WARN_TAG="[UYARI]"
+    ERROR_TAG="[HATA]"
+else
+    INFO_TAG="[INFO]"
+    WARN_TAG="[WARNING]"
+    ERROR_TAG="[ERROR]"
+fi
+
+declare -A PHP_TEXT_EN=(
+    ["menu_title"]="PHP & Composer Installation Menu"
+    ["menu_option1"]="Install PHP + Composer"
+    ["menu_option2"]="Switch default PHP version"
+    ["menu_option3"]="Install Composer only"
+    ["menu_option0"]="Return to main menu"
+    ["menu_hint"]="Use commas for multiple selections (e.g., 1,2)."
+    ["prompt_choice"]="Your choice"
+    ["returning"]="Returning to the main menu..."
+    ["invalid_choice"]="Invalid selection."
+    ["no_selection"]="No selection detected."
+)
+
+declare -A PHP_TEXT_TR=(
+    ["menu_title"]="PHP & Composer Kurulum Menüsü"
+    ["menu_option1"]="PHP + Composer kur"
+    ["menu_option2"]="Varsayılan PHP sürümünü değiştir"
+    ["menu_option3"]="Sadece Composer kur"
+    ["menu_option0"]="Ana menüye dön"
+    ["menu_hint"]="Birden fazla seçim için virgül kullanın (örn: 1,2)."
+    ["prompt_choice"]="Seçiminiz"
+    ["returning"]="Ana menüye dönülüyor..."
+    ["invalid_choice"]="Geçersiz seçim."
+    ["no_selection"]="Bir seçim yapılmadı."
+)
+
+php_text() {
+    local key="$1"
+    local default_value="${PHP_TEXT_EN[$key]:-$key}"
+    if [ "$CURRENT_LANG" = "tr" ]; then
+        echo "${PHP_TEXT_TR[$key]:-$default_value}"
+    else
+        echo "$default_value"
+    fi
+}
+
 
 # PHP sürüm listeleri
 PHP_SUPPORTED_VERSIONS=("7.4" "8.1" "8.2" "8.3" "8.4" "8.5")
@@ -363,19 +410,19 @@ install_php_version() {
 # Ana kurulum akışı
 main() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} PHP ve Composer Kurulum Menüsü"
+    printf "${BLUE}║%*s║${NC}\n" -43 " $(php_text menu_title) "
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     while true; do
-        echo -e "\n${YELLOW}Bir işlem seçin (virgülle çoklu seçim mümkün, örn: 1,3):${NC}"
-        echo -e "  ${GREEN}1${NC} - PHP sürümü kur"
-        echo -e "  ${GREEN}2${NC} - Kurulu PHP sürümünü değiştir"
-        echo -e "  ${GREEN}3${NC} - Composer durumunu denetle"
-        echo -e "  ${RED}0${NC} - Ana menüye dön"
-        read -r -p "Seçiminiz: " menu_choice </dev/tty
+        echo -e "\n${YELLOW}$(php_text menu_hint)${NC}"
+        echo -e "  ${GREEN}1${NC} - $(php_text menu_option1)"
+        echo -e "  ${GREEN}2${NC} - $(php_text menu_option2)"
+        echo -e "  ${GREEN}3${NC} - $(php_text menu_option3)"
+        echo -e "  ${RED}0${NC} - $(php_text menu_option0)"
+        read -r -p "${YELLOW}$(php_text prompt_choice):${NC} " menu_choice </dev/tty
 
         if [ -z "$(echo "$menu_choice" | tr -d '[:space:]')" ]; then
-            echo -e "${YELLOW}[UYARI]${NC} Bir seçim yapmadınız."
+            echo -e "${YELLOW}${WARN_TAG}${NC} $(php_text no_selection)"
             continue
         fi
 
@@ -445,13 +492,13 @@ main() {
                     install_composer
                 ;;
                 *)
-                    echo -e "${RED}[HATA]${NC} Geçersiz seçim: $raw_choice"
+                    echo -e "${RED}${ERROR_TAG}${NC} $(php_text invalid_choice): $raw_choice"
                     ;;
             esac
         done
 
         if [ "$exit_menu" = true ]; then
-            echo -e "${YELLOW}[BİLGİ]${NC} PHP menüsünden çıkılıyor."
+            echo -e "${YELLOW}${INFO_TAG}${NC} $(php_text returning)"
             break
         fi
     done

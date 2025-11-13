@@ -247,7 +247,7 @@ install_ai_cli_tools_menu() {
 
         if [ "$batch_context" = true ] && [ "${#CLI_SUMMARY[@]}" -gt 0 ]; then
             echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            echo -e "${YELLOW}${INFO_TAG}${NC} Kurulan CLI araçları için giriş komutları:"
+            echo -e "${YELLOW}${INFO_TAG}${NC} $(translate ai_summary_title)"
             echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
             declare -A PRINTED_HINTS=()
             for summary_entry in "${CLI_SUMMARY[@]}"; do
@@ -260,7 +260,7 @@ install_ai_cli_tools_menu() {
                 if [ -n "$summary_hint" ]; then
                     echo -e "  ${GREEN}•${NC} ${summary_label}: ${GREEN}${summary_hint}${NC}"
                 else
-                    echo -e "  ${GREEN}•${NC} ${summary_label}: ${YELLOW}İlgili CLI dokümanındaki kimlik doğrulama adımlarını uygulayın.${NC}"
+                    echo -e "  ${GREEN}•${NC} ${summary_label}: ${YELLOW}$(translate ai_summary_default_hint)${NC}"
                 fi
             done
         fi

@@ -103,7 +103,7 @@ bash -n setup && shellcheck setup  # optional
 ### CLI & Framework Sub-menus
 
 #### AI CLI Menu
-The sub-menu accepts comma-separated selections (`1,3,7`) or an `11` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `copilot auth login`, etc.).
+The sub-menu accepts comma-separated selections (`1,3,7`) or a `12` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `openspec init`, `copilot auth login`, etc.).
 
 | Option | Tool | Highlights |
 |--------|------|------------|
@@ -117,7 +117,8 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or an `11` shortcut th
 | `8` | Cline CLI | Requires Node.js ≥ 18, installs the `@cline/cli` package, and prompts for `cline login` only during interactive runs. |
 | `9` | Aider CLI | Installs the `aider-chat` package via pipx (Node.js ≥ 18 guard) and reminds you to export provider API keys before running `aider`. |
 | `10` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
-| `11` | Install every CLI | Runs options `1-10` in batch mode (logins skipped, summary printed at the end). |
+| `11` | OpenSpec CLI + Agents | Installs `@fission-ai/openspec` globally and syncs Contains Studio agents into `~/.claude/agents`. |
+| `12` | Install every CLI | Runs options `1-11` in batch mode (logins skipped, summary printed at the end). |
 
 ##### Claude Code CLI
 Anthropic’s Claude Code CLI (https://github.com/anthropics/claude-code) ships the same Ink-based workflow you see in the Claude desktop app. The installer attaches `/dev/tty` before launching `claude login`, preventing “Raw mode is not supported” errors when you run the script remotely. Sample usage:
@@ -252,6 +253,24 @@ cp -r agents/* ~/.claude/agents/
 
 The repository organizes agents by department (engineering, design, marketing, operations, etc.), so they immediately appear inside Claude Code’s “Agents” sidebar.
 
+#### OpenSpec CLI + Agents Bundle (AI CLI Option 11)
+
+Selecting option `11` inside the AI CLI menu installs the [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) globally via npm and then syncs the Contains Studio agents. The CLI (`openspec`) adds spec-driven workflows to Claude Code, Gemini CLI, Cursor, and other AI assistants without needing API keys.
+
+What the installer does:
+
+1. Ensures Node.js ≥ 18 and `npm` are available, then runs `npm install -g @fission-ai/openspec`.
+2. Verifies `git` and pulls the Contains Studio agents into `~/.claude/agents/` (same as option `12`).
+3. Prints usage reminders:
+
+```bash
+openspec init          # initialize specs in your repo
+openspec plan          # draft proposals
+openspec sync          # update local specs/changes
+```
+
+With the CLI and agents installed, you can draft specs, share proposals, and let Claude Code’s new sub-agents execute the agreed tasks.
+
 #### AI Framework Menu
 The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
 
@@ -370,7 +389,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 ### Alt Menü Detayları
 
 #### AI CLI Menüsü
-Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `11` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `copilot auth login` vb.) özet olarak yazdırır.
+Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `12` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `openspec init`, `copilot auth login` vb.) özet olarak yazdırır.
 
 | Seçenek | Araç | Detaylar |
 |---------|------|----------|
@@ -384,7 +403,8 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `11` kısayolu
 | `8` | Cline CLI | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
 | `9` | Aider CLI | Pipx üzerinden `aider-chat` paketini kurar (Node.js ≥ 18 kontrolü sonrası) ve API anahtarlarını export etmeniz gerektiğini hatırlatır. |
 | `10` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
-| `11` | Hepsini Kur | `1-10` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+| `11` | OpenSpec CLI + Agents | `@fission-ai/openspec` paketini kurar ve Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder. |
+| `12` | Hepsini Kur | `1-11` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 ##### Claude Code CLI
 Anthropic’in Claude Code CLI aracı (https://github.com/anthropics/claude-code), Claude masaüstündeki Ink tabanlı deneyimi terminale taşır. Kurulum sırasında `/dev/tty` bağlandığı için “Raw mode is not supported” hatası alınmaz ve `claude login` komutu uzaktan bile sorunsuz çalışır:
@@ -523,6 +543,24 @@ cp -r agents/* ~/.claude/agents/
 ```
 
 Depo, ajanları departmanlara göre (engineering, design, marketing vb.) sınıflandırdığı için Claude Code’un “Agents” panelinde kategorize bir şekilde listelenir.
+
+#### OpenSpec CLI + Ajan Paketi (AI CLI Seçenek 11)
+
+AI CLI menüsündeki `11` numaralı seçenek, [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec) aracını npm üzerinden kurar (`npm install -g @fission-ai/openspec`) ve ardından Contains Studio ajan paketini senkronize eder. OpenSpec CLI, spesifikasyon odaklı geliştirme akışını Claude Code, Gemini CLI, Cursor vb. araçlara taşır; API anahtarı gerektirmez.
+
+Kurulum adımları:
+
+1. Node.js ≥ 18 ve `npm` varlığını doğrular, ardından CLI’ı global olarak yükler.
+2. `git` kontrolü yapar ve Contains Studio ajanlarını `~/.claude/agents/` dizinine kopyalar.
+3. Kullanım hatırlatmaları basar:
+
+```bash
+openspec init          # depo içinde OpenSpec klasörünü başlatır
+openspec plan          # değişiklik planı oluşturur
+openspec sync          # spesifikasyonları güncel tutar
+```
+
+Bu sayede hem OpenSpec CLI komutlarını hem de Claude Code ajanlarını aynı menü seçeneği ile hazır hale getirebilirsiniz.
 
 Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut anahtarlarınızı maskeleyerek hızlıca rota değiştirmenize olanak tanır.
 

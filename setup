@@ -6,11 +6,14 @@ if [ -f "$0" ]; then
     if file "$0" | grep -q "CRLF"; then
         echo "Windows line endings detected, fixing..."
         
-        if command -v dos2unix &> /dev/null; then
+        if command -v dos2unix &> /dev/null;
+        then
             dos2unix "$0"
-        elif command -v sed &> /dev/null; then
+        elif command -v sed &> /dev/null;
+        then
             sed -i 's/\r$//' "$0"
-        elif command -v tr &> /dev/null; then
+        elif command -v tr &> /dev/null;
+        then
             tr -d '\r' < "$0" > "$0.tmp" && mv "$0.tmp" "$0"
         fi
         
@@ -44,10 +47,11 @@ declare -A SETUP_TEXT_EN=(
     ["menu_option5"]="Install AI Frameworks"
     ["menu_option6"]="Configure Git Global Settings"
     ["menu_option7"]="Configure GLM/Claude Provider"
-    ["menu_option8"]="Install PHP and Composer"
-    ["menu_option9"]="Install GitHub CLI"
-    ["menu_option10"]="Remove AI Frameworks"
-    ["menu_option11"]="Manage MCP Servers"
+    ["menu_option8"]="Install Auxiliary AI Tools (OpenSpec, Agents, etc.)"
+    ["menu_option9"]="Install PHP and Composer"
+    ["menu_option10"]="Install GitHub CLI"
+    ["menu_option11"]="Remove AI Frameworks"
+    ["menu_option12"]="Manage MCP Servers"
     ["menu_optionA"]="Install Everything (Recommended)"
     ["menu_option0"]="Exit"
     ["menu_multi_hint"]="You can make multiple selections with commas (e.g., 1,2,5)."
@@ -80,10 +84,11 @@ declare -A SETUP_TEXT_TR=(
     ["menu_option5"]="AI Framework'lerini Kur"
     ["menu_option6"]="Git Global Ayarlarını Yapılandır"
     ["menu_option7"]="GLM/Claude Sağlayıcısını Yapılandır"
-    ["menu_option8"]="PHP ve Composer Kur"
-    ["menu_option9"]="GitHub CLI Kur"
-    ["menu_option10"]="AI Framework'lerini Kaldır"
-    ["menu_option11"]="MCP Sunucularını Yönet"
+    ["menu_option8"]="Yardımcı AI Araçlarını Kur (OpenSpec, Ajanlar, vb.)"
+    ["menu_option9"]="PHP ve Composer Kur"
+    ["menu_option10"]="GitHub CLI Kur"
+    ["menu_option11"]="AI Framework'lerini Kaldır"
+    ["menu_option12"]="MCP Sunucularını Yönet"
     ["menu_optionA"]="Tümünü Kur (Önerilen)"
     ["menu_option0"]="Çıkış"
     ["menu_multi_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2,5)."
@@ -125,7 +130,8 @@ source_module() {
         # shellcheck source=/dev/null
         source "$local_path"
     else
-        if ! command -v curl &> /dev/null; then
+        if ! command -v curl &> /dev/null;
+        then
             echo "${ERROR_TAG} $(setup_text_fmt curl_missing "$remote_rel_path")"
             exit 1
         fi
@@ -244,6 +250,7 @@ main_menu() {
         echo -e "  ${GREEN}9${NC} - $(setup_text menu_option9)"
         echo -e "  ${GREEN}10${NC} - $(setup_text menu_option10)"
         echo -e "  ${GREEN}11${NC} - $(setup_text menu_option11)"
+        echo -e "  ${GREEN}12${NC} - $(setup_text menu_option12)"
         echo -e "  ${GREEN}A${NC} - $(setup_text menu_optionA)"
         echo -e "  ${GREEN}L${NC} - $(setup_text menu_language_option) ($(get_language_label "$LANGUAGE"))"
         echo -e "  ${RED}0${NC} - $(setup_text menu_option0)"
@@ -267,16 +274,17 @@ main_menu() {
 
             case "$choice" in
                 1) update_system ;;
-                2) run_module "install_python_tools" ;; # Bu modül Python, Pip, Pipx, UV kuracak
+                2) run_module "install_python_tools" ;;
                 3) run_module "install_node_menu" ;;
                 4) run_module "install_ai_cli_tools_menu" ;;
                 5) run_module "install_ai_frameworks_menu" ;;
                 6) run_module "configure_git" ;;
                 7) run_module "configure_glm_claude" ;;
-                8) run_module "install_php_composer" ;;
-                9) run_module "install_github_cli" ;;
-                10) run_module "remove_ai_frameworks_menu" ;;
-                11) run_module "manage_mcp_servers_menu" ;;
+                8) run_module "install_aux_tools_menu" ;;
+                9) run_module "install_php_composer" ;;
+                10) run_module "install_github_cli" ;;
+                11) run_module "remove_ai_frameworks_menu" ;;
+                12) run_module "manage_mcp_servers_menu" ;;
                 L)
                     language_menu
                     ;; 
@@ -284,8 +292,9 @@ main_menu() {
                     update_system
                     run_module "install_python_tools"
                     run_module "install_node_menu" "all"
-                    run_module "install_ai_cli_tools_menu" "all" # "all" parametresi ile tüm CLI araçlarını kur
-                    run_module "install_ai_frameworks_menu" "all" # "all" parametresi ile tüm frameworkleri kur
+                    run_module "install_ai_cli_tools_menu" "all"
+                    run_module "install_aux_tools_menu" "all"
+                    run_module "install_ai_frameworks_menu" "all"
                     run_module "configure_git"
                     run_module "configure_glm_claude"
                     run_module "install_github_cli"

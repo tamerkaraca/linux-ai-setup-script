@@ -27,10 +27,7 @@ declare -A AI_CLI_MENU_TEXT_EN=(
     ["ai_option11"]="Kilocode CLI"
     ["ai_option12"]="Auggie CLI"
     ["ai_option13"]="Droid CLI"
-    ["ai_option14"]="OpenSpec CLI"
-    ["ai_option15"]="Contains Studio Agents (for Claude)"
-    ["ai_option16"]="Wes Hobson Agents (for Claude)"
-    ["ai_option17"]="Install All AI CLI Tools"
+    ["ai_option14"]="Install All AI CLI Tools"
     ["ai_option_return"]="Return to Main Menu"
     ["ai_menu_hint"]="You can make multiple selections with commas (e.g., 1,2,5)."
     ["prompt_choice"]="Your choice"
@@ -57,10 +54,7 @@ declare -A AI_CLI_MENU_TEXT_TR=(
     ["ai_option11"]="Kilocode CLI"
     ["ai_option12"]="Auggie CLI"
     ["ai_option13"]="Droid CLI"
-    ["ai_option14"]="OpenSpec CLI"
-    ["ai_option15"]="Contains Studio Agents (Claude için)"
-    ["ai_option16"]="Wes Hobson Agents (Claude için)"
-    ["ai_option17"]="Tüm AI CLI Araçlarını Kur"
+    ["ai_option14"]="Tüm AI CLI Araçlarını Kur"
     ["ai_option_return"]="Ana Menüye Dön"
     ["ai_menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2,5)."
     ["prompt_choice"]="Seçiminiz"
@@ -199,27 +193,6 @@ install_ai_cli_tools_menu() {
                     success=1
                 fi
                 ;;
-            14)
-                label="OpenSpec CLI"
-                login_hint="openspec init (in project)"
-                if ! run_module "install_openspec_cli" "$interactive"; then
-                    success=1
-                fi
-                ;;
-            15)
-                label="Contains Studio Agents"
-                login_hint="Restart Claude Code"
-                if ! run_module "install_claude_agents"; then
-                    success=1
-                fi
-                ;;
-            16)
-                label="Wes Hobson Agents"
-                login_hint="Restart Claude Code"
-                if ! run_module "install_claude_agents" "wshobson"; then
-                    success=1
-                fi
-                ;;
             *)
                 echo -e "${RED}$(ai_cli_menu_text warning_invalid_choice): $option${NC}"
                 success=1
@@ -255,10 +228,6 @@ install_ai_cli_tools_menu() {
             echo -e "  ${GREEN}11${NC} $(ai_cli_menu_text ai_option11)"
             echo -e "  ${GREEN}12${NC} $(ai_cli_menu_text ai_option12)"
             echo -e "  ${GREEN}13${NC} $(ai_cli_menu_text ai_option13)"
-            echo -e "  ${GREEN}14${NC} $(ai_cli_menu_text ai_option14)"
-            echo -e "  ${GREEN}15${NC} $(ai_cli_menu_text ai_option15)"
-            echo -e "  ${GREEN}16${NC} $(ai_cli_menu_text ai_option16)"
-            echo -e "  ${GREEN}17${NC} $(ai_cli_menu_text ai_option17)"
             echo -e "  ${RED}0${NC} $(ai_cli_menu_text ai_option_return)"
             echo -e "\n${YELLOW}$(ai_cli_menu_text ai_menu_hint)${NC}"
             echo
@@ -273,7 +242,7 @@ install_ai_cli_tools_menu() {
                 break
             fi
         else
-            cli_choices="17"
+            cli_choices="14"
             batch_context=true
         fi
 
@@ -288,7 +257,7 @@ install_ai_cli_tools_menu() {
             choice=$(echo "$choice" | tr -d '[:space:]')
             [ -z "$choice" ] && continue
 
-            if [ "$choice" = "17" ]; then
+            if [ "$choice" = "14" ]; then
                 batch_context=true
             fi
 
@@ -298,12 +267,12 @@ install_ai_cli_tools_menu() {
             fi
 
             case $choice in
-                1|2|3|4|5|6|7|8|9|10|11|12|13|14|15|16)
+                1|2|3|4|5|6|7|8|9|10|11|12|13)
                     run_cli_choice "$choice" "$interactive_flag" || true
                     ;;
-                17)
+                14)
                     batch_context=true
-                    for sub_choice in 1 2 3 4 5 6 7 8 9 10 11 12 13 14 15 16; do
+                    for sub_choice in {1..13}; do
                         run_cli_choice "$sub_choice" "false" || true
                     done
                     all_installed=true
@@ -338,39 +307,29 @@ install_ai_cli_tools_menu() {
                 if [ -n "$summary_hint" ]; then
                     # Adjust hint translations
                     case "$summary_hint" in
-                        "claude login") summary_hint="claude login" ;;
-                        "gemini auth") summary_hint="gemini auth" ;;
-                        "opencode login") summary_hint="opencode login" ;;
-                        "qoder login") summary_hint="qoder login" ;;
-                        "qwen login") summary_hint="qwen login" ;;
+                        "claude login") summary_hint="claude login" ;; 
+                        "gemini auth") summary_hint="gemini auth" ;; 
+                        "opencode login") summary_hint="opencode login" ;; 
+                        "qoder login") summary_hint="qoder login" ;; 
+                        "qwen login") summary_hint="qwen login" ;; 
                         "codex (Sign in with ChatGPT or OPENAI_API_KEY)")
                             if [ "${LANGUAGE:-en}" = "tr" ]; then
                                 summary_hint="codex (ChatGPT ile oturum açın veya OPENAI_API_KEY kullanın)"
                             fi
                             ;;
-                        "cursor-agent login") summary_hint="cursor-agent login" ;;
-                        "cline login") summary_hint="cline login" ;;
+                        "cursor-agent login") summary_hint="cursor-agent login" ;; 
+                        "cline login") summary_hint="cline login" ;; 
                         "aider --help (Export API keys)")
                             if [ "${LANGUAGE:-en}" = "tr" ]; then
                                 summary_hint="aider --help (API anahtarlarını export edin)"
                             fi
                             ;;
-                        "copilot auth login && copilot auth activate") summary_hint="copilot auth login && copilot auth activate" ;;
-                        "kilocode config") summary_hint="kilocode config" ;;
-                        "auggie login") summary_hint="auggie login" ;;
+                        "copilot auth login && copilot auth activate") summary_hint="copilot auth login && copilot auth activate" ;; 
+                        "kilocode config") summary_hint="kilocode config" ;; 
+                        "auggie login") summary_hint="auggie login" ;; 
                         "droid (per Factory quickstart)")
                             if [ "${LANGUAGE:-en}" = "tr" ]; then
                                 summary_hint="droid (Factory quickstart'a göre)"
-                            fi
-                            ;;
-                        "openspec init (in project)")
-                            if [ "${LANGUAGE:-en}" = "tr" ]; then
-                                summary_hint="openspec init (projede)"
-                            fi
-                            ;;
-                        "Restart Claude Code")
-                            if [ "${LANGUAGE:-en}" = "tr" ]; then
-                                summary_hint="Claude Code'u yeniden başlat"
                             fi
                             ;;
                     esac

@@ -21,44 +21,6 @@ fi
 
 declare -A QWEN_TEXT_EN=(
     ["install_title"]="Starting Qwen CLI installation..."
-    ["npm_missing"]="npm command not found. Please install Node.js (Main Menu → 3)."
-    ["dry_run_requirement"]="Will verify Node.js >= %s."
-    ["dry_run_install"]="npm install -g %s"
-    ["dry_run_skip"]="Authentication is skipped in dry-run mode."
-    ["install_fail"]="Qwen CLI installation failed. Package: %s"
-    ["command_missing"]="'qwen' command not found. Check your PATH."
-    ["version_info"]="Qwen CLI version: %s"
-    ["interactive_intro"]="You must authenticate with Qwen CLI now."
-    ["interactive_prompt"]="Run 'qwen login' to complete sign-in."
-    ["interactive_wait"]="Press Enter once authentication is complete."
-    ["manual_skip"]="Authentication skipped for batch installs."
-    ["manual_reminder"]="Please run '${GREEN}qwen login${NC}' manually after installation."
-    ["warn_login_error"]="An error occurred during login. Run 'qwen login' manually if needed."
-    ["warn_no_tty"]="TTY not available. Run 'qwen login' manually."
-    ["install_done"]="Qwen CLI installation completed!"
-)
-
-declare -A QWEN_TEXT_TR=(
-    ["install_title"]="Qwen CLI kurulumu başlatılıyor..."
-    ["npm_missing"]="npm komutu bulunamadı. Lütfen Node.js kurulumunu tamamlayın (Ana Menü → 3)."
-    ["dry_run_requirement"]="Node.js >= %s gereksinimi doğrulanacak."
-    ["dry_run_install"]="npm install -g %s"
-    ["dry_run_skip"]="Dry-run modunda kimlik doğrulama adımları atlanır."
-    ["install_fail"]="Qwen CLI kurulumu başarısız oldu. Paket: %s"
-    ["command_missing"]="'qwen' komutu bulunamadı. PATH ayarlarınızı kontrol edin."
-    ["version_info"]="Qwen CLI sürümü: %s"
-    ["interactive_intro"]="Şimdi Qwen CLI ile kimlik doğrulaması yapmalısınız."
-    ["interactive_prompt"]="Hesabınızla giriş yapmak için 'qwen login' komutunu çalıştırın."
-    ["interactive_wait"]="Kimlik doğrulama tamamlandığında Enter'a basın."
-    ["manual_skip"]="Toplu kuruluma göre kimlik doğrulama adımı atlandı."
-    ["manual_reminder"]="Kurulum sonrası '${GREEN}qwen login${NC}' komutunu manuel olarak çalıştırmayı unutmayın."
-    ["warn_login_error"]="Oturum açma sırasında bir hata oluştu. Gerekirse manuel olarak 'qwen login' çalıştırın."
-    ["warn_no_tty"]="TTY erişimi yok. Lütfen manuel olarak 'qwen login' çalıştırın."
-    ["install_done"]="Qwen CLI kurulumu tamamlandı!"
-)
-
-declare -A QWEN_TEXT_EN=(
-    ["install_title"]="Starting Qwen CLI installation..."
     ["npm_missing"]="npm command not found. Please install Node.js first."
     ["install_fail"]="Qwen CLI npm installation failed. Package: %s"
     ["command_missing"]="'qwen' command not found. Check your PATH."
@@ -69,6 +31,12 @@ declare -A QWEN_TEXT_EN=(
     ["manual_skip"]="Authentication skipped for batch installs."
     ["manual_reminder"]="Please run '${GREEN}qwen login${NC}' manually after installation."
     ["install_done"]="Qwen CLI installation completed!"
+    ["install_done"]="Qwen CLI installation completed!"
+    ["package_required"]="The '--package' option requires a value."
+    ["unknown_arg"]="Unknown argument: %s"
+    ["dry_run_requirement"]="Will verify Node.js >= %s."
+    ["dry_run_install"]="npm install -g %s"
+    ["dry_run_skip"]="Authentication is skipped in dry-run mode."
 )
 
 declare -A QWEN_TEXT_TR=(
@@ -83,6 +51,11 @@ declare -A QWEN_TEXT_TR=(
     ["manual_skip"]="Toplu kuruluma göre kimlik doğrulama adımı atlandı."
     ["manual_reminder"]="Kurulum sonrası '${GREEN}qwen login${NC}' komutunu manuel olarak çalıştırmayı unutmayın."
     ["install_done"]="Qwen CLI kurulumu tamamlandı!"
+    ["package_required"]="'--package' seçeneği bir değer gerektirir."
+    ["unknown_arg"]="Bilinmeyen argüman: %s"
+    ["dry_run_requirement"]="Node.js >= %s gereksinimi doğrulanacak."
+    ["dry_run_install"]="npm install -g %s"
+    ["dry_run_skip"]="Dry-run modunda kimlik doğrulama adımları atlanır."
 )
 
 qwen_text() {
@@ -93,6 +66,16 @@ qwen_text() {
     else
         printf "%s" "$default_value"
     fi
+}
+
+qwen_printf() {
+    local __out="$1"
+    local __key="$2"
+    shift 2
+    local __fmt
+    __fmt="$(qwen_text "$__key")"
+    # shellcheck disable=SC2059
+    printf -v "$__out" "$__fmt" "$@"
 }
 
 ensure_npm_available() {
@@ -123,14 +106,16 @@ install_qwen_cli() {
                 ;;
             --package)
                 if [ -z "${2:-}" ]; then
-                    echo -e "${RED}${ERROR_TAG}${NC} '--package' seçeneği bir değer gerektirir."
+                    echo -e "${RED}${ERROR_TAG}${NC} $(qwen_text package_required)"
                     return 1
                 fi
                 package_spec="$2"
                 shift
                 ;;
             *)
-                echo -e "${YELLOW}${WARN_TAG}${NC} Bilinmeyen argüman: $1"
+                local qwen_unknown_msg
+                qwen_printf qwen_unknown_msg unknown_arg "$1"
+                echo -e "${YELLOW}${WARN_TAG}${NC} ${qwen_unknown_msg}"
                 ;;
         esac
         shift || true

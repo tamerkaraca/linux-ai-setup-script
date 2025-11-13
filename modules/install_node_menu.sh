@@ -16,9 +16,14 @@ if ! declare -f run_module >/dev/null 2>&1; then
         local module_url="${BASE_URL}/${module_name}.sh"
         shift
         if [ -f "./modules/${module_name}.sh" ]; then
-            PKG_MANAGER="${PKG_MANAGER:-}" UPDATE_CMD="${UPDATE_CMD:-}" INSTALL_CMD="${INSTALL_CMD:-}" bash "./modules/${module_name}.sh" "$@"
+            PKG_MANAGER="${PKG_MANAGER:-}" UPDATE_CMD="${UPDATE_CMD:-}" INSTALL_CMD="${INSTALL_CMD:-}" \
+            BASE_URL="${BASE_URL:-}" REMOTE_MODULE_DIR="${REMOTE_MODULE_DIR:-}" LANGUAGE="${LANGUAGE:-}" \
+            bash "./modules/${module_name}.sh" "$@"
         else
-            curl -fsSL "$module_url" | PKG_MANAGER="${PKG_MANAGER:-}" UPDATE_CMD="${UPDATE_CMD:-}" INSTALL_CMD="${INSTALL_CMD:-}" bash -s -- "$@"
+            curl -fsSL "$module_url" | \
+            PKG_MANAGER="${PKG_MANAGER:-}" UPDATE_CMD="${UPDATE_CMD:-}" INSTALL_CMD="${INSTALL_CMD:-}" \
+            BASE_URL="${BASE_URL:-}" REMOTE_MODULE_DIR="${REMOTE_MODULE_DIR:-}" LANGUAGE="${LANGUAGE:-}" \
+            bash -s -- "$@"
         fi
     }
 fi

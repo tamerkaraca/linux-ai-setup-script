@@ -6,7 +6,7 @@
 # SuperClaude kaldırma
 remove_superclaude() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude kaldırma işlemi başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} SuperClaude kaldırma işlemi başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
 
     local pipx_removed=false
@@ -15,16 +15,16 @@ remove_superclaude() {
     if command -v pipx &> /dev/null; then
         if pipx list 2>/dev/null | grep -q "SuperClaude"; then
             if pipx uninstall SuperClaude; then
-                echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude pipx ortamından kaldırıldı."
+                echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperClaude pipx ortamından kaldırıldı."
                 pipx_removed=true
             else
-                echo -e "${RED}[HATA]${NC} SuperClaude pipx ortamından kaldırılamadı."
+                echo -e "${RED}${ERROR_TAG}${NC} SuperClaude pipx ortamından kaldırılamadı."
             fi
         else
-            echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude pipx ortamında bulunamadı."
+            echo -e "${YELLOW}${INFO_TAG}${NC} SuperClaude pipx ortamında bulunamadı."
         fi
     else
-        echo -e "${YELLOW}[UYARI]${NC} Pipx yüklü değil, doğrudan dosya temizliği yapılacak."
+        echo -e "${YELLOW}${WARN_TAG}${NC} Pipx yüklü değil, doğrudan dosya temizliği yapılacak."
     fi
 
     local superclaude_paths=(
@@ -47,9 +47,9 @@ remove_superclaude() {
     hash -r 2>/dev/null || true
 
     if [ "$pipx_removed" = true ] || [ "$paths_removed" = true ]; then
-        echo -e "${GREEN}[BAŞARILI]${NC} SuperClaude kaldırma işlemi tamamlandı."
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperClaude kaldırma işlemi tamamlandı."
     else
-        echo -e "${YELLOW}[BİLGİ]${NC} SuperClaude için kaldırılacak bir bileşen bulunamadı."
+        echo -e "${YELLOW}${INFO_TAG}${NC} SuperClaude için kaldırılacak bir bileşen bulunamadı."
     fi
 }
 

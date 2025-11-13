@@ -10,9 +10,9 @@ fi
 
 CURRENT_LANG="${LANGUAGE:-en}"
 if [ "$CURRENT_LANG" = "tr" ]; then
-    INFO_TAG="[BİLGİ]"
-    WARN_TAG="[UYARI]"
-    ERROR_TAG="[HATA]"
+    INFO_TAG="${INFO_TAG}"
+    WARN_TAG="${WARN_TAG}"
+    ERROR_TAG="${ERROR_TAG}"
 else
     INFO_TAG="[INFO]"
     WARN_TAG="[WARNING]"

@@ -14,14 +14,14 @@ attach_tty_and_run() {
 
 install_superqwen() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen Framework (Pipx) kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} SuperQwen Framework (Pipx) kurulumu başlatılıyor..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if ! command -v pipx &> /dev/null; then
-        echo -e "${YELLOW}[UYARI]${NC} SuperQwen için önce Pipx kuruluyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} SuperQwen için önce Pipx kuruluyor..."
         install_pipx
         if ! command -v pipx &> /dev/null; then
-            echo -e "${RED}[HATA]${NC} Pipx kurulumu başarısız, SuperQwen kurulamaz."
+            echo -e "${RED}${ERROR_TAG}${NC} Pipx kurulumu başarısız, SuperQwen kurulamaz."
             return 1
         fi
     fi
@@ -29,31 +29,31 @@ install_superqwen() {
     reload_shell_configs
     export PATH="$HOME/.local/bin:$PATH"
 
-    echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen indiriliyor ve kuruluyor (pipx)..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} SuperQwen indiriliyor ve kuruluyor (pipx)..."
     pipx install SuperQwen
     
     export PATH="$HOME/.local/bin:$PATH"
     
     if ! command -v SuperQwen &> /dev/null; then
-        echo -e "${RED}[HATA]${NC} SuperQwen (pipx) kurulumu başarısız!"
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen terminali yeniden başlatıp tekrar deneyin."
+        echo -e "${RED}${ERROR_TAG}${NC} SuperQwen (pipx) kurulumu başarısız!"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen terminali yeniden başlatıp tekrar deneyin."
         return 1
     fi
     
-    echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen (pipx) kurulumu tamamlandı."
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperQwen (pipx) kurulumu tamamlandı."
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}   SuperQwen Yapılandırması Başlatılıyor...${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
-    echo -e "${YELLOW}[BİLGİ]${NC} SuperQwen install komutu çalıştırılıyor..."
-    echo -e "${YELLOW}[BİLGİ]${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} SuperQwen install komutu çalıştırılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
 
     if attach_tty_and_run SuperQwen install; then
-        echo -e "${GREEN}[BAŞARILI]${NC} SuperQwen yapılandırması tamamlandı!"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperQwen yapılandırması tamamlandı!"
     else
-        echo -e "${RED}[HATA]${NC} SuperQwen 'install' komutu başarısız!"
-        echo -e "${YELLOW}[BİLGİ]${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperQwen install${NC}' komutuyla yapılandırabilirsiniz."
+        echo -e "${RED}${ERROR_TAG}${NC} SuperQwen 'install' komutu başarısız!"
+        echo -e "${YELLOW}${INFO_TAG}${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperQwen install${NC}' komutuyla yapılandırabilirsiniz."
     fi
 
     echo -e "\n${CYAN}╔═══════════════════════════════════════════════╗${NC}"

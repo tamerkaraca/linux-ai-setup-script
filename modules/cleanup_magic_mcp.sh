@@ -6,31 +6,31 @@
 # SuperGemini MCP Sunucu Temizleme
 cleanup_magic_mcp() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}[BİLGİ]${NC} SuperGemini MCP Sunucu Yapılandırması Temizleme..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} SuperGemini MCP Sunucu Yapılandırması Temizleme..."
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     SETTINGS_FILE="$HOME/.gemini/settings.json"
     
     if ! command -v jq &> /dev/null; then
-        echo -e "${RED}[HATA]${NC} 'jq' komutu bulunamadı. Bu özellik için 'jq' gereklidir."
-        echo -e "${YELLOW}[BİLGİ]${NC} Lütfen 'jq' paketini kurun (örn: sudo apt install jq)."
+        echo -e "${RED}${ERROR_TAG}${NC} 'jq' komutu bulunamadı. Bu özellik için 'jq' gereklidir."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen 'jq' paketini kurun (örn: sudo apt install jq)."
         return 1
     fi
     
     if [ ! -f "$SETTINGS_FILE" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} $SETTINGS_FILE bulunamadı, işlem atlanıyor."
+        echo -e "${YELLOW}${INFO_TAG}${NC} $SETTINGS_FILE bulunamadı, işlem atlanıyor."
         return 0
     fi
 
     if ! jq -e '.mcpServers' "$SETTINGS_FILE" > /dev/null; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Dosyada 'mcpServers' ayarı bulunmuyor."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Dosyada 'mcpServers' ayarı bulunmuyor."
         return 0
     fi
 
     mapfile -t mcp_servers < <(jq -r '.mcpServers | keys[]' "$SETTINGS_FILE")
 
     if [ ${#mcp_servers[@]} -eq 0 ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Yapılandırılmış MCP sunucusu bulunamadı."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Yapılandırılmış MCP sunucusu bulunamadı."
         return 0
     fi
 
@@ -41,11 +41,11 @@ cleanup_magic_mcp() {
         index=$((index + 1))
     done
     echo -e "  ${RED}0${NC} - İptal"
-    echo -e "${YELLOW}[BİLGİ]${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
+    echo -e "${YELLOW}${INFO_TAG}${NC} Birden fazla seçim için virgülle ayırın (örn: 1,2,3)"
 
     read -r -p "Seçiminiz: " choices </dev/tty
     if [ "$choices" = "0" ] || [ -z "$choices" ]; then
-        echo -e "${YELLOW}[BİLGİ]${NC} Temizleme işlemi iptal edildi."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Temizleme işlemi iptal edildi."
         return 0
     fi
 
@@ -59,34 +59,34 @@ cleanup_magic_mcp() {
     for choice in "${SELECTED_INDICES[@]}"; do
         choice=$(echo "$choice" | tr -d ' ')
         if ! [[ "$choice" =~ ^[1-9][0-9]*$ ]]; then
-            echo -e "${RED}[HATA]${NC} Geçersiz seçim: $choice"
+            echo -e "${RED}${ERROR_TAG}${NC} Geçersiz seçim: $choice"
             continue
         fi
 
         local idx=$((choice - 1))
         if [ $idx -lt 0 ] || [ $idx -ge ${#mcp_servers[@]} ]; then
-            echo -e "${RED}[HATA]${NC} Desteklenmeyen seçim: $choice"
+            echo -e "${RED}${ERROR_TAG}${NC} Desteklenmeyen seçim: $choice"
             continue
         fi
 
         local server_to_remove="${mcp_servers[$idx]}"
-        echo -e "${YELLOW}[BİLGİ]${NC} '${server_to_remove}' MCP sunucusu kaldırılıyor..."
+        echo -e "${YELLOW}${INFO_TAG}${NC} '${server_to_remove}' MCP sunucusu kaldırılıyor..."
         
         jq "del(.mcpServers.\"$server_to_remove\")" "$temp_file" > "$temp_file.tmp" && mv "$temp_file.tmp" "$temp_file"
         if [ $? -eq 0 ]; then
-            echo -e "${GREEN}[BAŞARILI]${NC} '${server_to_remove}' kaldırıldı."
+            echo -e "${GREEN}${SUCCESS_TAG}${NC} '${server_to_remove}' kaldırıldı."
             changes_made=true
         else
-            echo -e "${RED}[HATA]${NC} '${server_to_remove}' kaldırılırken hata oluştu."
+            echo -e "${RED}${ERROR_TAG}${NC} '${server_to_remove}' kaldırılırken hata oluştu."
         fi
     done
 
     if [ "$changes_made" = true ]; then
         mv "$temp_file" "$SETTINGS_FILE"
-        echo -e "${GREEN}[BAŞARILI]${NC} Değişiklikler $SETTINGS_FILE dosyasına kaydedildi."
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} Değişiklikler $SETTINGS_FILE dosyasına kaydedildi."
     else
         rm -f "$temp_file"
-        echo -e "${YELLOW}[BİLGİ]${NC} Hiçbir değişiklik yapılmadı."
+        echo -e "${YELLOW}${INFO_TAG}${NC} Hiçbir değişiklik yapılmadı."
     fi
 }
 

@@ -131,8 +131,8 @@ ensure_cline_build_prereqs() {
             sudo apt install -y build-essential python3 python3-dev >/dev/null 2>&1
             ;;
         dnf|dnf5)
-            sudo "${PKG_MANAGER}" install -y @'Development Tools' python3 python3-devel make gcc-c++ >/dev/null 2>&1 || \
-            sudo "${PKG_MANAGER}" group install -y "Development Tools" >/dev/null 2>&1
+            dnf_group_install "Development Tools"
+            sudo "${PKG_MANAGER}" install -y python3 python3-devel make gcc-c++ >/dev/null 2>&1
             ;;
         yum)
             sudo yum groupinstall -y "Development Tools" >/dev/null 2>&1

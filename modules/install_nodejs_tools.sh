@@ -81,17 +81,52 @@ install_bun() {
     fi
 }
 
+install_node_extras() {
+    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
+    echo -e "${YELLOW}[BİLGİ]${NC} Node CLI ek paketleri yükleniyor..."
+    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+
+    if ! command -v node >/dev/null 2>&1; then
+        echo -e "${RED}[HATA]${NC} Node.js bulunamadı. Lütfen önce NVM/Node kurulumunu çalıştırın."
+        return 1
+    fi
+
+    echo -e "${YELLOW}[BİLGİ]${NC} corepack etkinleştiriliyor..."
+    corepack enable || true
+
+    echo -e "${YELLOW}[BİLGİ]${NC} pnpm ve yarn global olarak kuruluyor..."
+    if ! npm install -g pnpm yarn >/dev/null 2>&1; then
+        echo -e "${YELLOW}[UYARI]${NC} pnpm/yarn kurulurken bir hata oluştu."
+    fi
+
+    echo -e "${GREEN}[BAŞARILI]${NC} Ek Node araçları yapılandırıldı."
+}
+
 main() {
     local install_node="true"
     local install_bun_flag="true"
+    local install_extras_flag="true"
 
     while [[ $# -gt 0 ]]; do
         case "$1" in
             --node-only)
                 install_bun_flag="false"
+                install_extras_flag="false"
                 ;;
             --bun-only)
                 install_node="false"
+                install_extras_flag="false"
+                ;;
+            --extras-only)
+                install_node="false"
+                install_bun_flag="false"
+                install_extras_flag="true"
+                ;;
+            --with-extras)
+                install_extras_flag="true"
+                ;;
+            --skip-extras)
+                install_extras_flag="false"
                 ;;
             --skip-bun)
                 install_bun_flag="false"
@@ -109,6 +144,10 @@ main() {
 
     if [ "$install_bun_flag" = "true" ]; then
         install_bun
+    fi
+
+    if [ "$install_extras_flag" = "true" ]; then
+        install_node_extras || true
     fi
 
     reload_shell_configs

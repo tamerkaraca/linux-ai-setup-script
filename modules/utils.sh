@@ -9,6 +9,120 @@ CYAN=$'\033[0;36m'
 NC=$'\033[0m' # No Color
 export RED GREEN YELLOW BLUE CYAN NC
 
+# Dil ve yerelleştirme ayarları
+SUPPORTED_LANGUAGES=(en tr)
+
+detect_system_language() {
+    local locale_value="${LC_ALL:-${LANG:-}}"
+    if [[ "$locale_value" =~ ^tr ]]; then
+        echo "tr"
+    else
+        echo "en"
+    fi
+}
+
+set_language() {
+    local target_lang="$1"
+    for lang in "${SUPPORTED_LANGUAGES[@]}"; do
+        if [ "$lang" = "$target_lang" ]; then
+            LANGUAGE="$lang"
+            export LANGUAGE
+            return 0
+        fi
+    done
+    return 1
+}
+
+if [ -z "${LANGUAGE:-}" ]; then
+    LANGUAGE="$(detect_system_language)"
+fi
+export LANGUAGE
+
+get_language_label() {
+    case "$1" in
+        tr) echo "Türkçe" ;;
+        *) echo "English" ;;
+    esac
+}
+
+declare -A TEXT_EN=(
+    ["menu_title"]="MAIN INSTALL MENU"
+    ["menu_subtitle"]="Select an action"
+    ["menu_option1"]="Update system packages and core tools"
+    ["menu_option2"]="Install Python, Pip/Pipx, UV"
+    ["menu_option3"]="Open Node.js tool sub-menu"
+    ["menu_option4"]="Install AI CLI tools"
+    ["menu_option5"]="Install AI frameworks"
+    ["menu_option6"]="Configure Git"
+    ["menu_option7"]="Configure Claude Code providers"
+    ["menu_option8"]="Install PHP & Composer"
+    ["menu_option9"]="Install GitHub CLI"
+    ["menu_option10"]="Remove AI frameworks"
+    ["menu_option11"]="Manage MCP servers"
+    ["menu_optionA"]="Run everything sequentially"
+    ["menu_option0"]="Exit"
+    ["menu_language_option"]="Switch language"
+    ["menu_current_language"]="Current language"
+    ["menu_multi_hint"]="Use commas for multiple selections (e.g., 1,4,5)."
+    ["prompt_choice"]="Your choice"
+    ["prompt_press_enter"]="Press Enter to continue..."
+    ["warning_no_selection"]="No selection detected, please try again."
+    ["warning_invalid_choice"]="Invalid selection"
+    ["info_returning"]="Returning to the previous menu."
+    ["info_language_switched"]="Language updated."
+    ["node_menu_title"]="Node.js Tooling Menu"
+    ["node_menu_subtitle"]="Pick one or more components to install/update"
+    ["node_option1"]="Install or update Node.js (NVM + latest LTS)"
+    ["node_option2"]="Install or update Bun runtime"
+    ["node_option3"]="Install Node CLI extras (Corepack, pnpm, yarn)"
+    ["node_option4"]="Install every component"
+    ["node_option0"]="Return to main menu"
+)
+
+declare -A TEXT_TR=(
+    ["menu_title"]="ANA KURULUM MENÜSÜ"
+    ["menu_subtitle"]="Bir işlem seçin"
+    ["menu_option1"]="Sistemi güncelle ve temel paketleri kur"
+    ["menu_option2"]="Python, Pip/Pipx ve UV kur"
+    ["menu_option3"]="Node.js araç alt menüsünü aç"
+    ["menu_option4"]="AI CLI araçlarını kur"
+    ["menu_option5"]="AI frameworklerini kur"
+    ["menu_option6"]="Git yapılandırması"
+    ["menu_option7"]="Claude Code sağlayıcı ayarları"
+    ["menu_option8"]="PHP & Composer kurulumu"
+    ["menu_option9"]="GitHub CLI kurulumu"
+    ["menu_option10"]="AI frameworklerini kaldır"
+    ["menu_option11"]="MCP sunucu yönetimi"
+    ["menu_optionA"]="Hepsini sırayla çalıştır"
+    ["menu_option0"]="Çıkış"
+    ["menu_language_option"]="Dili değiştir"
+    ["menu_current_language"]="Geçerli dil"
+    ["menu_multi_hint"]="Birden fazla seçim için virgül kullanın (örn: 1,4,5)."
+    ["prompt_choice"]="Seçiminiz"
+    ["prompt_press_enter"]="Devam etmek için Enter'a basın..."
+    ["warning_no_selection"]="Bir seçim yapılmadı, lütfen tekrar deneyin."
+    ["warning_invalid_choice"]="Geçersiz seçim"
+    ["info_returning"]="Önceki menüye dönülüyor."
+    ["info_language_switched"]="Dil güncellendi."
+    ["node_menu_title"]="Node.js Araç Menüsü"
+    ["node_menu_subtitle"]="Kurmak/güncellemek istediğiniz bileşenleri seçin"
+    ["node_option1"]="Node.js (NVM + son LTS) kur/güncelle"
+    ["node_option2"]="Bun runtime kur/güncelle"
+    ["node_option3"]="Node CLI ekstralarını kur (Corepack, pnpm, yarn)"
+    ["node_option4"]="Tüm bileşenleri kur"
+    ["node_option0"]="Ana menüye dön"
+)
+
+translate() {
+    local key="$1"
+    local default_value="${TEXT_EN["$key"]:-$key}"
+    if [ "$LANGUAGE" = "tr" ]; then
+        echo "${TEXT_TR["$key"]:-$default_value}"
+    else
+        echo "$default_value"
+    fi
+}
+
 # Modül indirmeleri için temel URL (ortak kullanılır, gerekirse dışarıdan BASE_URL override edilebilir)
 BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules}"
 

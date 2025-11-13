@@ -37,7 +37,7 @@
 
 ### Overview
 
-`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, Kilocode, Auggie, Factory Droid quickstart, OpenSpec, OpenAI Codex, Copilot CLI, Contains Studio & Wes Hobson agent packs), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration.
+`setup` prepares a Linux workstation for AI development. It auto-detects the package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, Kilocode, Auggie, Factory Droid quickstart, OpenSpec, OpenAI Codex, Copilot CLI, Contains Studio & Wes Hobson agent packs), AI frameworks (SuperGemini, SuperQwen, SuperClaude), GitHub CLI, MCP server maintenance, and GLM-4.6 configuration. The UI is bilingual: English is the default, Turkish is auto-selected when your locale starts with `tr`, and you can toggle languages anytime via menu option `L`.
 
 ### Architecture
 
@@ -87,7 +87,7 @@ bash -n setup && shellcheck setup  # optional
 |--------|-------------|
 | `1` | Update system packages + install essentials (`curl`, `wget`, `git`, `jq`, `zip`, compilers). |
 | `2` | Install Python toolchain: Python 3, Pip, ensurepip fallback, Pipx, UV; auto-reloads shell RC files. |
-| `3` | Install Node.js tooling: NVM, latest LTS node, npm upgrade guard, Bun. |
+| `3` | Open the Node.js tooling sub-menu (NVM + Node LTS, Bun, CLI extras). |
 | `4` | Install AI CLI tools (opens sub-menu). |
 | `5` | Install AI frameworks (opens sub-menu; handles Pipx, GLM prompts, tty-safe runs). |
 | `6` | Git configuration (name/email, signing, alias suggestions). |
@@ -96,10 +96,22 @@ bash -n setup && shellcheck setup  # optional
 | `9` | GitHub CLI install with official repo keys. |
 | `10` | Remove AI frameworks (Super* uninstall + cleanup). |
 | `11` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
+| `L` | Switch the interface language (English ↔ Türkçe, auto-detected default). |
 | `A` | Install everything sequentially (skips interactive logins, prints summaries). |
 | `0` | Exit. |
 
 ### CLI & Framework Sub-menus
+
+#### Node.js Tooling Menu
+Option `3` now opens an interactive menu that accepts comma-separated selections (`1,3`) and also exposes a `4` shortcut to run every component. Each choice calls the hardened installers under `modules/install_nodejs_tools.sh`, so you can mix-and-match without re-running the entire stack.
+
+| Option | Component | Highlights |
+|--------|-----------|------------|
+| `1` | Node.js via NVM | Installs/updates NVM, refreshes shell RC files, and installs the latest LTS release. |
+| `2` | Bun runtime | Runs Bun’s official installer, adds `~/.bun/bin` to PATH, and prints the detected version. |
+| `3` | Node CLI extras | Enables Corepack and installs `pnpm` + `yarn` globally, perfect for repo scripts and CI. |
+| `4` | Install every component | Executes options `1-3` sequentially. |
+| `0` | Return to main menu | No changes applied. |
 
 #### AI CLI Menu
 The sub-menu accepts comma-separated selections (`1,3,7`) or a `17` shortcut that installs every CLI sequentially. Option `11` installs Kilocode CLI (architect/debug/auto workflows) with Node.js guards, option `12` installs Augment’s Auggie CLI (Node 22+), and option `13` intentionally surfaces Factory’s Droid quickstart instructions so you always follow the upstream process. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `kilocode config`, `auggie login`, `droid quickstart`, `openspec init`, `copilot auth login`, etc.).
@@ -333,6 +345,7 @@ The framework menu ensures `pipx` exists (installing Python first if necessary),
 
 ### Usage Notes
 
+- **Language toggle:** English is the default, Turkish is auto-detected when your locale starts with `tr`, and you can flip languages anytime via menu option `L`.
 - **Environment reloads:** PATH updates for `pipx`, `uv`, `nvm`, `bun`, `gh`, etc., are appended to `~/.bashrc`, `~/.zshrc`, and `~/.profile`. The script auto-sources whichever exists so new commands are usable immediately.
 - **Remote execution:** The menu structure, colorized logs, and sub-modules behave the same whether you cloned locally or piped via curl.
 - **API keys:** Super* installers guide you through provider portals (Gemini, Anthropic, OpenAI). GLM configuration masks existing keys (`abcd***wxyz`) and only replaces them if you supply a new value.
@@ -375,7 +388,7 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 
 ### Genel Bakış
 
-`setup`, Linux tabanlı geliştirici makinelerinde uçtan uca AI ortamı kurar. Paket yöneticisini otomatik saptar, CRLF düzeltir, Python/Node/PHP ekosistemlerini kurar, AI CLI & framework menüleri sunar (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, Kilocode, Auggie, Factory Droid quickstart, OpenSpec, OpenAI Codex, GitHub Copilot CLI, Contains Studio & Wes Hobson ajan paketleri), GLM-4.6 yapılandırmasını ve MCP temizliğini yönetir.
+`setup`, Linux tabanlı geliştirici makinelerinde uçtan uca AI ortamı kurar. Paket yöneticisini otomatik saptar, CRLF düzeltir, Python/Node/PHP ekosistemlerini kurar, AI CLI & framework menüleri sunar (Claude Code, Gemini CLI, OpenCode, Qoder, Qwen, Cursor Agent, Cline, Aider, Kilocode, Auggie, Factory Droid quickstart, OpenSpec, OpenAI Codex, GitHub Copilot CLI, Contains Studio & Wes Hobson ajan paketleri), GLM-4.6 yapılandırmasını ve MCP temizliğini yönetir. Arayüz iki dillidir: varsayılan İngilizcedir, sistem dili `tr` ile başlıyorsa otomatik olarak Türkçe açılır ve menüdeki `L` seçeneğiyle anında dil değiştirebilirsiniz.
 
 ### Mimari
 
@@ -423,7 +436,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 |---------|---------|
 | `1` | Sistem güncellemesi + temel paketler. |
 | `2` | Python + Pip/Pipx/UV kurulumu, PATH güncellemeleri. |
-| `3` | Node.js/NVM/Bun kurulumu. |
+| `3` | Node.js araç alt menüsü (NVM + Node LTS, Bun, CLI ekstraları). |
 | `4` | AI CLI araçları (alt menü). |
 | `5` | AI Frameworkleri (SuperGemini/SuperQwen/SuperClaude). |
 | `6` | Git yapılandırması. |
@@ -432,10 +445,22 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `9` | GitHub CLI. |
 | `10` | AI Framework kaldırma menüsü. |
 | `11` | MCP sunucularını listeleme/temizleme. |
+| `L` | Dili değiştir (varsayılan İngilizce, `tr` lokalli sistemlerde otomatik Türkçe açılır). |
 | `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
 | `0` | Çıkış. |
 
 ### Alt Menü Detayları
+
+#### Node.js Araç Menüsü
+`3` numaralı seçenek artık çoklu seçim desteği olan bir alt menü açar. Virgülle ayrılmış girişler (`1,3`) desteklenir ve `4` kısayolu tüm bileşenleri ardışık olarak kurar.
+
+| Seçenek | Bileşen | Detaylar |
+|---------|---------|----------|
+| `1` | Node.js (NVM + LTS) | NVM’i kurar/günceller, shell RC dosyalarını ayarlar ve son LTS Node sürümünü yükler. |
+| `2` | Bun runtime | Resmî Bun kurulum betiğini çalıştırır, `~/.bun/bin` dizinini PATH’e ekler ve sürümü gösterir. |
+| `3` | Node CLI ekstraları | Corepack’i etkinleştirir, `pnpm` ve `yarn`’ı global olarak kurar; CI çalışmaları için idealdir. |
+| `4` | Tüm bileşenler | `1-3` seçeneklerini sırayla çalıştırır. |
+| `0` | Ana menü | Değişiklik yapılmadan geri dönülür. |
 
 #### AI CLI Menüsü
 Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `17` kısayolunu kabul eder. `11` numaralı Kilocode CLI seçeneği, architect/debug/auto modlarını etkinleştiren `@kilocode/cli` paketini Node.js ≥ 18 doğrulaması ile kurar; `12` numaralı Auggie CLI seçeneği Augment’in Node.js 22+ gerektiren `@augmentcode/auggie` paketini yükleyip `auggie login` akışını otomatik başlatır; `13` numaralı Droid CLI seçeneği ise Factory’nin quickstart talimatlarını terminalde gösterir ve manuel kurulum bağlantılarını paylaşır. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları (`claude login`, `gemini auth`, `cursor-agent login`, `cline login`, `aider --help`, `kilocode config`, `auggie login`, `droid quickstart`, `openspec init`, `copilot auth login` vb.) özet olarak yazdırır.
@@ -690,6 +715,7 @@ Her iki akış da ilgili dokümantasyon bağlantılarını gösterir ve mevcut a
 
 ### Kullanım Notları
 
+- **Dil geçişi:** Varsayılan dil İngilizce’dir; yerel ayarlarınız `tr` ile başlıyorsa menü Türkçe açılır ve `L` seçeneğiyle anında dil değiştirebilirsiniz.
 - **PATH güncellemeleri** script tarafından otomatik `source` edilir; yeni komutlar aynı terminalde erişilebilir.
 - **API anahtarları** maskelenerek gösterilir, boş bırakılırsa mevcut değer korunur.
 - **TTY gereksinimleri** `attach_tty_and_run` ile çözüldü; artık `Raw mode is not supported` hatası alınmaz.

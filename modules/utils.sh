@@ -334,6 +334,29 @@ translate_fmt() {
     printf "$template" "$@"
 }
 
+# Lightweight helper for ad-hoc bilingual strings without registering keys.
+translate_pair() {
+    local en_text="$1"
+    local tr_text="${2:-$1}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "$tr_text"
+    else
+        printf "%s" "$en_text"
+    fi
+}
+
+translate_pair_fmt() {
+    local en_text="$1"
+    local tr_text="${2:-$1}"
+    shift 2 || true
+    local template="$en_text"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        template="$tr_text"
+    fi
+    # shellcheck disable=SC2059
+    printf "$template" "$@"
+}
+
 # Modül indirmeleri için temel URL (ortak kullanılır, gerekirse dışarıdan BASE_URL override edilebilir)
 BASE_URL="${BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/modules}"
 

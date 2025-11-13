@@ -16,17 +16,95 @@ fi
 : "${CYAN:=$'\033[0;36m'}"
 : "${NC:=$'\033[0m'}"
 
+declare -A SUPERGEMINI_TEXT_EN=(
+    ["install_title"]="Starting SuperGemini Framework (pipx) installation..."
+    ["pipx_required"]="Installing Pipx first because SuperGemini requires it..."
+    ["pipx_fail"]="Pipx installation failed; SuperGemini cannot continue."
+    ["installing"]="Downloading and installing SuperGemini via pipx..."
+    ["install_fail"]="SuperGemini (pipx) installation failed!"
+    ["restart_notice"]="Please restart your terminal and try again."
+    ["install_done"]="SuperGemini (pipx) installation completed."
+    ["profile_select_title"]="Select a SuperGemini configuration profile:"
+    ["profile_express"]="Express (Recommended, guided install)"
+    ["profile_minimal"]="Minimal (Core only, fastest)"
+    ["profile_full"]="Full (Everything enabled)"
+    ["profile_choice_prompt"]="Your choice (1/2/3) [Default: 1]: "
+    ["profile_minimal_selected"]="Continuing with the Minimal profile..."
+    ["profile_full_selected"]="Continuing with the Full profile..."
+    ["profile_express_selected"]="Continuing with the Express (recommended) profile..."
+    ["running_command"]="Running command: %s"
+    ["api_key_prompt"]="API keys may be requested during this phase. Follow the on-screen prompts."
+    ["config_fail"]="The 'SuperGemini install' command failed!"
+    ["manual_config_note"]="You can rerun '${GREEN}SuperGemini install${NC}' later to supply API keys manually."
+    ["config_done"]="SuperGemini configuration completed!"
+    ["usage_tips_title"]="SuperGemini Framework usage tips:"
+    ["usage_start"]="Start: ${GREEN}SuperGemini${NC} (or ${GREEN}sg${NC})"
+    ["usage_update"]="Update: ${GREEN}pipx upgrade SuperGemini${NC}"
+    ["usage_remove"]="Remove: ${GREEN}pipx uninstall SuperGemini${NC}"
+    ["usage_reconfig"]="Reconfigure: ${GREEN}SuperGemini install${NC}"
+    ["usage_more_info"]="More info: https://github.com/SuperClaude-Org/SuperGemini"
+    ["api_guide_title"]="API key quick guide:"
+    ["api_gemini"]="Gemini API Key: ${CYAN}https://makersuite.google.com/app/apikey${NC}"
+    ["api_anthropic"]="Anthropic API Key: ${CYAN}https://console.anthropic.com/${NC}"
+    ["api_openai"]="OpenAI API Key: ${CYAN}https://platform.openai.com/api-keys${NC}"
+    ["api_install_prompt"]="'SuperGemini install' will prompt for these keys."
+)
+
+declare -A SUPERGEMINI_TEXT_TR=(
+    ["install_title"]="SuperGemini Framework (Pipx) kurulumu başlatılıyor..."
+    ["pipx_required"]="SuperGemini için önce Pipx kuruluyor..."
+    ["pipx_fail"]="Pipx kurulumu başarısız, SuperGemini kurulamaz."
+    ["installing"]="SuperGemini indiriliyor ve kuruluyor (pipx)..."
+    ["install_fail"]="SuperGemini (pipx) kurulumu başarısız!"
+    ["restart_notice"]="Lütfen terminali yeniden başlatıp tekrar deneyin."
+    ["install_done"]="SuperGemini (pipx) kurulumu tamamlandı."
+    ["profile_select_title"]="SuperGemini Yapılandırma Profili Seçin:"
+    ["profile_express"]="Express (Önerilen, hızlı kurulum)"
+    ["profile_minimal"]="Minimal (Sadece çekirdek, en hızlı)"
+    ["profile_full"]="Full (Tüm özellikler)"
+    ["profile_choice_prompt"]="Seçiminiz (1/2/3) [Varsayılan: 1]: "
+    ["profile_minimal_selected"]="Minimal profil ile kurulum yapılıyor..."
+    ["profile_full_selected"]="Full profil ile kurulum yapılıyor..."
+    ["profile_express_selected"]="Express (önerilen) profil ile kurulum yapılıyor..."
+    ["running_command"]="Komut çalıştırılıyor: %s"
+    ["api_key_prompt"]="Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin."
+    ["config_fail"]="SuperGemini 'install' komutu başarısız!"
+    ["manual_config_note"]="Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperGemini install${NC}' komutuyla yapılandırabilirsiniz."
+    ["config_done"]="SuperGemini yapılandırması tamamlandı!"
+    ["usage_tips_title"]="SuperGemini Framework Kullanım İpuçları:"
+    ["usage_start"]="Başlatma: ${GREEN}SuperGemini${NC} (veya ${GREEN}sg${NC})"
+    ["usage_update"]="Güncelleme: ${GREEN}pipx upgrade SuperGemini${NC}"
+    ["usage_remove"]="Kaldırma: ${GREEN}pipx uninstall SuperGemini${NC}"
+    ["usage_reconfig"]="Yeniden yapılandırma: ${GREEN}SuperGemini install${NC}"
+    ["usage_more_info"]="Daha fazla bilgi: https://github.com/SuperClaude-Org/SuperGemini"
+    ["api_guide_title"]="API Anahtarı Alma Rehberi:"
+    ["api_gemini"]="Gemini API Key: ${CYAN}https://makersuite.google.com/app/apikey${NC}"
+    ["api_anthropic"]="Anthropic API Key: ${CYAN}https://console.anthropic.com/${NC}"
+    ["api_openai"]="OpenAI API Key: ${CYAN}https://platform.openai.com/api-keys${NC}"
+    ["api_install_prompt"]="'SuperGemini install' komutu sizden bu anahtarları isteyecektir."
+)
+
+supergemini_text() {
+    local key="$1"
+    local default_value="${SUPERGEMINI_TEXT_EN[$key]:-$key}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${SUPERGEMINI_TEXT_TR[$key]:-$default_value}"
+    else
+        printf "%s" "$default_value"
+    fi
+}
+
 # SuperGemini Framework kurulumu (Pipx ile)
 install_supergemini() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}${INFO_TAG}${NC} SuperGemini Framework (Pipx) kurulumu başlatılıyor..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "install_title")"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
     
     if ! command -v pipx &> /dev/null; then
-        echo -e "${YELLOW}${WARN_TAG}${NC} SuperGemini için önce Pipx kuruluyor..."
+        echo -e "${YELLOW}${WARN_TAG}${NC} $(supergemini_text "pipx_required")"
         install_pipx
         if ! command -v pipx &> /dev/null; then
-            echo -e "${RED}${ERROR_TAG}${NC} Pipx kurulumu başarısız, SuperGemini kurulamaz."
+            echo -e "${RED}${ERROR_TAG}${NC} $(supergemini_text "pipx_fail")"
             return 1
         fi
     fi
@@ -34,45 +112,50 @@ install_supergemini() {
     reload_shell_configs silent
     export PATH="$HOME/.local/bin:$PATH"
 
-    echo -e "${YELLOW}${INFO_TAG}${NC} SuperGemini indiriliyor ve kuruluyor (pipx)..."
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "installing")"
     pipx install SuperGemini
     
     export PATH="$HOME/.local/bin:$PATH"
     
     if ! command -v SuperGemini &> /dev/null; then
-        echo -e "${RED}${ERROR_TAG}${NC} SuperGemini (pipx) kurulumu başarısız!"
-        echo -e "${YELLOW}${INFO_TAG}${NC} Lütfen terminali yeniden başlatıp tekrar deneyin."
+        echo -e "${RED}${ERROR_TAG}${NC} $(supergemini_text "install_fail")"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "restart_notice")"
         return 1
     fi
     
-    echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperGemini (pipx) kurulumu tamamlandı."
+    echo -e "${GREEN}${SUCCESS_TAG}${NC} $(supergemini_text "install_done")"
 
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}   SuperGemini Yapılandırma Profili Seçin:${NC}"
+    echo -e "${YELLOW}   $(supergemini_text "profile_select_title")${NC}"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-    echo -e "  ${GREEN}1${NC} - Express (Önerilen, hızlı kurulum)"
-    echo -e "  ${GREEN}2${NC} - Minimal (Sadece çekirdek, en hızlı)"
-    echo -e "  ${GREEN}3${NC} - Full (Tüm özellikler)"
-    read -r -p "Seçiminiz (1/2/3) [Varsayılan: 1]: " setup_choice </dev/tty
+    echo -e "  ${GREEN}1${NC} - $(supergemini_text "profile_express")"
+    echo -e "  ${GREEN}2${NC} - $(supergemini_text "profile_minimal")"
+    echo -e "  ${GREEN}3${NC} - $(supergemini_text "profile_full")"
+    read -r -p "$(supergemini_text "profile_choice_prompt")" setup_choice </dev/tty
     
     SETUP_CMD=""
     case $setup_choice in
         2)
-            echo -e "${YELLOW}${INFO_TAG}${NC} Minimal profil ile kurulum yapılıyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "profile_minimal_selected")"
             SETUP_CMD="SuperGemini install --profile minimal --yes"
             ;; 
         3)
-            echo -e "${YELLOW}${INFO_TAG}${NC} Full profil ile kurulum yapılıyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "profile_full_selected")"
             SETUP_CMD="SuperGemini install --profile full --yes"
             ;; 
         *)
-            echo -e "${YELLOW}${INFO_TAG}${NC} Express (önerilen) profil ile kurulum yapılıyor..."
+            echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "profile_express_selected")"
             SETUP_CMD="SuperGemini install --yes"
             ;; 
     esac
     
-    echo -e "${YELLOW}${INFO_TAG}${NC} $SETUP_CMD komutu çalıştırılıyor..."
-    echo -e "${YELLOW}${INFO_TAG}${NC} Bu aşamada API anahtarlarınız istenebilir. Lütfen ekranı takip edin.${NC}"
+    local running_cmd_fmt
+    running_cmd_fmt="$(supergemini_text "running_command")"
+    # shellcheck disable=SC2059
+    printf -v running_cmd_msg "$running_cmd_fmt" "$SETUP_CMD"
+    echo -e "${YELLOW}${INFO_TAG}${NC} ${running_cmd_msg}"
+
+    echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "api_key_prompt")${NC}"
     
     local install_success="true"
     if [ "$setup_choice" = "2" ]; then
@@ -90,28 +173,28 @@ install_supergemini() {
     fi
     
     if [ "$install_success" != "true" ]; then
-        echo -e "${RED}${ERROR_TAG}${NC} SuperGemini 'install' komutu başarısız!"
-        echo -e "${YELLOW}${INFO_TAG}${NC} Gerekli API anahtarlarını daha sonra manuel olarak '${GREEN}SuperGemini install${NC}' komutuyla yapılandırabilirsiniz."
+        echo -e "${RED}${ERROR_TAG}${NC} $(supergemini_text "config_fail")"
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(supergemini_text "manual_config_note")"
     else
-        echo -e "${GREEN}${SUCCESS_TAG}${NC} SuperGemini yapılandırması tamamlandı!"
+        echo -e "${GREEN}${SUCCESS_TAG}${NC} $(supergemini_text "config_done")"
     fi
 
     echo -e "\n${CYAN}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}   SuperGemini Framework Kullanım İpuçları:${NC}"
+    echo -e "${CYAN}   $(supergemini_text "usage_tips_title")${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════╝${NC}"
-    echo -e "  ${GREEN}•${NC} Başlatma: ${GREEN}SuperGemini${NC} (veya ${GREEN}sg${NC})"
-    echo -e "  ${GREEN}•${NC} Güncelleme: ${GREEN}pipx upgrade SuperGemini${NC}"
-    echo -e "  ${GREEN}•${NC} Kaldırma: ${GREEN}pipx uninstall SuperGemini${NC}"
-    echo -e "  ${GREEN}•${NC} Yeniden yapılandırma: ${GREEN}SuperGemini install${NC}"
-    echo -e "  ${GREEN}•${NC} Daha fazla bilgi: https://github.com/SuperClaude-Org/SuperGemini"
+    echo -e "  ${GREEN}•${NC} $(supergemini_text "usage_start")"
+    echo -e "  ${GREEN}•${NC} $(supergemini_text "usage_update")"
+    echo -e "  ${GREEN}•${NC} $(supergemini_text "usage_remove")"
+    echo -e "  ${GREEN}•${NC} $(supergemini_text "usage_reconfig")"
+    echo -e "  ${GREEN}•${NC} $(supergemini_text "usage_more_info")"
     
     echo -e "\n${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}   API Anahtarı Alma Rehberi:${NC}"
+    echo -e "${YELLOW}   $(supergemini_text "api_guide_title")${NC}"
     echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
-    echo -e "${GREEN}1.${NC} Gemini API Key: ${CYAN}https://makersuite.google.com/app/apikey${NC}"
-    echo -e "${GREEN}2.${NC} Anthropic API Key: ${CYAN}https://console.anthropic.com/${NC}"
-    echo -e "${GREEN}3.${NC} OpenAI API Key: ${CYAN}https://platform.openai.com/api-keys${NC}"
-    echo -e "\n${YELLOW}${INFO_TAG}${NC} 'SuperGemini install' komutu sizden bu anahtarları isteyecektir."
+    echo -e "${GREEN}1.${NC} $(supergemini_text "api_gemini")"
+    echo -e "${GREEN}2.${NC} $(supergemini_text "api_anthropic")"
+    echo -e "${GREEN}3.${NC} $(supergemini_text "api_openai")"
+    echo -e "\n${YELLOW}${INFO_TAG}${NC} $(supergemini_text "api_install_prompt")"
 }
 
 # Ana kurulum akışı

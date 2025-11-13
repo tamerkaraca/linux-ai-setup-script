@@ -38,6 +38,8 @@ declare -A CURSOR_TEXT_EN=(
     ["batch_skip"]="Authentication skipped in batch mode."
     ["batch_reminder"]="Please run '%s' manually after installation."
     ["install_done"]="Cursor Agent CLI installation completed!"
+    ["package_required"]="The '--package' option requires a value."
+    ["unknown_arg"]="Unknown argument: %s"
 )
 
 declare -A CURSOR_TEXT_TR=(
@@ -59,6 +61,8 @@ declare -A CURSOR_TEXT_TR=(
     ["batch_skip"]="Toplu kurulum modunda kimlik doğrulama atlandı."
     ["batch_reminder"]="Kurulum sonrası '%s' komutunu manuel çalıştırmayı unutmayın."
     ["install_done"]="Cursor Agent CLI kurulumu tamamlandı!"
+    ["package_required"]="'--package' seçeneği bir değer gerektirir."
+    ["unknown_arg"]="Bilinmeyen argüman: %s"
 )
 
 cursor_text() {
@@ -109,14 +113,16 @@ install_cursor_cli() {
                 ;;
             --package)
                 if [ -z "${2:-}" ]; then
-                    echo -e "${RED}${ERROR_TAG}${NC} '--package' seçeneği bir değer gerektirir."
+                    echo -e "${RED}${ERROR_TAG}${NC} $(cursor_text package_required)"
                     return 1
                 fi
                 package_spec="$2"
                 shift
                 ;;
             *)
-                echo -e "${YELLOW}${WARN_TAG}${NC} Bilinmeyen argüman: $1"
+                local cursor_unknown_msg
+                cursor_printf cursor_unknown_msg unknown_arg "$1"
+                echo -e "${YELLOW}${WARN_TAG}${NC} ${cursor_unknown_msg}"
                 ;;
         esac
         shift || true

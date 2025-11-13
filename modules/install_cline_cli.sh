@@ -42,6 +42,10 @@ declare -A CLINE_TEXT_EN=(
     ["batch_skip"]="Authentication skipped in batch mode."
     ["batch_reminder"]="Please run '%s' manually after installation."
     ["install_done"]="Cline CLI installation completed!"
+    ["package_required"]="The '--package' option requires a value."
+    ["unknown_arg"]="Unknown argument: %s"
+    ["build_tools_install"]="Installing required native build tools for Cline CLI: %s"
+    ["build_tools_warn"]="Could not auto-install build tools. Ensure 'make', 'g++', and 'python3' are available."
 )
 
 declare -A CLINE_TEXT_TR=(
@@ -65,6 +69,10 @@ declare -A CLINE_TEXT_TR=(
     ["batch_skip"]="Toplu kurulum modunda kimlik doğrulama atlandı."
     ["batch_reminder"]="Kurulum sonrası '%s' komutunu manuel olarak çalıştırmayı unutmayın."
     ["install_done"]="Cline CLI kurulumu tamamlandı!"
+    ["package_required"]="'--package' seçeneği bir değer gerektirir."
+    ["unknown_arg"]="Bilinmeyen argüman: %s"
+    ["build_tools_install"]="Cline CLI için gerekli derleme araçları kuruluyor: %s"
+    ["build_tools_warn"]="Derleme araçları otomatik kurulamadı. Lütfen 'make', 'g++' ve 'python3' komutlarının mevcut olduğundan emin olun."
 )
 
 cline_text() {
@@ -114,11 +122,9 @@ ensure_cline_build_prereqs() {
         detect_package_manager
     fi
 
-    if [ "${LANGUAGE:-en}" = "tr" ]; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} Cline CLI için gerekli derleme araçları kuruluyor: ${missing[*]}"
-    else
-        echo -e "${YELLOW}${INFO_TAG}${NC} Installing required native build tools for Cline CLI: ${missing[*]}"
-    fi
+    local cline_build_msg
+    cline_printf cline_build_msg build_tools_install "${missing[*]}"
+    echo -e "${YELLOW}${INFO_TAG}${NC} ${cline_build_msg}"
     case "$PKG_MANAGER" in
         apt)
             sudo apt update -y >/dev/null 2>&1 || true
@@ -136,7 +142,7 @@ ensure_cline_build_prereqs() {
             sudo pacman -Sy --noconfirm base-devel python >/dev/null 2>&1
             ;;
         *)
-            echo -e "${YELLOW}${WARN_TAG}${NC} Derleme araçları otomatik kurulamadı. Lütfen 'make', 'g++' ve 'python3' komutlarının mevcut olduğundan emin olun."
+            echo -e "${YELLOW}${WARN_TAG}${NC} $(cline_text build_tools_warn)"
             ;;
     esac
 }
@@ -159,7 +165,7 @@ install_cline_cli() {
                 ;;
             --package)
                 if [ -z "${2:-}" ]; then
-                    echo -e "${RED}${ERROR_TAG}${NC} '--package' seçeneği bir değer gerektirir."
+                    echo -e "${RED}${ERROR_TAG}${NC} $(cline_text package_required)"
                     return 1
                 fi
                 package_spec="$2"
@@ -167,7 +173,9 @@ install_cline_cli() {
                 shift
                 ;;
             *)
-                echo -e "${YELLOW}${WARN_TAG}${NC} Bilinmeyen argüman: $1"
+                local cline_unknown_msg
+                cline_printf cline_unknown_msg unknown_arg "$1"
+                echo -e "${YELLOW}${WARN_TAG}${NC} ${cline_unknown_msg}"
                 ;;
         esac
         shift || true

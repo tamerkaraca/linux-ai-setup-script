@@ -21,11 +21,10 @@ source "./modules/utils.sh"
 
 declare -A TERMINAL_MENU_TEXT_EN=(
     ["menu_title"]="Terminal Tools Menu"
-    ["option1"]="Zsh (Advanced Shell)"
-    ["option2"]="Oh My Zsh (Zsh Framework)"
+    ["option1"]="Zsh (Shell, Framework, Plugins & Configuration)"
     ["optionA"]="Install All Terminal Tools"
     ["option_return"]="Return to Main Menu"
-    ["menu_hint"]="You can make multiple selections with commas (e.g., 1,2)."
+    ["menu_hint"]="You can make multiple selections with commas (e.g., 1)."
     ["prompt_choice"]="Your choice"
     ["info_returning"]="Returning to the main menu..."
     ["warning_invalid_choice"]="Invalid choice"
@@ -34,11 +33,10 @@ declare -A TERMINAL_MENU_TEXT_EN=(
 
 declare -A TERMINAL_MENU_TEXT_TR=(
     ["menu_title"]="Terminal Araçları Menüsü"
-    ["option1"]="Zsh (Gelişmiş Shell)"
-    ["option2"]="Oh My Zsh (Zsh Framework'ü)"
+    ["option1"]="Zsh (Shell, Framework, Eklentiler ve Yapılandırma)"
     ["optionA"]="Tüm Terminal Araçlarını Kur"
     ["option_return"]="Ana Menüye Dön"
-    ["menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2)."
+    ["menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1)."
     ["prompt_choice"]="Seçiminiz"
     ["info_returning"]="Ana menüye dönülüyor..."
     ["warning_invalid_choice"]="Geçersiz seçim"
@@ -66,7 +64,6 @@ install_terminal_tools_menu() {
             printf "${BLUE}║%*s║${NC}\n" -43 " $(terminal_menu_text menu_title) "
             echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
             echo -e "  ${GREEN}1${NC} - $(terminal_menu_text option1)"
-            echo -e "  ${GREEN}2${NC} - $(terminal_menu_text option2)"
             echo -e "  ${GREEN}A${NC} - $(terminal_menu_text optionA)"
             echo -e "  ${RED}0${NC} - $(terminal_menu_text option_return)"
             echo -e "\n${YELLOW}$(terminal_menu_text menu_hint)${NC}"
@@ -86,11 +83,9 @@ install_terminal_tools_menu() {
         for choice in "${SELECTED_ITEMS[@]}"; do
             choice=$(echo "$choice" | tr -d '[:space:]')
             case $choice in
-                1) run_module "install_zsh" ;;
-                2) run_module "install_oh_my_zsh" ;;
+                1) run_module "install_zsh_plugins_menu" ;;
                 A|a) 
-                    run_module "install_zsh"
-                    run_module "install_oh_my_zsh"
+                    run_module "install_zsh_plugins_menu" "all"
                     all_installed=true
                     ;;
                 0) 

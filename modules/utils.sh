@@ -486,15 +486,15 @@ dnf_group_install() {
 
 update_system() {
     echo -e "\n${YELLOW}${INFO_TAG}${NC} $(translate log_system_update_start)"
-    eval "$UPDATE_CMD"
+    eval "$UPDATE_CMD" 2>/dev/null || true
     
     echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_system_install_basics)"
     
     if [ "$PKG_MANAGER" = "apt" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip-full")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip-full
+        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip-full 2>/dev/null || true
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "build-essential")"
-        eval "$INSTALL_CMD" build-essential
+        eval "$INSTALL_CMD" build-essential 2>/dev/null || true
         
     elif [ "$PKG_MANAGER" = "dnf" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"

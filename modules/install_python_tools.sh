@@ -290,16 +290,18 @@ install_pipx() {
         install_python
     fi
     
-    echo -e "${YELLOW}${INFO_TAG}${NC} $(py_text pipx_pkg_attempt)"
-    
-    if [ "$PKG_MANAGER" = "apt" ]; then
-        eval "$INSTALL_CMD" pipx
-    elif [ "$PKG_MANAGER" = "dnf" ]; then
-        eval "$INSTALL_CMD" pipx
-    elif [ "$PKG_MANAGER" = "pacman" ]; then
-        eval "$INSTALL_CMD" python-pipx
-    elif [ "$PKG_MANAGER" = "yum" ]; then
-        eval "$INSTALL_CMD" pipx
+    if ! command -v pipx &> /dev/null; then
+        echo -e "${YELLOW}${INFO_TAG}${NC} $(py_text pipx_pkg_attempt)"
+        
+        if [ "$PKG_MANAGER" = "apt" ]; then
+            eval "$INSTALL_CMD" pipx 2>/dev/null || true
+        elif [ "$PKG_MANAGER" = "dnf" ]; then
+            eval "$INSTALL_CMD" pipx 2>/dev/null || true
+        elif [ "$PKG_MANAGER" = "pacman" ]; then
+            eval "$INSTALL_CMD" python-pipx 2>/dev/null || true
+        elif [ "$PKG_MANAGER" = "yum" ]; then
+            eval "$INSTALL_CMD" pipx 2>/dev/null || true
+        fi
     fi
     
     if ! command -v pipx &> /dev/null; then

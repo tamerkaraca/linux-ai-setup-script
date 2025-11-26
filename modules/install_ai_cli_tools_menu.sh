@@ -27,6 +27,7 @@ declare -A AI_CLI_MENU_TEXT_EN=(
     ["ai_option11"]="Kilocode CLI"
     ["ai_option12"]="Auggie CLI"
     ["ai_option13"]="Droid CLI"
+    ["ai_option14"]="Jules CLI (Google)"
     ["ai_optionA"]="Install All AI CLI Tools"
     ["ai_option_return"]="Return to Main Menu"
     ["ai_menu_hint"]="You can make multiple selections with commas (e.g., 1,2,5)."
@@ -54,6 +55,7 @@ declare -A AI_CLI_MENU_TEXT_TR=(
     ["ai_option11"]="Kilocode CLI"
     ["ai_option12"]="Auggie CLI"
     ["ai_option13"]="Droid CLI"
+    ["ai_option14"]="Jules CLI (Google)"
     ["ai_optionA"]="Tüm AI CLI Araçlarını Kur"
     ["ai_option_return"]="Ana Menüye Dön"
     ["ai_menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2,5)."
@@ -193,6 +195,13 @@ install_ai_cli_tools_menu() {
                     success=1
                 fi
                 ;;
+            14)
+                label="Jules CLI"
+                login_hint="jules login"
+                if ! run_module "install_jules_cli" "$interactive"; then
+                    success=1
+                fi
+                ;;
             *)
                 echo -e "${RED}$(ai_cli_menu_text warning_invalid_choice): $option${NC}"
                 success=1
@@ -228,6 +237,7 @@ esac
             echo -e "  ${GREEN}11${NC} $(ai_cli_menu_text ai_option11)"
             echo -e "  ${GREEN}12${NC} $(ai_cli_menu_text ai_option12)"
             echo -e "  ${GREEN}13${NC} $(ai_cli_menu_text ai_option13)"
+            echo -e "  ${GREEN}14${NC} $(ai_cli_menu_text ai_option14)"
             echo -e "  ${GREEN}A${NC} $(ai_cli_menu_text ai_optionA)"
             echo -e "  ${RED}0${NC} $(ai_cli_menu_text ai_option_return)"
             echo -e "\n${YELLOW}$(ai_cli_menu_text ai_menu_hint)${NC}"
@@ -268,12 +278,12 @@ esac
             fi
 
             case $choice in
-                1|2|3|4|5|6|7|8|9|10|11|12|13)
+                1|2|3|4|5|6|7|8|9|10|11|12|13|14)
                     run_cli_choice "$choice" "$interactive_flag" || true
                     ;;
                 A)
                     batch_context=true
-                    for sub_choice in {1..13}; do
+                    for sub_choice in {1..14}; do
                         run_cli_choice "$sub_choice" "false" || true
                     done
                     all_installed=true
@@ -333,6 +343,7 @@ esac
                                 summary_hint="droid (Factory quickstart'a göre)"
                             fi
                             ;;
+                        "jules login") summary_hint="jules login" ;;
                     esac
                     echo -e "  ${GREEN}•${NC} ${summary_label}: ${GREEN}${summary_hint}${NC}"
                 else

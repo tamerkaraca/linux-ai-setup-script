@@ -93,46 +93,58 @@ install_superclaude() {
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${YELLOW}${INFO_TAG}${NC} $(superclaude_text "install_title")"
     echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-    
-    if ! command -v pipx &> /dev/null; then
-        echo -e "${YELLOW}${WARN_TAG}${NC} $(superclaude_text "pipx_required")"
-        install_pipx
-        if ! command -v pipx &> /dev/null; then
-            echo -e "${RED}${ERROR_TAG}${NC} $(superclaude_text "pipx_fail")"
-            return 1
-        fi
-    fi
-    
-    reload_shell_configs
-    export PATH="$HOME/.local/bin:$PATH"
 
-    echo -e "${YELLOW}${INFO_TAG}${NC} $(superclaude_text "installing")"
-    pipx install SuperClaude
+    # Following official documentation from https://github.com/SuperClaude-Org/SuperClaude_Framework/blob/master/docs/getting-started/installation.md
     
+    # Step 1: Install pipx
+    echo -e "\n${CYAN}--- Step 1: Installing/updating pipx...${NC}"
+    if ! python3 -m pip install --user --break-system-packages pipx; then
+        echo -e "${RED}${ERROR_TAG}${NC} Failed to install pipx using 'python3 -m pip'."
+        return 1
+    fi
+
+    # Step 2: Ensure pipx path is in system PATH
+    echo -e "\n${CYAN}--- Step 2: Ensuring pipx path is configured...${NC}"
+    if ! python3 -m pipx ensurepath; then
+        echo -e "${YELLOW}${WARN_TAG}${NC} 'pipx ensurepath' command reported an issue. This is often safe to ignore. Continuing..."
+    fi
+
+    # Update PATH for the current script session and clear command cache
     export PATH="$HOME/.local/bin:$PATH"
-    
-    if ! command -v SuperClaude &> /dev/null; then
+    hash -r 2>/dev/null || true
+
+    # Step 3: Install SuperClaude using pipx
+    echo -e "\n${CYAN}--- Step 3: Installing SuperClaude framework...${NC}"
+    # Using --force to ensure we either install fresh or overwrite/upgrade an existing installation.
+    if ! pipx install SuperClaude --force; then
         echo -e "${RED}${ERROR_TAG}${NC} $(superclaude_text "install_fail")"
+        return 1
+    fi
+
+    # Clear command cache again after installation
+    hash -r 2>/dev/null || true
+    
+    # Verify installation
+    if ! command -v superclaude &> /dev/null; then
+        echo -e "${RED}${ERROR_TAG}${NC} SuperClaude command not found after installation."
         echo -e "${YELLOW}${INFO_TAG}${NC} $(superclaude_text "restart_notice")"
         return 1
     fi
-    
     echo -e "${GREEN}${SUCCESS_TAG}${NC} $(superclaude_text "install_done")"
 
-    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}   $(superclaude_text "config_title")${NC}"
-    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-    
+    # Step 4: Run initial setup/configuration for SuperClaude
+    echo -e "\n${CYAN}--- Step 4: Running initial SuperClaude configuration...${NC}"
     echo -e "${YELLOW}${INFO_TAG}${NC} $(superclaude_text "running_install")"
     echo -e "${YELLOW}${INFO_TAG}${NC} $(superclaude_text "api_key_prompt")${NC}"
 
-    if attach_tty_and_run SuperClaude install; then
+    if attach_tty_and_run superclaude install; then
         echo -e "${GREEN}${SUCCESS_TAG}${NC} $(superclaude_text "config_done")"
     else
         echo -e "${RED}${ERROR_TAG}${NC} $(superclaude_text "config_fail")"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(superclaude_text "manual_config_note")"
     fi
 
+    # Final usage tips
     echo -e "\n${CYAN}╔═══════════════════════════════════════════════╗${NC}"
     echo -e "${CYAN}   $(superclaude_text "usage_tips_title")${NC}"
     echo -e "${CYAN}╚═══════════════════════════════════════════════╝${NC}"
@@ -141,14 +153,6 @@ install_superclaude() {
     echo -e "  ${GREEN}•${NC} $(superclaude_text "usage_remove")"
     echo -e "  ${GREEN}•${NC} $(superclaude_text "usage_reconfig")"
     echo -e "  ${GREEN}•${NC} $(superclaude_text "usage_more_info")"
-
-    echo -e "\n${YELLOW}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}   $(superclaude_text "api_guide_title")${NC}"
-    echo -e "${YELLOW}╚═══════════════════════════════════════════════╝${NC}"
-    echo -e "${GREEN}1.${NC} $(superclaude_text "api_gemini")"
-    echo -e "${GREEN}2.${NC} $(superclaude_text "api_anthropic")"
-    echo -e "${GREEN}3.${NC} $(superclaude_text "api_openai")"
-    echo -e "\n${YELLOW}${INFO_TAG}${NC} $(superclaude_text "api_install_prompt")"
 }
 
 # Ana kurulum akışı

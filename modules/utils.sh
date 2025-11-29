@@ -357,6 +357,51 @@ translate_fmt() {
     fi
 }
 
+# Check if a package is available in the package manager
+is_package_available() {
+    local package="$1"
+    case "$PKG_MANAGER" in
+        apt)
+            apt-cache show "$package" 2>/dev/null | grep -q "Package: $package"
+            ;;
+        dnf|yum)
+            "$PKG_MANAGER" list available "$package" 2>/dev/null | grep -q "^$package\."
+            ;;
+        pacman)
+            pacman -Si "$package" 2>/dev/null | grep -q "Name.*: $package"
+            ;;
+        *)
+            return 1
+            ;;
+    esac
+}
+
+# Try to install a package, with fallbacks for different package names
+install_package_with_fallbacks() {
+    local primary_package="$1"
+    shift
+    local fallback_packages=("$@")
+
+    # Try primary package first
+    if is_package_available "$primary_package"; then
+        eval "$INSTALL_CMD" "$primary_package"
+        return $?
+    fi
+
+    # Try fallback packages
+    for fallback in "${fallback_packages[@]}"; do
+        if is_package_available "$fallback"; then
+            echo -e "${YELLOW}${INFO_TAG}${NC} Package '$primary_package' not available, installing '$fallback' instead"
+            eval "$INSTALL_CMD" "$fallback"
+            return $?
+        fi
+    done
+
+    # If none available, warn and skip
+    echo -e "${YELLOW}${WARN_TAG}${NC} Package '$primary_package' and fallbacks not available, skipping installation"
+    return 1
+}
+
 reload_shell_configs() {
     local mode="${1:-verbose}"
     local candidates=()
@@ -492,25 +537,29 @@ update_system() {
     
     if [ "$PKG_MANAGER" = "apt" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip-full")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip-full 2>/dev/null || true
+        eval "$INSTALL_CMD" curl wget git jq zip unzip 2>/dev/null || true
+        install_package_with_fallbacks "p7zip-full" "p7zip"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "build-essential")"
         eval "$INSTALL_CMD" build-essential 2>/dev/null || true
         
     elif [ "$PKG_MANAGER" = "dnf" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
+        eval "$INSTALL_CMD" curl wget git jq zip unzip
+        install_package_with_fallbacks "p7zip"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
         dnf_group_install "Development Tools"
         
     elif [ "$PKG_MANAGER" = "pacman" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
+        eval "$INSTALL_CMD" curl wget git jq zip unzip
+        install_package_with_fallbacks "p7zip"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "base-devel")"
         sudo pacman -S base-devel --noconfirm
         
     elif [ "$PKG_MANAGER" = "yum" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip p7zip
+        eval "$INSTALL_CMD" curl wget git jq zip unzip
+        install_package_with_fallbacks "p7zip"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
         sudo yum groupinstall "Development Tools" -y
     fi

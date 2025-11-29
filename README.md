@@ -24,12 +24,20 @@
 [![Zsh](https://img.shields.io/badge/Zsh-000000?style=flat-square&logo=zsh&logoColor=white)](https://zsh.sourceforge.io/)
 
 ### AI Tools & Frameworks
-[![Claude](https://img.shields.io/badge/Claude-000000?style=flat-square&logo=anthropic&logoColor=white)](https://claude.ai/)
-[![Gemini](https://img.shields.io/badge/Gemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://gemini.google.com/)
-[![OpenAI](https://img.shields.io/badge/OpenAI-412991?style=flat-square&logo=openai&logoColor=white)](https://openai.com/)
-[![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-000000?style=flat-square&logo=github&logoColor=white)](https://github.com/features/copilot)
-[![Cursor](https://img.shields.io/badge/Cursor-000000?style=flat-square&logo=cursor&logoColor=white)](https://cursor.sh/)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-000000?style=flat-square&logo=anthropic&logoColor=white)](https://claude.ai/)
+[![Gemini CLI](https://img.shields.io/badge/Gemini%20CLI-4285F4?style=flat-square&logo=google&logoColor=white)](https://gemini.google.com/)
+[![OpenCode](https://img.shields.io/badge/OpenCode-000000?style=flat-square&logo=github&logoColor=white)](https://opencode.dev/)
+[![Qoder](https://img.shields.io/badge/Qoder-000000?style=flat-square)](https://qoder.ai/)
+[![Qwen](https://img.shields.io/badge/Qwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://qwen.ai/)
+[![OpenAI Codex](https://img.shields.io/badge/OpenAI%20Codex-412991?style=flat-square&logo=openai&logoColor=white)](https://openai.com/)
+[![Cursor Agent](https://img.shields.io/badge/Cursor%20Agent-000000?style=flat-square&logo=cursor&logoColor=white)](https://cursor.sh/)
+[![Cline](https://img.shields.io/badge/Cline-000000?style=flat-square)](https://cline.ai/)
 [![Aider](https://img.shields.io/badge/Aider-000000?style=flat-square&logo=python&logoColor=white)](https://aider.chat/)
+[![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-000000?style=flat-square&logo=github&logoColor=white)](https://github.com/features/copilot)
+[![Kilocode](https://img.shields.io/badge/Kilocode-000000?style=flat-square)](https://kilocode.ai/)
+[![Auggie](https://img.shields.io/badge/Auggie-000000?style=flat-square)](https://auggie.dev/)
+[![Droid](https://img.shields.io/badge/Droid-000000?style=flat-square)](https://droid.ai/)
+[![Jules](https://img.shields.io/badge/Jules-4285F4?style=flat-square&logo=google&logoColor=white)](https://jules.google.com/)
 
 ---
 

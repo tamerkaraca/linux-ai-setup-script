@@ -4,16 +4,16 @@
 
 ## Technologies Used
 
-- Bash
-- Node.js
-- Python
-- PHP
-- Git
-- Homebrew (macOS)
-- pipx
-- npm
-- yarn
-- pnpm
+[![Bash](https://img.shields.io/badge/Bash-4EAA25?style=flat-square&logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
+[![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)](https://git-scm.com/)
+[![Homebrew](https://img.shields.io/badge/Homebrew-000000?style=flat-square&logo=homebrew&logoColor=white)](https://brew.sh/) (macOS)
+[![pipx](https://img.shields.io/badge/pipx-2C5AA0?style=flat-square&logo=pypi&logoColor=white)](https://pipx.pypa.io/)
+[![npm](https://img.shields.io/badge/npm-CB3837?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/)
+[![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?style=flat-square&logo=yarn&logoColor=white)](https://yarnpkg.com/)
+[![pnpm](https://img.shields.io/badge/pnpm-F69220?style=flat-square&logo=pnpm&logoColor=white)](https://pnpm.io/)
 
 ---
 

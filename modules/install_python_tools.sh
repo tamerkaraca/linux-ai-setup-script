@@ -401,9 +401,9 @@ install_uv() {
 run_python_tools_menu() {
     while true; do
         clear
-        echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        printf "${BLUE}║%*s║${NC}\n" -43 " $(py_text menu_title) "
-        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+        echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+        printf "${BLUE}║%*s║${NC}\n" -70 " $(py_text menu_title) "
+        echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
         echo -e "  ${GREEN}1${NC} - $(py_text menu_option1)"
         echo -e "  ${GREEN}2${NC} - $(py_text menu_option2)"
         echo -e "  ${GREEN}3${NC} - $(py_text menu_option3)"

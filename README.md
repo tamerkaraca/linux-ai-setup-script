@@ -2,6 +2,8 @@
 
 > Single-command bootstrapper for a modern AI workstation on Linux/WSL and macOS. Interactive menus, remote-safe modules, colorful banners, and bilingual guidance (English & Turkish).
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
 ## Technologies Used
 
 ### Core Technologies
@@ -26,7 +28,7 @@
 ### AI Tools & Frameworks
 [![Claude Code](https://img.shields.io/badge/Claude%20Code-000000?style=flat-square&logo=anthropic&logoColor=white)](https://claude.ai/)
 [![Gemini CLI](https://img.shields.io/badge/Gemini%20CLI-4285F4?style=flat-square&logo=google&logoColor=white)](https://gemini.google.com/)
-[![OpenCode](https://img.shields.io/badge/OpenCode-000000?style=flat-square&logo=github&logoColor=white)](https://opencode.dev/)
+[![OpenCode](https://img.shields.io/badge/OpenCode-000000?style=flat-square&logo=github&logoColor=white)](https://opencode.ai)
 [![Qoder](https://img.shields.io/badge/Qoder-000000?style=flat-square)](https://qoder.ai/)
 [![Qwen](https://img.shields.io/badge/Qwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://qwen.ai/)
 [![OpenAI Codex](https://img.shields.io/badge/OpenAI%20Codex-412991?style=flat-square&logo=openai&logoColor=white)](https://openai.com/)
@@ -38,9 +40,9 @@
 [![Auggie](https://img.shields.io/badge/Auggie-000000?style=flat-square)](https://auggie.dev/)
 [![Droid](https://img.shields.io/badge/Droid-000000?style=flat-square)](https://droid.ai/)
 [![Jules](https://img.shields.io/badge/Jules-4285F4?style=flat-square&logo=google&logoColor=white)](https://jules.google.com/)
-[![SuperGemini](https://img.shields.io/badge/SuperGemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://supergemini.ai/)
-[![SuperQwen](https://img.shields.io/badge/SuperQwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://superqwen.ai/)
-[![SuperClaude](https://img.shields.io/badge/SuperClaude-000000?style=flat-square&logo=anthropic&logoColor=white)](https://superclaude.ai/)
+[![SuperGemini](https://img.shields.io/badge/SuperGemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://github.com/SuperClaude-Org/SuperGemini_Framework)
+[![SuperQwen](https://img.shields.io/badge/SuperQwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://github.com/SuperClaude-Org/SuperQwen_Framework)
+[![SuperClaude](https://img.shields.io/badge/SuperClaude-000000?style=flat-square&logo=anthropic&logoColor=white)](https://github.com/SuperClaude-Org/SuperClaude_Framework)
 
 ---
 

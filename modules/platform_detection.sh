@@ -100,14 +100,23 @@ detect_platform() {
 }
 
 is_macos() {
+    if [ -z "${PLATFORM:-}" ]; then
+        detect_platform
+    fi
     [ "${PLATFORM:-}" = "macos" ]
 }
 
 is_linux() {
+    if [ -z "${PLATFORM:-}" ]; then
+        detect_platform
+    fi
     [ "${PLATFORM:-}" = "linux" ]
 }
 
 is_wsl() {
+    if [ -z "${PLATFORM:-}" ]; then
+        detect_platform
+    fi
     [ "${PLATFORM:-}" = "wsl" ]
 }
 

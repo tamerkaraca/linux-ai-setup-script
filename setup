@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Windows CRLF düzeltme kontrolü
-if [ -f "$0" ]; then
+if [ -f "$0" ] && command -v file &> /dev/null; then
     if file "$0" | grep -q "CRLF"; then
         echo "Windows line endings detected, fixing..."
         

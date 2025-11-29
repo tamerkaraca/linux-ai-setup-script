@@ -81,10 +81,20 @@ configure_git() {
     echo -e "${CYAN}$(git_config_text prompt_note)${NC}"
 
     # Yeni kullanıcı adını sor
-    read -r -p "$(git_config_text prompt_name) [${current_name:-$(git_config_text name_example)}]: " GIT_USER_NAME </dev/tty
+    if [ -t 0 ]; then
+        read -r -p "$(git_config_text prompt_name) [${current_name:-$(git_config_text name_example)}]: " GIT_USER_NAME </dev/tty
+    else
+        echo -e "${CYAN}$(git_config_text prompt_name) [${current_name:-$(git_config_text name_example)}]:${NC}"
+        read -r -p "" GIT_USER_NAME || GIT_USER_NAME=""
+    fi
     
     # Yeni e-postayı sor
-    read -r -p "$(git_config_text prompt_email) [${current_email:-$(git_config_text email_example)}]: " GIT_USER_EMAIL </dev/tty
+    if [ -t 0 ]; then
+        read -r -p "$(git_config_text prompt_email) [${current_email:-$(git_config_text email_example)}]: " GIT_USER_EMAIL </dev/tty
+    else
+        echo -e "${CYAN}$(git_config_text prompt_email) [${current_email:-$(git_config_text email_example)}]:${NC}"
+        read -r -p "" GIT_USER_EMAIL || GIT_USER_EMAIL=""
+    fi
 
     # Eğer yeni bir değer girildiyse güncelle
     if [ -n "$GIT_USER_NAME" ]; then

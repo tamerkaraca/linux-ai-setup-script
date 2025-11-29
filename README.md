@@ -1,10 +1,23 @@
-# 🌈 AI Development Environment Setup Script
+# AI Development Environment Setup Script
 
 > Single-command bootstrapper for a modern AI workstation on Linux/WSL and macOS. Interactive menus, remote-safe modules, colorful banners, and bilingual guidance (English & Turkish).
 
+## Technologies Used
+
+- Bash
+- Node.js
+- Python
+- PHP
+- Git
+- Homebrew (macOS)
+- pipx
+- npm
+- yarn
+- pnpm
+
 ---
 
-## 📚 Table of Contents
+## Table of Contents
 
 1. [English Guide](#-english-guide)
    - [Overview](#overview)
@@ -33,7 +46,7 @@
 
 ---
 
-## 🇬🇧 English Guide
+## English Guide
 
 ### Overview
 
@@ -99,10 +112,10 @@ bash -n setup && shellcheck setup  # optional
 | `8` | Install Auxiliary AI Tools (OpenSpec, Agents, etc.). |
 | `9` | Install PHP and Composer with selectable versions and Laravel-friendly extensions. |
 | `10` | Install GitHub CLI with official repo keys. |
-| `A` | Remove all AI frameworks |
-| `A` | MCP server management (list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
-| `L` | Switch the interface language (English ↔ Türkçe, auto-detected default). |
+| `11` | Remove all AI frameworks (Linux only). |
+| `12` | MCP server management (macOS only; list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
 | `A` | Install everything sequentially (skips interactive logins, prints summaries). |
+| `L` | Switch the interface language (English ↔ Türkçe, auto-detected default). |
 | `0` | Exit. |
 
 ### CLI & Framework Sub-menus
@@ -136,7 +149,8 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `14` shortcut tha
 | `11` | Kilocode CLI | Installs `@kilocode/cli`, enforces Node.js ≥ 18, and prints reminders to run `kilocode config` plus architect/debug/auto modes. |
 | `12` | Auggie CLI | Installs `@augmentcode/auggie` (Node.js ≥ 22) and walks through `auggie login`, `.augment/commands`, and CI-friendly flags. |
 | `13` | Droid CLI | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
-| `14` | Install every CLI | Runs options `1-13` in batch mode (logins skipped, summary printed at the end). |
+| `14` | Jules CLI | Installs `@google/jules` globally (Node.js ≥ 18) and guides through `jules login` for authentication. |
+| `15` | Install every CLI | Runs options `1-14` in batch mode (logins skipped, summary printed at the end). |
 
 #### Auxiliary AI Tools Menu
 This new menu, accessible via option `8` in the main menu, groups together tools for spec-driven development and agent libraries.
@@ -192,7 +206,7 @@ All scripts in this repository are validated with:
 - **Syntax checks:** `bash -n` for all shell scripts
 - **Static analysis:** `shellcheck` for best practices and security
 - **Line ending normalization:** Automatic CRLF to LF conversion
-- **Current status:** ✅ 40 scripts validated (39 modules + setup)
+- **Current status:** ✅ 54 scripts validated (53 modules + setup)
 
 ### Credits
 
@@ -205,7 +219,7 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 
 ---
 
-## 🇹🇷 Türkçe Rehber
+## Türkçe Rehber
 
 ### Genel Bakış
 
@@ -265,10 +279,10 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `8` | Yardımcı AI Araçlarını Kur (OpenSpec, Ajanlar, vb.). |
 | `9` | PHP & Composer kurulum sihirbazı. |
 | `10` | GitHub CLI. |
-| `A` | AI Framework kaldırma menüsü. |
-| `A` | MCP sunucu yönetimi (listele, `~/.gemini`, `~/.qwen`, `~/.claude` temizle). |
-| `L` | Dili değiştir (varsayılan İngilizce, `tr` lokalli sistemlerde otomatik Türkçe açılır). |
+| `11` | AI Framework kaldırma menüsü (sadece Linux). |
+| `12` | MCP sunucu yönetimi (sadece macOS; listele, `~/.gemini`, `~/.qwen`, `~/.claude` temizle). |
 | `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
+| `L` | Dili değiştir (varsayılan İngilizce, `tr` lokalli sistemlerde otomatik Türkçe açılır). |
 | `0` | Çıkış. |
 
 ### Alt Menü Detayları
@@ -302,7 +316,8 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `14` kısayolu
 | `11` | Kilocode CLI | `@kilocode/cli` paketini kurar, `kilocode config` / architect-debug modları için yönergeler verir. |
 | `12` | Auggie CLI | `@augmentcode/auggie` paketini Node.js ≥ 22 doğrulaması ile kurar, `auggie login` ve `.augment/commands` içeriğini hatırlatır. |
 | `13` | Droid CLI | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir. |
-| `14` | Hepsini Kur | `1-13` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+| `14` | Jules CLI | `@google/jules` paketini global kurar (Node.js ≥ 18); `jules login` ile kimlik doğrulaması yapmanızı sağlar. |
+| `15` | Hepsini Kur | `1-14` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 #### Yardımcı AI Araçları Menüsü
 Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon odaklı geliştirme araçlarını ve ajan kütüphanelerini bir araya getirir.
@@ -353,7 +368,7 @@ Bu depodaki tüm scriptler aşağıdaki yöntemlerle doğrulanmıştır:
 - **Sözdizimi kontrolleri:** Tüm shell scriptler için `bash -n`
 - **Statik analiz:** En iyi pratikler ve güvenlik için `shellcheck`
 - **Satır sonu normalizasyonu:** Otomatik CRLF'den LF'ye dönüşüm
-- **Mevcut durum:** ✅ 40 script doğrulandı (39 modül + setup)
+- **Mevcut durum:** ✅ 54 script doğrulandı (53 modül + setup)
 
 ### Emek Verenler
 

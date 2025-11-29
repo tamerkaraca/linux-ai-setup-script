@@ -72,9 +72,9 @@ fi
 
 show_node_menu() {
     clear
-    echo -e "${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    printf "${BLUE}║%*s║${NC}\n" -43 " $(node_menu_text node_menu_title) "
-    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+    echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+    printf "${BLUE}║%*s║${NC}\n" -70 " $(node_menu_text node_menu_title) "
+    echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
     echo -e "$(node_menu_text node_menu_subtitle)\n"
     echo -e "  ${GREEN}1${NC} - $(node_menu_text node_option1)"
     echo -e "  ${GREEN}2${NC} - $(node_menu_text node_option2)"

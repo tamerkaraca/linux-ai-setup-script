@@ -65,9 +65,9 @@ run_module() {
 remove_ai_frameworks_menu() {
     while true; do
         clear
-        echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        printf "${BLUE}║%*s║${NC}\n" -43 " $(rm_text menu_title) "
-        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+        echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+        printf "${BLUE}║%*s║${NC}\n" -70 " $(rm_text menu_title) "
+        echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
         echo -e "  ${GREEN}1${NC} - $(rm_text option1)"
         echo -e "  ${GREEN}2${NC} - $(rm_text option2)"
         echo -e "  ${GREEN}3${NC} - $(rm_text option3)"

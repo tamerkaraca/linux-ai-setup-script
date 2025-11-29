@@ -146,9 +146,9 @@ list_all_mcp_servers() {
 manage_mcp_servers_menu() {
     while true; do
         clear
-        echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        printf "${BLUE}║%*s║${NC}\n" -43 " $(mcp_text menu_title) "
-        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+        echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+        printf "${BLUE}║%*s║${NC}\n" -70 " $(mcp_text menu_title) "
+        echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
         echo -e "  ${GREEN}1${NC} - $(mcp_text option1)"
         echo -e "  ${GREEN}2${NC} - $(mcp_text option2)"
         echo -e "  ${GREEN}3${NC} - $(mcp_text option3)"

@@ -60,9 +60,9 @@ install_terminal_tools_menu() {
         local choices=""
         if [ -z "$install_all" ]; then
             clear
-            echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            printf "${BLUE}║%*s║${NC}\n" -43 " $(terminal_menu_text menu_title) "
-            echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+            echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+            printf "${BLUE}║%*s║${NC}\n" -70 " $(terminal_menu_text menu_title) "
+            echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
             echo -e "  ${GREEN}1${NC} - $(terminal_menu_text option1)"
             echo -e "  ${GREEN}A${NC} - $(terminal_menu_text optionA)"
             echo -e "  ${RED}0${NC} - $(terminal_menu_text option_return)"

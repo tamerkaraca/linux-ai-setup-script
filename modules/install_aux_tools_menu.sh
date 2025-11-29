@@ -66,9 +66,9 @@ install_aux_tools_menu() {
         local choices=""
         if [ -z "$install_all" ]; then
             clear
-            echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            printf "${BLUE}║%*s║${NC}\n" -43 " $(aux_menu_text menu_title) "
-            echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+            echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+            printf "${BLUE}║%*s║${NC}\n" -70 " $(aux_menu_text menu_title) "
+            echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
             echo -e "  ${GREEN}1${NC} - $(aux_menu_text option1)"
             echo -e "  ${GREEN}2${NC} - $(aux_menu_text option2)"
             echo -e "  ${GREEN}3${NC} - $(aux_menu_text option3)"

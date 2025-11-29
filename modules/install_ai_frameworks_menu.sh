@@ -103,9 +103,9 @@ install_ai_frameworks_menu() {
     while true; do
         if [ -z "$install_all" ]; then
             clear
-            echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-            printf "${BLUE}║%*s║${NC}\n" -43 " $(ai_fw_menu_text fw_menu_title) "
-            echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+            echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+            printf "${BLUE}║%*s║${NC}\n" -70 " $(ai_fw_menu_text fw_menu_title) "
+            echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
             echo -e "  ${GREEN}1${NC} - $(ai_fw_menu_text fw_option1)"
             echo -e "  ${GREEN}2${NC} - $(ai_fw_menu_text fw_option2)"
             echo -e "  ${GREEN}3${NC} - $(ai_fw_menu_text fw_option3)"

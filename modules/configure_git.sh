@@ -73,9 +73,9 @@ configure_git() {
 
     # Mevcut değerleri al
     local current_name
-    current_name=$(git config --global user.name)
+    current_name=$(git config --global user.name 2>/dev/null || true)
     local current_email
-    current_email=$(git config --global user.email)
+    current_email=$(git config --global user.email 2>/dev/null || true)
 
     echo -e "${YELLOW}${INFO_TAG}${NC} $(git_config_text prompt_intro)"
     echo -e "${CYAN}$(git_config_text prompt_note)${NC}"

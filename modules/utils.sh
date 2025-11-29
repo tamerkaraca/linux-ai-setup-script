@@ -542,7 +542,7 @@ update_system() {
     if [ "$PKG_MANAGER" = "apt" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip-full")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip 2>/dev/null || true
-        install_package_with_fallbacks "p7zip-full" "p7zip"
+        install_package_with_fallbacks "p7zip-full" "p7zip" || true
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "build-essential")"
         eval "$INSTALL_CMD" build-essential 2>/dev/null || true
         
@@ -552,21 +552,21 @@ update_system() {
         # Enable EPEL for p7zip on RHEL/CentOS
         eval "$INSTALL_CMD" epel-release 2>/dev/null || true
         dnf makecache 2>/dev/null || true
-        install_package_with_fallbacks "p7zip"
+        install_package_with_fallbacks "p7zip" || true
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
-        dnf_group_install "Development Tools"
+        dnf_group_install "Development Tools" || true
         
     elif [ "$PKG_MANAGER" = "pacman" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip
-        install_package_with_fallbacks "p7zip"
+        install_package_with_fallbacks "p7zip" || true
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "base-devel")"
         sudo pacman -S base-devel --noconfirm
         
     elif [ "$PKG_MANAGER" = "yum" ]; then
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
         eval "$INSTALL_CMD" curl wget git jq zip unzip
-        install_package_with_fallbacks "p7zip"
+        install_package_with_fallbacks "p7zip" || true
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
         sudo yum groupinstall "Development Tools" -y
     fi

@@ -402,7 +402,10 @@ run_python_tools_menu() {
     while true; do
         clear
         echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
-        printf "${BLUE}║%*s║${NC}\n" -70 " $(py_text menu_title) "
+        text=" $(py_text menu_title) "
+        len=${#text}
+        padding=$(( (72 - len) / 2 ))
+        printf "${BLUE}║%*s%s%*s║${NC}\n" "$padding" "" "$text" "$((72 - len - padding))" ""
         echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
         echo -e "  ${GREEN}1${NC} - $(py_text menu_option1)"
         echo -e "  ${GREEN}2${NC} - $(py_text menu_option2)"

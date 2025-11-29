@@ -61,7 +61,10 @@ install_terminal_tools_menu() {
         if [ -z "$install_all" ]; then
             clear
             echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
-            printf "${BLUE}║%*s║${NC}\n" -70 " $(terminal_menu_text menu_title) "
+            text=" $(terminal_menu_text menu_title) "
+            len=${#text}
+            padding=$(( (72 - len) / 2 ))
+            printf "${BLUE}║%*s%s%*s║${NC}\n" "$padding" "" "$text" "$((72 - len - padding))" ""
             echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
             echo -e "  ${GREEN}1${NC} - $(terminal_menu_text option1)"
             echo -e "  ${GREEN}A${NC} - $(terminal_menu_text optionA)"

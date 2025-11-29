@@ -531,6 +531,10 @@ dnf_group_install() {
 
 update_system() {
     echo -e "\n${YELLOW}${INFO_TAG}${NC} $(translate log_system_update_start)"
+    # Fix for polkitd group missing on some Debian-based systems (e.g., WSL)
+    if [ "$PKG_MANAGER" = "apt" ]; then
+        sudo groupadd polkitd 2>/dev/null || true
+    fi
     eval "$UPDATE_CMD" 2>/dev/null || true
     
     echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_system_install_basics)"

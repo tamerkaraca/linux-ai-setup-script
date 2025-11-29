@@ -547,6 +547,7 @@ update_system() {
         eval "$INSTALL_CMD" curl wget git jq zip unzip
         # Enable EPEL for p7zip on RHEL/CentOS
         eval "$INSTALL_CMD" epel-release 2>/dev/null || true
+        dnf makecache 2>/dev/null || true
         install_package_with_fallbacks "p7zip"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(translate_fmt log_install_devtools "Development Tools")"
         dnf_group_install "Development Tools"

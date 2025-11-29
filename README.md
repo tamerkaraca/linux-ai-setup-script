@@ -38,6 +38,9 @@
 [![Auggie](https://img.shields.io/badge/Auggie-000000?style=flat-square)](https://auggie.dev/)
 [![Droid](https://img.shields.io/badge/Droid-000000?style=flat-square)](https://droid.ai/)
 [![Jules](https://img.shields.io/badge/Jules-4285F4?style=flat-square&logo=google&logoColor=white)](https://jules.google.com/)
+[![SuperGemini](https://img.shields.io/badge/SuperGemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://supergemini.ai/)
+[![SuperQwen](https://img.shields.io/badge/SuperQwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://superqwen.ai/)
+[![SuperClaude](https://img.shields.io/badge/SuperClaude-000000?style=flat-square&logo=anthropic&logoColor=white)](https://superclaude.ai/)
 
 ---
 

@@ -401,9 +401,12 @@ install_php_version() {
 
 # Ana kurulum akışı
 main() {
-    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    printf "${BLUE}║%*s║${NC}\n" -43 " $(php_text menu_title) "
-    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
+    echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+    text=" $(php_text menu_title) "
+    len=${#text}
+    padding=$(( (72 - len) / 2 ))
+    printf "${BLUE}║%*s%s%*s║${NC}\n" "$padding" "" "$text" "$((72 - len - padding))" ""
+    echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
 
     while true; do
         echo -e "\n${YELLOW}$(php_text menu_hint)${NC}"

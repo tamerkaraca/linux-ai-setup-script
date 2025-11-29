@@ -65,9 +65,12 @@ run_module() {
 remove_ai_frameworks_menu() {
     while true; do
         clear
-        echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-        printf "${BLUE}║%*s║${NC}\n" -43 " $(rm_text menu_title) "
-        echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}\n"
+        echo -e "\n${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+        text=" $(rm_text menu_title) "
+        len=${#text}
+        padding=$(( (72 - len) / 2 ))
+        printf "${BLUE}║%*s%s%*s║${NC}\n" "$padding" "" "$text" "$((72 - len - padding))" ""
+        echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
         echo -e "  ${GREEN}1${NC} - $(rm_text option1)"
         echo -e "  ${GREEN}2${NC} - $(rm_text option2)"
         echo -e "  ${GREEN}3${NC} - $(rm_text option3)"

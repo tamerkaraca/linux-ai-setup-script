@@ -70,19 +70,23 @@ print_info_panel() {
     panel_line_raw "$(center_text "${BOLD}${info_title}${NC}" "$HEADING_WIDTH")"
     echo -e "${BLUE}╠════════════════════════════════════════════════════════════════════════╣${NC}"
     local version_value="${GREEN}${version}${NC}"
-    local version_plain=$(printf '%s' "$version_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
+    local version_plain
+    version_plain=$(printf '%s' "$version_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
     local version_pad=$((72 - 23 - ${#version_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${version_label}" "$version_value" "$version_pad" "" "${BLUE}║${NC}"
     local developer_value="${GREEN}Tamer KARACA${NC}"
-    local developer_plain=$(printf '%s' "$developer_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
+    local developer_plain
+    developer_plain=$(printf '%s' "$developer_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
     local developer_pad=$((72 - 23 - ${#developer_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${developer_label}" "$developer_value" "$developer_pad" "" "${BLUE}║${NC}"
     local github_value="${CYAN}@tamerkaraca${NC}"
-    local github_plain=$(printf '%s' "$github_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
+    local github_plain
+    github_plain=$(printf '%s' "$github_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
     local github_pad=$((72 - 23 - ${#github_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${github_label}" "$github_value" "$github_pad" "" "${BLUE}║${NC}"
     local repo_value="${CYAN}${repo}${NC}"
-    local repo_plain=$(printf '%s' "$repo_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
+    local repo_plain
+    repo_plain=$(printf '%s' "$repo_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
     local repo_pad=$((72 - 23 - ${#repo_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${repo_label}" "$repo_value" "$repo_pad" "" "${BLUE}║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"

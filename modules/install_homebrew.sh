@@ -60,12 +60,16 @@ install_homebrew() {
         if [[ -x "/opt/homebrew/bin/brew" ]]; then
             # Apple Silicon Mac
             export PATH="/opt/homebrew/bin:$PATH"
+            # shellcheck disable=SC2016
             echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.zshrc
+            # shellcheck disable=SC2016
             echo 'eval "$(/opt/homebrew/bin/brew shellenv)"' >> ~/.bash_profile
         elif [[ -x "/usr/local/bin/brew" ]]; then
             # Intel Mac
             export PATH="/usr/local/bin:$PATH"
+            # shellcheck disable=SC2016
             echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.zshrc
+            # shellcheck disable=SC2016
             echo 'eval "$(/usr/local/bin/brew shellenv)"' >> ~/.bash_profile
         fi
         

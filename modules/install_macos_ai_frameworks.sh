@@ -53,7 +53,9 @@ install_pipx_macos() {
         export PATH="$HOME/.local/bin:$PATH"
         
         # Add to shell configuration files
+        # shellcheck disable=SC2016
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.zshrc
+        # shellcheck disable=SC2016
         echo 'export PATH="$HOME/.local/bin:$PATH"' >> ~/.bash_profile
         
         return 0

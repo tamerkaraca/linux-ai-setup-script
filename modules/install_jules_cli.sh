@@ -78,15 +78,12 @@ install_jules_cli() {
     fi
 
     if [ -n "${NPM_LAST_INSTALL_PREFIX}" ]; then
-        local jules_prefix_fmt
-        jules_prefix_fmt="$(jules_text prefix_notice)"
         # shellcheck disable=SC2059
         printf -v jules_prefix_msg "%s" "${NPM_LAST_INSTALL_PREFIX}"
         echo -e "${YELLOW}${INFO_TAG}${NC} ${jules_prefix_msg}"
     fi
 
-    local jules_version_fmt
-    jules_version_fmt="$(jules_text version_info)"
+    local jules_version_msg
     # shellcheck disable=SC2059
     printf -v jules_version_msg "%s" "$(jules --version)"
     echo -e "${GREEN}${SUCCESS_TAG}${NC} ${jules_version_msg}"

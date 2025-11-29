@@ -78,7 +78,9 @@ install_bun_manually() {
         log_success "Bun installed successfully"
         
         # Add Bun to PATH
+        # shellcheck disable=SC2016
         echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.zshrc
+        # shellcheck disable=SC2016
         echo 'export PATH="$HOME/.bun/bin:$PATH"' >> ~/.bash_profile
         
         # Source for current session

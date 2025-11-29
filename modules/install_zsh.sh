@@ -53,8 +53,6 @@ install_zsh() {
         local zsh_version
         zsh_version=$(zsh --version 2>/dev/null | head -n1 || echo "unknown")
         echo -e "${GREEN}${SUCCESS_TAG}${NC} $(zsh_text already_installed)"
-        local version_fmt
-        version_fmt="$(zsh_text version_info)"
         printf -v version_msg "%s" "$zsh_version"
         echo -e "${GREEN}${INFO_TAG}${NC} ${version_msg}"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(zsh_text shell_change_info)"
@@ -130,8 +128,6 @@ install_zsh() {
     if command -v zsh >/dev/null 2>&1; then
         local zsh_version
         zsh_version=$(zsh --version 2>/dev/null | head -n1 || echo "unknown")
-        local version_fmt
-        version_fmt="$(zsh_text version_info)"
         printf -v version_msg "%s" "$zsh_version"
         echo -e "${GREEN}${SUCCESS_TAG}${NC} ${version_msg}"
         echo -e "${YELLOW}${INFO_TAG}${NC} $(zsh_text shell_change_info)"

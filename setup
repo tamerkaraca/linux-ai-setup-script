@@ -313,6 +313,7 @@ main_menu() {
                         run_module "install_homebrew"
                     else
                         update_system
+                        run_module "install_wslu"
                     fi
                     ;;
                 2) run_module "install_python_tools" ;;
@@ -408,6 +409,7 @@ main_menu() {
                         fi
                     else
                         update_system
+                        run_module "install_wslu"
                         run_module "install_python_tools"
                         run_module "install_node_menu" "all"
                         run_module "install_ai_cli_tools_menu" "all"

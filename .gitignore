@@ -9,3 +9,8 @@ WARP.md
 .codex/
 openspec/
 .aider*
+.github/
+.gitlab/
+.vscode/
+.idea/
+*.log

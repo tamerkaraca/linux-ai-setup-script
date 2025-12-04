@@ -131,7 +131,7 @@ bash -n setup && shellcheck setup  # optional
 
 | Option | Description |
 |--------|-------------|
-| `1` | Update system packages + install essentials (`curl`, `wget`, `git`, `jq`, `zip`, compilers). |
+| `1` | Update system packages + install essentials (`curl`, `wget`, `git`, `jq`, `zip`, compilers). On WSL, also installs `wslu` to provide host browser access for CLI tools. |
 | `2` | Install Python toolchain: Python 3, Pip, ensurepip fallback, Pipx, UV; auto-reloads shell RC files. |
 | `3` | Open the Node.js tooling sub-menu (NVM + Node LTS, Bun, CLI extras). |
 | `4` | Install AI CLI tools (opens sub-menu). |
@@ -165,20 +165,20 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `14` shortcut tha
 
 | Option | Tool | Highlights |
 |--------|------|------------|
-| `1` | Claude Code CLI | Attaches to `/dev/tty` so Anthropic’s Ink prompts work even during remote runs. |
-| `2` | Gemini CLI | Requires Node.js ≥ 20, performs npm fallback installs, and reminds you to run `gemini auth`. |
-| `3` | OpenCode CLI | Handles remote-safe installs for the OpenCode beta tooling and prints `opencode login` hints. |
-| `4` | Qoder CLI | Probes several npm scopes and accepts overrides (`QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--skip-probe`) plus local bundle installs. |
-| `5` | Qwen CLI | Enforces Node.js ≥ 18, bootstraps Node when missing, and uses `/dev/tty` for `qwen login` prompts with a `--package` override. |
-| `6` | OpenAI Codex CLI | Installs Codex/Cursor helpers and points you to the ChatGPT or `OPENAI_API_KEY` auth flow. |
-| `7` | Cursor Agent CLI | Requires Node.js ≥ 18, installs `cursor-agent` via npm, and reminds you to run `cursor-agent login` (interactive runs open `/dev/tty`). |
-| `8` | Cline CLI | Requires Node.js ≥ 18, installs the `@cline/cli` package, and prompts for `cline login` only during interactive runs. |
-| `9` | Aider CLI | Uses the official `aider-install` script for a robust installation, handling Python versions and dependencies automatically. |
-| `10` | GitHub Copilot CLI | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
-| `11` | Kilocode CLI | Installs `@kilocode/cli`, enforces Node.js ≥ 18, and prints reminders to run `kilocode config` plus architect/debug/auto modes. |
-| `12` | Auggie CLI | Installs `@augmentcode/auggie` (Node.js ≥ 22) and walks through `auggie login`, `.augment/commands`, and CI-friendly flags. |
-| `13` | Droid CLI | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
-| `14` | Jules CLI | Installs `@google/jules` globally (Node.js ≥ 18) and guides through `jules login` for authentication. |
+| `1` | [Claude Code CLI](https://github.com/anthropics/claude-code) | Attaches to `/dev/tty` so Anthropic’s Ink prompts work even during remote runs. |
+| `2` | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | Requires Node.js ≥ 20, performs npm fallback installs, and reminds you to run `gemini auth`. |
+| `3` | [OpenCode CLI](https://github.com/opencode-ai/opencode) | Handles remote-safe installs for the OpenCode beta tooling and prints `opencode login` hints. |
+| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Probes several npm scopes and accepts overrides (`QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--skip-probe`) plus local bundle installs. |
+| `5` | [Qwen CLI](https://github.com/QwenLM/qwen-code/) | Enforces Node.js ≥ 18, bootstraps Node when missing, and uses `/dev/tty` for `qwen login` prompts with a `--package` override. |
+| `6` | [OpenAI Codex CLI](https://github.com/openai/codex/) | Installs Codex/Cursor helpers and points you to the ChatGPT or `OPENAI_API_KEY` auth flow. |
+| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Requires Node.js ≥ 18, installs `cursor-agent` via npm, and reminds you to run `cursor-agent login` (interactive runs open `/dev/tty`). |
+| `8` | [Cline CLI](https://github.com/cline/cline/) | Requires Node.js ≥ 18, installs the `@cline/cli` package, and prompts for `cline login` only during interactive runs. |
+| `9` | [Aider CLI](https://github.com/Aider-AI/aider/) | Uses the official `aider-install` script for a robust installation, handling Python versions and dependencies automatically. |
+| `10` | [GitHub Copilot CLI](https://github.com/github/copilot-cli/) | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
+| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | Installs `@kilocode/cli`, enforces Node.js ≥ 18, and prints reminders to run `kilocode config` plus architect/debug/auto modes. |
+| `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | Installs `@augmentcode/auggie` (Node.js ≥ 22) and walks through `auggie login`, `.augment/commands`, and CI-friendly flags. |
+| `13` | [Droid CLI](https://factory.ai/) | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
+| `14` | [Jules CLI](https://jules.google/docs/) | Installs `@google/jules` globally (Node.js ≥ 18) and guides through `jules login` for authentication. |
 | `15` | Install every CLI | Runs options `1-14` in batch mode (logins skipped, summary printed at the end). |
 
 #### Auxiliary AI Tools Menu
@@ -186,10 +186,10 @@ This new menu, accessible via option `8` in the main menu, groups together tools
 
 | Option | Tool | Highlights |
 |--------|------|------------|
-| `1` | OpenSpec CLI | Installs `@fission-ai/openspec` globally (Node.js ≥ 18) so you can run `openspec init/plan/sync`. |
-| `2` | specify-cli | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. Requires Python tools to be installed. |
-| `3` | Contains Studio Agents | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
-| `4` | Wes Hobson Agents | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
+| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | Installs `@fission-ai/openspec` globally (Node.js ≥ 18) so you can run `openspec init/plan/sync`. |
+| `2` | [specify-cli](https://github.com/github/spec-kit) | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. Requires Python tools to be installed. |
+| `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
+| `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
 | `A` | Install All | Installs all auxiliary tools sequentially. |
 
 #### AI Framework Menu
@@ -298,7 +298,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 
 | Seçenek | Açıklama |
 |---------|---------|
-| `1` | Sistem güncellemesi + temel paketler. |
+| `1` | Sistem güncellemesi + temel paketler. WSL'de, CLI araçları için ana makine tarayıcısına erişim sağlamak üzere `wslu` paketini de kurar. |
 | `2` | Python + Pip/Pipx/UV kurulumu, PATH güncellemeleri. |
 | `3` | Node.js araç alt menüsü (NVM + Node LTS, Bun, CLI ekstraları). |
 | `4` | AI CLI araçları (alt menü). |
@@ -332,20 +332,20 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `14` kısayolu
 
 | Seçenek | Araç | Detaylar |
 |---------|------|----------|
-| `1` | Claude Code CLI | Anthropic’in Ink tabanlı arayüzünü `/dev/tty` üzerinden açar, uzaktan çalıştırmalarda bile kesinti olmaz. |
-| `2` | Gemini CLI | Node.js ≥ 20 gereksinimini kontrol eder, npm fallback kurulumları yapar ve `gemini auth` hatırlatması verir. |
-| `3` | OpenCode CLI | Beta OpenCode araçlarını uzaktan güvenli şekilde kurar ve `opencode login` komutunu hatırlatır. |
-| `4` | Qoder CLI | Birden çok npm paket adını dener; `QODER_NPM_PACKAGE` gibi override seçeneklerini destekler. |
-| `5` | Qwen CLI | Node.js ≥ 18 şartını uygular, gerekirse Node kurulumunu başlatır, `/dev/tty` ile `qwen login` akışını yönetir. |
-| `6` | OpenAI Codex CLI | Codex/Cursor yardımcılarını yükler, ChatGPT veya `OPENAI_API_KEY` tabanlı giriş akışını açıklar. |
-| `7` | Cursor Agent CLI | Node.js ≥ 18 gerektirir, `cursor-agent` paketini npm ile kurar ve interaktif modda `cursor-agent login` komutunu çalıştırır. |
-| `8` | Cline CLI | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
-| `9` | Aider CLI | Kurulum için resmi `aider-install` betiğini kullanır, bu sayede Python sürümleri ve bağımlılıklar otomatik olarak yönetilir. |
-| `10` | GitHub Copilot CLI | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
-| `11` | Kilocode CLI | `@kilocode/cli` paketini kurar, `kilocode config` / architect-debug modları için yönergeler verir. |
-| `12` | Auggie CLI | `@augmentcode/auggie` paketini Node.js ≥ 22 doğrulaması ile kurar, `auggie login` ve `.augment/commands` içeriğini hatırlatır. |
-| `13` | Droid CLI | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir. |
-| `14` | Jules CLI | `@google/jules` paketini global kurar (Node.js ≥ 18); `jules login` ile kimlik doğrulaması yapmanızı sağlar. |
+| `1` | [Claude Code CLI](https://github.com/anthropics/claude-code) | Anthropic’in Ink tabanlı arayüzünü `/dev/tty` üzerinden açar, uzaktan çalıştırmalarda bile kesinti olmaz. |
+| `2` | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | Node.js ≥ 20 gereksinimini kontrol eder, npm fallback kurulumları yapar ve `gemini auth` hatırlatması verir. |
+| `3` | [OpenCode CLI](https://github.com/opencode-ai/opencode) | Beta OpenCode araçlarını uzaktan güvenli şekilde kurar ve `opencode login` komutunu hatırlatır. |
+| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Birden çok npm paket adını dener; `QODER_NPM_PACKAGE` gibi override seçeneklerini destekler. |
+| `5` | [Qwen CLI](https://github.com/QwenLM/qwen-code/) | Node.js ≥ 18 şartını uygular, gerekirse Node kurulumunu başlatır, `/dev/tty` ile `qwen login` akışını yönetir. |
+| `6` | [OpenAI Codex CLI](https://github.com/openai/codex/) | Codex/Cursor yardımcılarını yükler, ChatGPT veya `OPENAI_API_KEY` tabanlı giriş akışını açıklar. |
+| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Node.js ≥ 18 gerektirir, `cursor-agent` paketini npm ile kurar ve interaktif modda `cursor-agent login` komutunu çalıştırır. |
+| `8` | [Cline CLI](https://github.com/cline/cline/) | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
+| `9` | [Aider CLI](https://github.com/Aider-AI/aider/) | Kurulum için resmi `aider-install` betiğini kullanır, bu sayede Python sürümleri ve bağımlılıklar otomatik olarak yönetilir. |
+| `10` | [GitHub Copilot CLI](https://github.com/github/copilot-cli/) | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
+| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | `@kilocode/cli` paketini kurar, `kilocode config` / architect-debug modları için yönergeler verir. |
+| `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | `@augmentcode/auggie` paketini Node.js ≥ 22 doğrulaması ile kurar, `auggie login` ve `.augment/commands` içeriğini hatırlatır. |
+| `13` | [Droid CLI](https://factory.ai/) | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir. |
+| `14` | [Jules CLI](https://jules.google/docs/) | `@google/jules` paketini global kurar (Node.js ≥ 18); `jules login` ile kimlik doğrulaması yapmanızı sağlar. |
 | `15` | Hepsini Kur | `1-14` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 #### Yardımcı AI Araçları Menüsü
@@ -353,10 +353,10 @@ Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon od
 
 | Seçenek | Araç | Detaylar |
 |---------|------|------------|
-| `1` | OpenSpec CLI | `@fission-ai/openspec` paketini global kurar (Node.js ≥ 18); `openspec init/plan/sync` komutlarını kullanabilirsiniz. |
-| `2` | specify-cli | GitHub'ın `spec-kit` deposundan `specify-cli` aracını `uv` ile kurar. Python araçlarının kurulu olmasını gerektirir. |
-| `3` | Contains Studio Agents | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
-| `4` | Wes Hobson Agents | `wshobson/agents` koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
+| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | `@fission-ai/openspec` paketini global kurar (Node.js ≥ 18); `openspec init/plan/sync` komutlarını kullanabilirsiniz. |
+| `2` | [specify-cli](https://github.com/github/spec-kit) | GitHub'ın `spec-kit` deposundan `specify-cli` aracını `uv` ile kurar. Python araçlarının kurulu olmasını gerektirir. |
+| `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
+| `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | `wshobson/agents` koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
 | `A` | Hepsini Kur | Tüm yardımcı araçları sırayla kurar. |
 
 #### AI Framework Menüsü

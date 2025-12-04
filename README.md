@@ -197,9 +197,9 @@ The framework menu ensures `pipx` exists (installing Python first if necessary),
 
 | Option | Framework | Highlights |
 |--------|-----------|------------|
-| `1` | SuperGemini | Installs the Gemini-native workflow via `pipx`, including login hints and PATH refresh. |
-| `2` | SuperQwen | Wraps the official installer with `attach_tty_and_run` so Qwen credentials can be entered safely. |
-| `3` | SuperClaude | Provides the Anthropic toolkit with the same TTY safeguards and cleanup helpers. |
+| `1` | [SuperGemini](https://github.com/SuperClaude-Org/SuperGemini_Framework) | Installs the Gemini-native workflow via `pipx`, including login hints and PATH refresh. |
+| `2` | [SuperQwen](https://github.com/SuperClaude-Org/SuperQwen_Framework) | Wraps the official installer with `attach_tty_and_run` so Qwen credentials can be entered safely. |
+| `3` | [SuperClaude](https://github.com/SuperClaude-Org/SuperClaude_Framework) | Provides the Anthropic toolkit with the same TTY safeguards and cleanup helpers. |
 | `4` | Install every framework | Sequentially installs all three frameworks (duplicate runs are skipped gracefully). |
 
 ### Usage Notes

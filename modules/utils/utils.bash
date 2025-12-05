@@ -121,302 +121,48 @@ get_language_label() {
     esac
 }
 
-init_translation_tables() {
-    declare -gA TEXT_EN=(
-    ["menu_title"]="MAIN INSTALL MENU"
-    ["menu_subtitle"]="Select an action"
-    ["menu_option1"]="Update system packages and core tools"
-    ["menu_option2"]="Install Python, Pip/Pipx, UV"
-    ["menu_option3"]="Open Node.js tool sub-menu"
-    ["menu_option4"]="Install AI CLI tools"
-    ["menu_option5"]="Install AI frameworks"
-    ["menu_option6"]="Configure Git"
-    ["menu_option7"]="Configure Claude Code providers"
-    ["menu_option8"]="Install PHP & Composer"
-    ["menu_option9"]="Install GitHub CLI"
-    ["menu_option10"]="Remove AI frameworks"
-    ["menu_option11"]="Manage MCP servers"
-    ["menu_optionA"]="Run everything sequentially"
-    ["menu_option0"]="Exit"
-    ["menu_language_option"]="Switch language"
-    ["menu_current_language"]="Current language"
-    ["menu_multi_hint"]="Use commas for multiple selections (e.g., 1,4,5)."
-    ["prompt_choice"]="Your choice"
-    ["prompt_press_enter"]="Press Enter to continue..."
-    ["warning_no_selection"]="No selection detected, please try again."
-    ["warning_invalid_choice"]="Invalid selection"
-    ["info_returning"]="Returning to the previous menu."
-    ["info_language_switched"]="Language updated."
-    ["node_menu_title"]="Node.js Tooling Menu"
-    ["node_menu_subtitle"]="Pick one or more components to install/update"
-    ["node_option1"]="Install or update Node.js (NVM + latest LTS)"
-    ["node_option2"]="Install or update Bun runtime"
-    ["node_option3"]="Install Node CLI extras (Corepack, pnpm, yarn)"
-    ["node_option4"]="Install every component"
-    ["node_option0"]="Return to main menu"
-    ["ai_menu_title"]="AI CLI Installation Menu"
-    ["ai_menu_hint"]="Use commas for multiple selections (e.g., 1,3,7)."
-    ["ai_option1"]="Claude Code CLI"
-    ["ai_option2"]="Gemini CLI"
-    ["ai_option3"]="OpenCode CLI"
-    ["ai_option4"]="Qoder CLI"
-    ["ai_option5"]="Qwen CLI"
-    ["ai_option6"]="OpenAI Codex CLI"
-    ["ai_option7"]="Cursor Agent CLI"
-    ["ai_option8"]="Cline CLI"
-    ["ai_option9"]="Aider CLI"
-    ["ai_option10"]="GitHub Copilot CLI"
-    ["ai_option11"]="Kilocode CLI"
-    ["ai_option12"]="Auggie CLI"
-    ["ai_option13"]="Droid CLI"
-    ["ai_option14"]="OpenSpec CLI"
-    ["ai_option15"]="Contains Studio Agents"
-    ["ai_option16"]="Wes Hobson Agents"
-    ["ai_option17"]="Install every CLI"
-    ["ai_option_return"]="Return to main menu"
-    ["ai_prompt_install_more"]="Install another AI CLI? (y/n) [n]:"
-    ["ai_summary_title"]="Login tips for installed CLIs:"
-    ["ai_summary_default_hint"]="Follow the CLI documentation for authentication."
-    ["fw_menu_title"]="AI Framework Installation Menu"
-    ["fw_menu_hint"]="Use commas for multiple selections (e.g., 1,2)."
-    ["fw_option1"]="SuperGemini Framework"
-    ["fw_option2"]="SuperQwen Framework"
-    ["fw_option3"]="SuperClaude Framework"
-    ["fw_option4"]="Install every framework"
-    ["fw_option_return"]="Return to main menu"
-    ["fw_prompt_install_more"]="Install another AI framework? (y/n) [n]:"
-    ["log_module_local"]="Running %s module from local files..."
-    ["log_module_remote"]="Downloading %s module and running it..."
-    ["log_module_error"]="An error occurred while running %s."
-    ["log_remote_prepare_failed"]="The remote module workspace could not be prepared."
-    ["log_module_download_failed"]="The %s module could not be downloaded."
-    ["log_shell_reload_success"]="Shell configurations auto-loaded (%s)."
-    ["log_shell_reload_missing"]="Shell configuration files were not found; restart your terminal if needed."
-    ["log_detect_pkg_manager"]="Detecting operating system and package manager..."
-    ["log_pkg_manager_missing"]="No supported package manager was found!"
-    ["log_pkg_manager_detected"]="Package manager: %s"
-    ["log_system_update_start"]="Updating the system..."
-    ["log_system_install_basics"]="Installing core tools, compression utilities, and build helpers..."
-    ["log_install_packages"]="Installing: %s"
-    ["log_install_devtools"]="Installing development tools: %s"
-    ["log_install_user_prefix"]="Installing %s into user prefix: %s"
-    ["log_install_user_fail"]="%s could not be installed into user prefix."
-    ["log_system_update_done"]="System update and base package installation completed!"
-    ["log_python_install_title"]="Starting Python installation..."
-    ["log_python_already"]="Python already installed: %s"
-    ["log_python_installing"]="Installing Python 3..."
-    ["log_python_success"]="Python installation completed: %s"
-    ["log_python_failed"]="Python installation failed!"
-    ["log_pip_title"]="Starting Pip installation/update..."
-    ["log_python_missing_for_pip"]="Python is missing, installing it first..."
-    ["log_pip_upgrading"]="Upgrading pip..."
-    ["log_pip_missing"]="Pip not found. Trying get-pip.py..."
-    ["log_pip_getpip_failed"]="Pip installation via get-pip.py failed!"
-    ["log_pip_getpip_success"]="Pip installed via get-pip.py."
-    ["log_pip_external_retry"]="Externally-managed-environment detected, retrying with --break-system-packages..."
-    ["log_pip_upgrade_failed"]="Pip upgrade failed!"
-    ["log_pip_version"]="Pip version: %s"
-    ["log_pip_tips_header"]="Pip usage tips:"
-    ["log_pip_tip_install"]="  • Install package: pip install <name>"
-    ["log_pip_tip_venv"]="  • Use virtual environments (recommended): python3 -m venv myenv && source myenv/bin/activate"
-    ["log_pip_tip_system"]="  • System-wide install: pip install --break-system-packages <name>"
-    ["log_pip_tip_note"]="  • Note: modern systems recommend using virtual environments (PEP 668)."
-    ["log_pipx_title"]="Starting Pipx installation..."
-    ["log_python_missing_for_pipx"]="Python is missing, installing it first..."
-    ["log_pipx_pkg_install"]="Installing pipx via package manager..."
-    ["log_pipx_pkg_missing"]="Package not found, falling back to manual installation..."
-    ["log_pipx_external_retry"]="Externally-managed-environment detected, trying alternate method..."
-    ["log_break_system_packages_retry"]="Retrying install with --break-system-packages..."
-    ["log_pipx_success"]="Pipx installation completed: %s"
-    ["log_pipx_manual_hint"]="Manual installation: sudo apt install pipx"
-    ["log_pipx_failed"]="Pipx installation failed!"
-    )
+# Detailed Logging System
+_log_detailed() {
+    local level="$1"
+    local message="$2"
+    local timestamp
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
-    declare -gA TEXT_TR=(
-    ["menu_title"]="ANA KURULUM MENÜSÜ"
-    ["menu_subtitle"]="Bir işlem seçin"
-    ["menu_option1"]="Sistemi güncelle ve temel paketleri kur"
-    ["menu_option2"]="Python, Pip/Pipx ve UV kur"
-    ["menu_option3"]="Node.js araç alt menüsünü aç"
-    ["menu_option4"]="AI CLI araçlarını kur"
-    ["menu_option5"]="AI frameworklerini kur"
-    ["menu_option6"]="Git yapılandırması"
-    ["menu_option7"]="Claude Code sağlayıcı ayarları"
-    ["menu_option8"]="PHP & Composer kurulumu"
-    ["menu_option9"]="GitHub CLI kurulumu"
-    ["menu_option10"]="AI frameworklerini kaldır"
-    ["menu_option11"]="MCP sunucu yönetimi"
-    ["menu_optionA"]="Hepsini sırayla çalıştır"
-    ["menu_option0"]="Çıkış"
-    ["menu_language_option"]="Dili değiştir"
-    ["menu_current_language"]="Geçerli dil"
-    ["menu_multi_hint"]="Birden fazla seçim için virgül kullanın (örn: 1,4,5)."
-    ["prompt_choice"]="Seçiminiz"
-    ["prompt_press_enter"]="Devam etmek için Enter'a basın..."
-    ["warning_no_selection"]="Bir seçim yapılmadı, lütfen tekrar deneyin."
-    ["warning_invalid_choice"]="Geçersiz seçim"
-    ["info_returning"]="Önceki menüye dönülüyor."
-    ["info_language_switched"]="Dil güncellendi."
-    ["node_menu_title"]="Node.js Araç Menüsü"
-    ["node_menu_subtitle"]="Kurmak/güncellemek istediğiniz bileşenleri seçin"
-    ["node_option1"]="Node.js (NVM + son LTS) kur/güncelle"
-    ["node_option2"]="Bun runtime kur/güncelle"
-    ["node_option3"]="Node CLI ekstralarını kur (Corepack, pnpm, yarn)"
-    ["node_option4"]="Tüm bileşenleri kur"
-    ["node_option0"]="Ana menüye dön"
-    ["ai_menu_title"]="AI CLI Kurulum Menüsü"
-    ["ai_menu_hint"]="Virgülle ayrılmış seçimleri kullanabilirsiniz (örn: 1,3,7)."
-    ["ai_option1"]="Claude Code CLI"
-    ["ai_option2"]="Gemini CLI"
-    ["ai_option3"]="OpenCode CLI"
-    ["ai_option4"]="Qoder CLI"
-    ["ai_option5"]="Qwen CLI"
-    ["ai_option6"]="OpenAI Codex CLI"
-    ["ai_option7"]="Cursor Agent CLI"
-    ["ai_option8"]="Cline CLI"
-    ["ai_option9"]="Aider CLI"
-    ["ai_option10"]="GitHub Copilot CLI"
-    ["ai_option11"]="Kilocode CLI"
-    ["ai_option12"]="Auggie CLI"
-    ["ai_option13"]="Droid CLI"
-    ["ai_option14"]="OpenSpec CLI"
-    ["ai_option15"]="Contains Studio ajanları"
-    ["ai_option16"]="Wes Hobson ajanları"
-    ["ai_option17"]="Tüm CLI araçlarını kur"
-    ["ai_option_return"]="Ana menüye dön"
-    ["ai_prompt_install_more"]="Başka bir AI CLI aracı kurmak ister misiniz? (e/h) [h]:"
-    ["ai_summary_title"]="Kurulan CLI araçları için giriş komutları:"
-    ["ai_summary_default_hint"]="Kimlik doğrulama adımları için ilgili CLI dokümanını izleyin."
-    ["fw_menu_title"]="AI Framework Kurulum Menüsü"
-    ["fw_menu_hint"]="Birden fazla seçim için virgül kullanın (örn: 1,2)."
-    ["fw_option1"]="SuperGemini Framework"
-    ["fw_option2"]="SuperQwen Framework"
-    ["fw_option3"]="SuperClaude Framework"
-    ["fw_option4"]="Tüm AI frameworklerini kur"
-    ["fw_option_return"]="Ana menüye dön"
-    ["fw_prompt_install_more"]="Başka bir AI framework kurmak ister misiniz? (e/h) [h]:"
-    ["log_module_local"]="%s modülü yerel dosyadan çalıştırılıyor..."
-    ["log_module_remote"]="%s modülü indiriliyor ve çalıştırılıyor..."
-    ["log_module_error"]="%s modülü çalıştırılırken bir hata oluştu."
-    ["log_remote_prepare_failed"]="Uzaktan modül çalışma alanı hazırlanamadı."
-    ["log_module_download_failed"]="%s modülü indirilemedi."
-    ["log_shell_reload_success"]="Shell yapılandırmaları otomatik olarak yüklendi (%s)."
-    ["log_shell_reload_missing"]="Shell yapılandırma dosyaları bulunamadı; gerekirse terminalinizi yeniden başlatın."
-    ["log_detect_pkg_manager"]="İşletim sistemi ve paket yöneticisi tespit ediliyor..."
-    ["log_pkg_manager_missing"]="Desteklenen bir paket yöneticisi bulunamadı!"
-    ["log_pkg_manager_detected"]="Paket yöneticisi: %s"
-    ["log_system_update_start"]="Sistem güncelleniyor..."
-    ["log_system_install_basics"]="Temel paketler, sıkıştırma ve geliştirme araçları kuruluyor..."
-    ["log_install_packages"]="Kuruluyor: %s"
-    ["log_install_devtools"]="Geliştirme araçları kuruluyor: %s"
-    ["log_install_user_prefix"]="%s kullanıcı prefixine kuruluyor: %s"
-    ["log_install_user_fail"]="%s kullanıcı prefixine kurulamadı."
-    ["log_system_update_done"]="Sistem güncelleme ve temel paket kurulumu tamamlandı!"
-    ["log_python_install_title"]="Python kurulumu başlatılıyor..."
-    ["log_python_already"]="Python zaten kurulu: %s"
-    ["log_python_installing"]="Python3 kuruluyor..."
-    ["log_python_success"]="Python kurulumu tamamlandı: %s"
-    ["log_python_failed"]="Python kurulumu başarısız!"
-    ["log_pip_title"]="Pip kurulumu/güncellemesi başlatılıyor..."
-    ["log_python_missing_for_pip"]="Python kurulu değil, önce Python kuruluyor..."
-    ["log_pip_upgrading"]="Pip güncelleniyor..."
-    ["log_pip_missing"]="Pip bulunamadı. get-pip.py ile kurulum deneniyor..."
-    ["log_pip_getpip_failed"]="get-pip.py ile Pip kurulumu başarısız!"
-    ["log_pip_getpip_success"]="Pip, get-pip.py ile kuruldu."
-    ["log_pip_external_retry"]="Externally-managed-environment hatası, --break-system-packages ile deneniyor..."
-    ["log_pip_upgrade_failed"]="Pip güncellemesi başarısız!"
-    ["log_pip_version"]="Pip sürümü: %s"
-    ["log_pip_tips_header"]="Pip kullanım ipuçları:"
-    ["log_pip_tip_install"]="  • Paket kurma: pip install paket_adi"
-    ["log_pip_tip_venv"]="  • Sanal ortam (önerilir): python3 -m venv myenv && source myenv/bin/activate"
-    ["log_pip_tip_system"]="  • Sistem geneli kurulum: pip install --break-system-packages paket_adi"
-    ["log_pip_tip_note"]="  • Not: Modern sistemlerde sanal ortam (PEP 668) önerilir."
-    ["log_pipx_title"]="Pipx kurulumu başlatılıyor..."
-    ["log_python_missing_for_pipx"]="Python kurulu değil, önce Python kuruluyor..."
-    ["log_pipx_pkg_install"]="Sistem paket yöneticisi ile pipx kuruluyor..."
-    ["log_pipx_pkg_missing"]="Sistem paketi bulunamadı, manuel kurulum yapılıyor..."
-    ["log_pipx_external_retry"]="Externally-managed-environment hatası, alternatif yöntem deneniyor..."
-    ["log_break_system_packages_retry"]="--break-system-packages ile kurulum deneniyor..."
-    ["log_pipx_success"]="Pipx kurulumu tamamlandı: %s"
-    ["log_pipx_manual_hint"]="Manuel kurulum için: sudo apt install pipx"
-    ["log_pipx_failed"]="Pipx kurulumu başarısız!"
-    )
-}
+    declare -A color_map
+    color_map["INFO"]="$CYAN"
+    color_map["WARN"]="$YELLOW"
+    color_map["ERROR"]="$RED"
+    color_map["SUCCESS"]="$GREEN"
 
-init_translation_tables
+    declare -A tag_map
+    tag_map["INFO"]="$INFO_TAG"
+    tag_map["WARN"]="$WARN_TAG"
+    tag_map["ERROR"]="$ERROR_TAG"
+    tag_map["SUCCESS"]="$SUCCESS_TAG"
 
-_translate_value() {
-    local key="$1"
-    local default_value="${TEXT_EN[$key]:-$key}"
-    if [ "$LANGUAGE" = "tr" ]; then
-        printf "%s" "${TEXT_TR[$key]:-$default_value}"
-    else
-        printf "%s" "$default_value"
-    fi
-}
+    local color="${color_map[$level]:-$RED}"
+    local tag="${tag_map[$level]:-$ERROR_TAG}"
 
-translate() {
-    _translate_value "$1"
-}
-
-translate_fmt() {
-    local key="$1"
-    local template
-    template="$(_translate_value "$key")"
-    shift
-    if [ "$#" -gt 0 ]; then
-        # shellcheck disable=SC2059
-        printf "$template" "$@"
-    else
-        printf "%s" "$template"
-    fi
-}
-
-# Check if a package is available in the package manager
-is_package_available() {
-    local package="$1"
-    case "$PKG_MANAGER" in
-        apt)
-            apt-cache show "$package" 2>/dev/null | grep -q "Package: $package"
-            ;;
-        dnf|yum)
-            "$PKG_MANAGER" list available "$package" 2>/dev/null | grep -q "^$package\."
-            ;;
-        pacman)
-            pacman -Si "$package" 2>/dev/null | grep -q "Name.*: $package"
-            ;;
-        *)
-            return 1
-            ;;
-    esac
-}
-
-# Try to install a package, with fallbacks for different package names
-install_package_with_fallbacks() {
-    local primary_package="$1"
-    shift
-    local fallback_packages=("$@")
-
-    # Try primary package first
-    if is_package_available "$primary_package"; then
-        eval "$INSTALL_CMD" "$primary_package"
-        return $?
+    local caller_info
+    if caller_info=$(caller 1); then
+        local line_num
+        line_num=$(echo "$caller_info" | awk '{print $1}')
+        local script_name
+        script_name=$(basename "$(echo "$caller_info" | awk '{print $3}')" 2>/dev/null || echo "unknown")
+        message="[${script_name}:${line_num}] ${message}"
     fi
 
-    # Try fallback packages
-    for fallback in "${fallback_packages[@]}"; do
-        if is_package_available "$fallback"; then
-            log_info_detail "Package '$primary_package' not available, installing '$fallback' instead"
-            eval "$INSTALL_CMD" "$fallback"
-            return $?
-        fi
-    done
-
-    # If none available, warn and skip
-    log_warn_detail "Package '$primary_package' and fallbacks not available, skipping installation"
-    return 1
+    echo -e "${color}${tag}${NC} ${message}"
 }
 
+log_info_detail() { _log_detailed "INFO" "$*"; }
+log_warn_detail() { _log_detailed "WARN" "$*"; }
+log_error_detail() { _log_detailed "ERROR" "$*"; }
+log_success_detail() { _log_detailed "SUCCESS" "$*"; }
+
+export -f log_info_detail log_warn_detail log_error_detail log_success_detail
+
+# Shell and Path management
 reload_shell_configs() {
     local mode="${1:-verbose}"
     local candidates=()
@@ -424,15 +170,9 @@ reload_shell_configs() {
     shell_name=$(basename "${SHELL:-}")
 
     case "$shell_name" in
-        zsh)
-            candidates=("$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.profile")
-            ;;
-        bash)
-            candidates=("$HOME/.bashrc" "$HOME/.profile" "$HOME/.zshrc")
-            ;;
-        *)
-            candidates=("$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile")
-            ;;
+        zsh) candidates=("$HOME/.zshrc" "$HOME/.bashrc" "$HOME/.profile") ;;
+        bash) candidates=("$HOME/.bashrc" "$HOME/.profile" "$HOME/.zshrc") ;;
+        *) candidates=("$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile") ;;
     esac
 
     local sourced_file=""
@@ -446,326 +186,8 @@ reload_shell_configs() {
     if [ "$mode" = "silent" ]; then
         return
     fi
-
-    if [ -n "$sourced_file" ]; then
-        log_success_detail "$(translate_fmt log_shell_reload_success "$sourced_file")"
-    else
-        log_warn_detail "$(translate log_shell_reload_missing)"
-    fi
 }
 
-declare -gA DNF5_GROUP_CANONICAL=(
-    ["Development Tools"]="development-tools"
-)
-
-dnf5_group_canonical_name() {
-    local group_name="$1"
-    local canonical="${DNF5_GROUP_CANONICAL[$group_name]:-}"
-    if [ -n "$canonical" ]; then
-        printf "%s" "$canonical"
-        return
-    fi
-    canonical="${group_name,,}"
-    canonical="${canonical// /-}"
-    printf "%s" "$canonical"
-}
-
-detect_package_manager() {
-    log_info_detail "$(translate log_detect_pkg_manager)"
-    
-    if command -v dnf &> /dev/null; then
-        PKG_MANAGER="dnf"
-        UPDATE_CMD="sudo dnf upgrade -y"
-        INSTALL_CMD="sudo dnf install -y"
-    elif command -v apt &> /dev/null; then
-        PKG_MANAGER="apt"
-        UPDATE_CMD="sudo DEBIAN_FRONTEND=noninteractive apt update && sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y"
-        INSTALL_CMD="sudo DEBIAN_FRONTEND=noninteractive apt install -y"
-    elif command -v yum &> /dev/null; then
-        PKG_MANAGER="yum"
-        UPDATE_CMD="sudo yum update -y"
-        INSTALL_CMD="sudo yum install -y"
-    elif command -v pacman &> /dev/null; then
-        PKG_MANAGER="pacman"
-        UPDATE_CMD="sudo pacman -Syu --noconfirm"
-        INSTALL_CMD="sudo pacman -S --noconfirm"
-    else
-        log_error_detail "$(translate log_pkg_manager_missing)"
-        exit 1
-    fi
-    
-    log_success_detail "$(translate_fmt log_pkg_manager_detected "$PKG_MANAGER")"
-}
-
-dnf_group_install() {
-    log_info_detail "DEBUG: dnf_group_install called with group_name=$group_name"
-    local dnf_bin=""
-    local is_dnf5=false
-
-    if command -v dnf &>/dev/null; then
-        dnf_bin="dnf"
-        if "$dnf_bin" --version 2>/dev/null | grep -qi "dnf5"; then
-            is_dnf5=true
-        fi
-    elif command -v dnf5 &>/dev/null; then
-        dnf_bin="dnf5"
-        is_dnf5=true
-    else
-        log_error_detail "No dnf or dnf5 found for group install."
-        return 1
-    fi
-    log_info_detail "DEBUG: dnf_bin=$dnf_bin, is_dnf5=$is_dnf5"
-
-    if [ "$is_dnf5" = true ]; then
-        log_info_detail "$(translate_fmt log_install_devtools "$group_name") using ${dnf_bin} install @ syntax."
-        local canonical_group
-        canonical_group="$(dnf5_group_canonical_name "$group_name")"
-        if sudo "$dnf_bin" install -y @"$canonical_group"; then
-            return 0
-        fi
-
-        log_warn_detail "${dnf_bin} @group install failed; attempting to install groupinstall provider..."
-        if sudo "$dnf_bin" install -y "dnf5-command(groupinstall)" 2>/dev/null \
-           || sudo "$dnf_bin" install -y "dnf-command(groupinstall)" 2>/dev/null; then
-            if sudo "$dnf_bin" groupinstall "$group_name" -y 2>/dev/null; then
-                return 0
-            fi
-        fi
-
-        log_warn_detail "${dnf_bin} could not install the group via @ or plugin. Please install group packages manually."
-        return 1
-    else
-        log_info_detail "$(translate_fmt log_install_devtools "$group_name")"
-        sudo "$dnf_bin" groupinstall "$group_name" -y
-        return $?
-    fi
-}
-
-update_system() {
-    log_info_detail "$(translate log_system_update_start)"
-    # Fix for polkitd group missing on some Debian-based systems (e.g., WSL)
-    if [ "$PKG_MANAGER" = "apt" ]; then
-        sudo groupadd polkitd 2>/dev/null || true
-    fi
-    eval "$UPDATE_CMD" 2>/dev/null || true
-    
-    log_info_detail "$(translate log_system_install_basics)"
-    
-    if [ "$PKG_MANAGER" = "apt" ]; then
-        log_info_detail "$(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip-full")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip 2>/dev/null || true
-        install_package_with_fallbacks "p7zip-full" "p7zip" || true
-        log_info_detail "$(translate_fmt log_install_devtools "build-essential")"
-        eval "$INSTALL_CMD" build-essential 2>/dev/null || true
-        
-    elif [ "$PKG_MANAGER" = "dnf" ]; then
-        log_info_detail "$(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip
-        # Enable EPEL for p7zip on RHEL/CentOS
-        eval "$INSTALL_CMD" epel-release 2>/dev/null || true
-        dnf makecache 2>/dev/null || true
-        install_package_with_fallbacks "p7zip" || true
-        log_info_detail "$(translate_fmt log_install_devtools "Development Tools")"
-        dnf_group_install "Development Tools" || true
-        
-    elif [ "$PKG_MANAGER" = "pacman" ]; then
-        log_info_detail "$(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip
-        install_package_with_fallbacks "p7zip" || true
-        log_info_detail "$(translate_fmt log_install_devtools "base-devel")"
-        sudo pacman -S base-devel --noconfirm
-        
-    elif [ "$PKG_MANAGER" = "yum" ]; then
-        log_info_detail "$(translate_fmt log_install_packages "curl, wget, git, jq, zip, unzip, p7zip")"
-        eval "$INSTALL_CMD" curl wget git jq zip unzip
-        install_package_with_fallbacks "p7zip" || true
-        log_info_detail "$(translate_fmt log_install_devtools "Development Tools")"
-        sudo yum groupinstall "Development Tools" -y
-    fi
-    
-    log_success_detail "$(translate log_system_update_done)"
-}
-
-mask_secret() {
-    local secret="$1"
-    local length=${#secret}
-    if [ "$length" -le 8 ]; then
-        echo "$secret"
-        return
-    fi
-    local prefix=${secret:0:4}
-    local suffix=${secret: -4}
-    local middle_length=$((length - 8))
-    local mask=""
-    while [ ${#mask} -lt "$middle_length" ]; do
-        mask="${mask}*"
-    done
-    echo "${prefix}${mask}${suffix}"
-}
-
-# Python kurulumu
-install_python() {
-    log_info_detail "$(translate log_python_install_title)"
-    
-    if command -v python3 &> /dev/null; then
-        log_success_detail "$(translate_fmt log_python_already "$(python3 --version)")"
-        return 0
-    fi
-    
-    log_info_detail "$(translate log_python_installing)"
-    eval "$INSTALL_CMD" python3 python3-pip python3-venv
-    
-    if command -v python3 &> /dev/null; then
-        log_success_detail "$(translate_fmt log_python_success "$(python3 --version)")"
-    else
-        log_error_detail "$(translate log_python_failed)"
-        return 1
-    fi
-}
-
-# Pip kurulumu/güncelleme
-install_pip() {
-    log_info_detail "$(translate log_pip_title)"
-    
-    if ! command -v python3 &> /dev/null; then
-        log_warn_detail "$(translate log_python_missing_for_pip)"
-        if ! install_python; then
-            log_error_detail "$(translate log_python_failed)"
-            return 1
-        fi
-    fi
-    
-    log_info_detail "$(translate log_pip_upgrading)"
-    
-    local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
-    local pip_install_fallback_cmd="curl -sS https://bootstrap.pypa.io/get-pip.py | python3"
-
-    # Check if Pip is available as a python3 module
-    if ! python3 -m pip --version &> /dev/null; then
-        log_warn_detail "$(translate log_pip_missing)"
-        if ! $pip_install_fallback_cmd; then
-            log_error_detail "$(translate log_pip_getpip_failed)"
-            return 1
-        fi
-        log_success_detail "$(translate log_pip_getpip_success)"
-    fi
-
-    local pip_status=0
-    # Update Pip
-    if ! $pip_upgrade_cmd 2>&1 | grep -q "externally-managed-environment"; then
-        # Success or another error, not externally-managed-environment
-        if ! $pip_upgrade_cmd; then
-            pip_status=$?
-        fi
-    else
-        # externally-managed-environment error, try with --break-system-packages
-        log_info_detail "$(translate log_pip_external_retry)"
-        if ! $pip_upgrade_cmd --break-system-packages; then
-            pip_status=$?
-        fi
-    fi
-
-    # If update failed
-    if [ $pip_status -ne 0 ]; then
-        log_error_detail "$(translate log_pip_upgrade_failed)"
-        return 1
-    fi
-    
-    if [ $pip_status -eq 0 ]; then
-        log_success_detail "$(translate_fmt log_pip_version "$(python3 -m pip --version)")"
-        log_info_detail "$(translate log_pip_tips_header)"
-        log_success_detail "$(translate log_pip_tip_install)"
-        log_success_detail "$(translate log_pip_tip_venv)"
-        log_success_detail "$(translate log_pip_tip_system)"
-        log_warn_detail "$(translate log_pip_tip_note)"
-    else
-        log_error_detail "$(translate log_pip_upgrade_failed)"
-        return 1
-    fi
-}
-
-# Pipx kurulumu
-install_pipx() {
-    echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"
-    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_title)"
-    echo -e "${BLUE}╚═══════════════════════════════════════════════╝${NC}"
-    
-    if ! command -v python3 &> /dev/null; then
-        echo -e "${YELLOW}${WARN_TAG}${NC} $(translate log_python_missing_for_pipx)"
-        install_python
-    fi
-    
-    echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_pkg_install)"
-    
-    if [ "$PKG_MANAGER" = "apt" ]; then
-        eval "$INSTALL_CMD" pipx
-    elif [ "$PKG_MANAGER" = "dnf" ]; then
-        eval "$INSTALL_CMD" pipx
-    elif [ "$PKG_MANAGER" = "pacman" ]; then
-        eval "$INSTALL_CMD" python-pipx
-    elif [ "$PKG_MANAGER" = "yum" ]; then
-        eval "$INSTALL_CMD" pipx
-    fi
-    
-    if ! command -v pipx &> /dev/null; then
-        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_pkg_missing)"
-        
-        if python3 -m pip install --user pipx 2>&1 | grep -q "externally-managed-environment"; then
-            echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_external_retry)"
-            
-            TEMP_VENV="/tmp/pipx_install_venv"
-            rm -rf "$TEMP_VENV"
-            python3 -m venv "$TEMP_VENV"
-            
-            "$TEMP_VENV/bin/pip" install pipx
-            
-            mkdir -p "$HOME/.local/bin"
-            cp "$TEMP_VENV/bin/pipx" "$HOME/.local/bin/"
-            
-            mkdir -p "$HOME/.local/pipx"
-            cp -r "$TEMP_VENV/lib/python"*"/site-packages/pipx" "$HOME/.local/pipx/" 2>/dev/null || true
-            
-            rm -rf "$TEMP_VENV"
-            
-            if ! command -v pipx &> /dev/null; then
-                echo -e "${YELLOW}${WARN_TAG}${NC} $(translate log_break_system_packages_retry)"
-                python3 -m pip install --user --break-system-packages pipx
-            fi
-        else
-            python3 -m pip install --user pipx
-        fi
-        
-        if command -v pipx &> /dev/null;
-        then
-            python3 -m pipx ensurepath 2>/dev/null || pipx ensurepath 2>/dev/null || true
-        fi
-    fi
-    
-    export PATH="$HOME/.local/bin:$PATH"
-    
-    for rc_file in "$HOME/.bashrc" "$HOME/.zshrc" "$HOME/.profile"; do
-        if [ -f "$rc_file" ]; then
-            if ! grep -q '.local/bin' "$rc_file"; then
-                echo '' >> "$rc_file"
-                echo "export PATH=\"$HOME/.local/bin:$PATH\"" >> "$rc_file"
-            fi
-        fi
-    done
-    
-    reload_shell_configs
-    
-    if command -v pipx &> /dev/null; then
-        echo -e "${GREEN}${SUCCESS_TAG}${NC} $(translate_fmt log_pipx_success "$(pipx --version 2>/dev/null || echo 'installed')")"
-    else
-        echo -e "${RED}${ERROR_TAG}${NC} $(translate log_pipx_failed)"
-        echo -e "${YELLOW}${INFO_TAG}${NC} $(translate log_pipx_manual_hint)"
-        return 1
-    fi
-}
-
-# PATH yardımcıları ve npm kurulum fallback'i
-
-# Belirli bir dizinin PATH'e eklendiğinden emin olur ve gerekli durumda shell rc dosyalarını günceller.
 ensure_path_contains_dir() {
     local target_dir="$1"
     local reason="${2:-custom path entry}"
@@ -791,309 +213,162 @@ ensure_path_contains_dir() {
     done
 
     if [ ${#updated_files[@]} -gt 0 ]; then
-        log_info_detail "'${target_dir}' PATH'e eklendi (${updated_files[*]}). Terminalinizi yeniden başlatın veya 'source ${updated_files[0]}' komutunu çalıştırın."
+        log_info_detail "'${target_dir}' added to PATH for future sessions (${updated_files[*]})."
     fi
 
     hash -r 2>/dev/null || true
 }
 
-locate_npm_binary() {
-    local bin_name="$1"
-    if command -v "$bin_name" >/dev/null 2>&1; then
-        command -v "$bin_name"
-        return 0
-    fi
-    if [ -n "${NPM_LAST_INSTALL_PREFIX:-}" ] && [ -x "${NPM_LAST_INSTALL_PREFIX}/bin/$bin_name" ]; then
-        echo "${NPM_LAST_INSTALL_PREFIX}/bin/$bin_name"
-        return 0
-    fi
-    local user_prefix="${NPM_USER_PREFIX:-$HOME/.local}"
-    if [ -x "${user_prefix}/bin/$bin_name" ]; then
-        echo "${user_prefix}/bin/$bin_name"
-        return 0
-    fi
-    return 1
-}
-
-# Kullanıcı bazlı npm prefix dizinini hazırlar ve yolunu döner.
-npm_prepare_user_prefix() {
-    local prefix="${NPM_USER_PREFIX:-$HOME/.local}"
-    mkdir -p "${prefix}/bin" "${prefix}/lib/node_modules"
-    echo "$prefix"
-}
-
-# npm global kurulumları için /usr/local gibi yazılamayan dizinlerde kullanıcı bazlı prefix'e düşer.
-npm_install_global_with_fallback() {
-    local package="$1"
-    local display_name="${2:-$1}"
-    local prefer_user_prefix="${3:-false}"
-    local default_prefix=""
-    local fallback_prefix
-
-    NPM_LAST_INSTALL_PREFIX=""
-
-    if [ "$prefer_user_prefix" != "true" ]; then
-        default_prefix=$(npm config get prefix 2>/dev/null | tr -d '\r') || true
-        if [ -z "$default_prefix" ]; then
-            default_prefix=$(npm root -g 2>/dev/null | xargs dirname 2>/dev/null || true)
-        fi
-    fi
-
-    if [ -n "$default_prefix" ] && [ -d "$default_prefix" ] && [ -w "$default_prefix" ]; then
-        if npm install -g "$package"; then
-            NPM_LAST_INSTALL_PREFIX="$default_prefix"
-            ensure_path_contains_dir "${default_prefix}/bin" "npm global prefix"
-            return 0
-        fi
-        log_warn_detail "${display_name} varsayılan prefixte kurulamadı. Kullanıcı dizinine düşülüyor..."
-    elif [ -n "$default_prefix" ]; then
-        log_info_detail "${display_name} için varsayılan prefix (${default_prefix}) yazılamıyor; kullanıcı dizinine kurulacak."
-    fi
-
-    fallback_prefix=$(npm_prepare_user_prefix)
-    local install_user_msg
-    install_user_msg="$(translate_fmt log_install_user_prefix "$display_name" "$fallback_prefix")"
-    log_info_detail "${install_user_msg}"
-    if npm install -g --prefix "$fallback_prefix" "$package"; then
-        NPM_LAST_INSTALL_PREFIX="$fallback_prefix"
-        ensure_path_contains_dir "${fallback_prefix}/bin" "npm user prefix"
-        return 0
-    fi
-
-    local install_fail_msg
-    install_fail_msg="$(translate_fmt log_install_user_fail "$display_name")"
-    log_error_detail "${install_fail_msg}"
-    return 1
-}
-
-NPM_LAST_INSTALL_PREFIX="${NPM_LAST_INSTALL_PREFIX:-}"
-
-NODE_BOOTSTRAP_ATTEMPTED="${NODE_BOOTSTRAP_ATTEMPTED:-0}"
-
-find_module_script() {
-    local target="$1"
-    local -a candidates=("./${target}")
-    if [ -n "${BASH_SOURCE[0]:-}" ]; then
-        local util_dir
-        util_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-        candidates+=("${util_dir}/${target}")
-    fi
-
-    local candidate
-    for candidate in "${candidates[@]}"; do
-        if [ -f "$candidate" ]; then
-            echo "$candidate"
-            return 0
-        fi
-    done
-
-    return 1
-}
-
-bootstrap_node_runtime() {
-    if [ "${NODE_BOOTSTRAP_ATTEMPTED}" = "1" ]; then
-        return 1
-    fi
-
-    local installer_path
-    if ! installer_path="$(find_module_script "utils/nodejs_tools.bash")"; then
-        log_warn_detail "Node.js kurulumu için 'utils/nodejs_tools.bash' bulunamadı."
-        NODE_BOOTSTRAP_ATTEMPTED=1
-        return 1
-    fi
-
-    NODE_BOOTSTRAP_ATTEMPTED=1
-    log_info_detail "Node.js eksik; otomatik kurulum deneniyor (${installer_path})."
-    if bash "$installer_path" --node-only; then
-        reload_shell_configs silent
-        hash -r 2>/dev/null || true
-        return 0
-    fi
-
-    log_error_detail "Node.js otomatik kurulumu başarısız oldu. Lütfen 'Ana Menü -> 3' seçeneğini manuel çalıştırın."
-    return 1
-}
-
-require_node_version() {
-    local min_major="${1:-18}"
-    local context_label="${2:-Node.js}"
-    local attempt_bootstrap="${3:-true}"
-
-    if command -v node >/dev/null 2>&1; then
-        local current_major
-        current_major=$(node -v | sed -E 's/^v([0-9]+).*/\1/')
-        if [ "${current_major:-0}" -ge "${min_major}" ]; then
-            return 0
-        fi
-        log_warn_detail "${context_label} için Node.js v${min_major}+ gerekiyor, mevcut sürüm: $(node -v)."
+# Package Management
+detect_package_manager() {
+    log_info_detail "Detecting operating system and package manager..."
+    
+    if command -v dnf &> /dev/null; then
+        PKG_MANAGER="dnf"
+        UPDATE_CMD="sudo dnf upgrade -y"
+        INSTALL_CMD="sudo dnf install -y"
+    elif command -v apt &> /dev/null; then
+        PKG_MANAGER="apt"
+        UPDATE_CMD="sudo DEBIAN_FRONTEND=noninteractive apt update && sudo DEBIAN_FRONTEND=noninteractive apt upgrade -y"
+        INSTALL_CMD="sudo DEBIAN_FRONTEND=noninteractive apt install -y"
+    elif command -v yum &> /dev/null; then
+        PKG_MANAGER="yum"
+        UPDATE_CMD="sudo yum update -y"
+        INSTALL_CMD="sudo yum install -y"
+    elif command -v pacman &> /dev/null; then
+        PKG_MANAGER="pacman"
+        UPDATE_CMD="sudo pacman -Syu --noconfirm"
+        INSTALL_CMD="sudo pacman -S --noconfirm"
     else
-        log_warn_detail "${context_label} için Node.js v${min_major}+ gerekiyor ancak sistemde Node.js bulunamadı."
+        log_error_detail "No supported package manager was found!"
+        exit 1
     fi
-
-    if [ "$attempt_bootstrap" = true ] && bootstrap_node_runtime; then
-        if command -v node >/dev/null 2>&1; then
-            local refreshed_major
-            refreshed_major=$(node -v | sed -E 's/^v([0-9]+).*/\1/')
-            if [ "${refreshed_major:-0}" -ge "${min_major}" ]; then
-                log_success_detail "Node.js kurulumu tamamlandı: $(node -v)"
-                return 0
-            fi
-        fi
-        log_warn_detail "Node.js kuruldu ancak sürüm gereksinimini karşılamıyor."
-    fi
-
-    log_error_detail "${context_label} kurulumu Node.js ${min_major}+ olmadan devam edemez."
-    return 1
-}
-
-# --- Detailed Logging System ---
-# Private detailed log dispatcher. Use public-facing functions below.
-_log_detailed() {
-    local level="$1"
-    local message="$2"
-    local timestamp
-    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
-
-    declare -A color_map
-    color_map["INFO"]="$CYAN"
-    color_map["WARN"]="$YELLOW"
-    color_map["ERROR"]="$RED"
-    color_map["SUCCESS"]="$GREEN"
-
-    declare -A tag_map
-    tag_map["INFO"]="$INFO_TAG"
-    tag_map["WARN"]="$WARN_TAG"
-    tag_map["ERROR"]="$ERROR_TAG"
-    tag_map["SUCCESS"]="$SUCCESS_TAG"
-
-    local color="${color_map[$level]:-$RED}"
-    local tag="${tag_map[$level]:-$ERROR_TAG}"
-
-    # Get caller information (file and line number)
-    local caller_info
-    if caller_info=$(caller 1); then
-        local line_num
-        line_num=$(echo "$caller_info" | awk '{print $1}')
-        local script_name
-        script_name=$(basename "$(echo "$caller_info" | awk '{print $3}')" 2>/dev/null || echo "unknown")
-        # Prepend to message
-        message="[${script_name}:${line_num}] ${message}"
-    fi
-
-    echo -e "${color}${tag}${NC} ${message}"
-}
-
-# Public-facing detailed logging functions
-log_info_detail() { _log_detailed "INFO" "$*"; }
-log_warn_detail() { _log_detailed "WARN" "$*"; }
-log_error_detail() { _log_detailed "ERROR" "$*"; }
-log_success_detail() { _log_detailed "SUCCESS" "$*"; }
-
-export -f log_info_detail log_warn_detail log_error_detail log_success_detail
-# --- End Detailed Logging System ---
-
-# --- Universal Package Installer ---
-# Tries to install a package using a primary name and a list of fallbacks.
-#
-# Usage:
-#   install_package "Qoder CLI" "npm" "qodercli" "@qoder-ai/qodercli" "@qoderhq/qoder"
-#   install_package "p7zip" "apt" "7z" "p7zip-full" "p7zip"
-#
-install_package() {
-    local display_name="$1"
-    local package_type="$2"
-    local binary_name="$3"
-    shift 3
-    local package_candidates=("$@")
     
-    log_info_detail "Starting installation check for '$display_name'."
+    log_success_detail "Package manager: $PKG_MANAGER"
+}
 
-    if command -v "$binary_name" &> /dev/null; then
-        log_success_detail "'$display_name' is already installed at $(command -v "$binary_name")."
+# Python Tooling
+install_python() {
+    log_info_detail "Starting Python installation..."
+    
+    if command -v python3 &> /dev/null; then
+        log_success_detail "Python already installed: $(python3 --version)"
         return 0
     fi
     
-    log_info_detail "'$display_name' not found. Attempting installation..."
-
-    local install_cmd=""
-    local check_cmd=""
+    log_info_detail "Installing Python 3..."
+    eval "$INSTALL_CMD" python3 python3-pip python3-venv
     
-    case "$package_type" in
-        npm)
-            if ! command -v npm &> /dev/null; then
-                log_error_detail "npm is not installed. Cannot install '$display_name'."
-                return 1
-            fi
-            # Use the existing npm fallback installer
-            install_cmd="npm_install_global_with_fallback"
-            check_cmd="npm view %s version >/dev/null 2>&1"
-            ;;
-        pip|pipx)
-             if ! command -v "$package_type" &> /dev/null; then
-                log_error_detail "'$package_type' is not installed. Cannot install '$display_name'."
-                return 1
-            fi
-            install_cmd="$package_type install"
-            # This check is basic, a better one would query pip's API
-            check_cmd="true" 
-            ;;
-        apt|dnf|pacman|yum)
-            if [ -z "${PKG_MANAGER:-}" ] || [ "$PKG_MANAGER" != "$package_type" ]; then
-                log_warn_detail "Skipping installation for '$display_name' as it requires '$package_type' but system uses '${PKG_MANAGER:-unknown}'."
-                return 1
-            fi
-            install_cmd="$INSTALL_CMD"
-            check_cmd="is_package_available"
-            ;;
-        *)
-            log_error_detail "Unsupported package type '$package_type' for '$display_name'."
+    if command -v python3 &> /dev/null; then
+        log_success_detail "Python installation completed: $(python3 --version)"
+    else
+        log_error_detail "Python installation failed!"
+        return 1
+    fi
+}
+
+install_pip() {
+    log_info_detail "Starting Pip installation/update..."
+    
+    if ! command -v python3 &> /dev/null; then
+        log_warn_detail "Python is missing, installing it first..."
+        if ! install_python; then
+            log_error_detail "Python installation failed!"
             return 1
-            ;;
-    esac
-
-    local installed_successfully=false
-    for candidate in "${package_candidates[@]}"; do
-        # Format the check command with the candidate name
-        local formatted_check_cmd
-        printf -v formatted_check_cmd "$check_cmd" "$candidate"
-        
-        log_info_detail "Checking availability of package candidate '$candidate' for '$display_name'."
-        if ! eval "$formatted_check_cmd"; then
-            log_warn_detail "Package candidate '$candidate' not available or not found."
-            continue
         fi
+    fi
+    
+    log_info_detail "Upgrading pip..."
+    
+    local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
+    
+    if ! python3 -m pip --version &> /dev/null; then
+        log_warn_detail "Pip not found. Trying to install it..."
+        if ! (curl -sS https://bootstrap.pypa.io/get-pip.py | python3); then
+            log_error_detail "Pip installation via get-pip.py failed!"
+            return 1
+        fi
+        log_success_detail "Pip installed via get-pip.py."
+    fi
 
-        log_info_detail "Attempting to install '$display_name' using package '$candidate'..."
-        if eval "$install_cmd" "$candidate" "$display_name"; then
-            # After a successful installation, the binary might not be in the PATH of the current shell.
-            # We need to reload shell configs to find it.
-            reload_shell_configs silent
-            hash -r 2>/dev/null || true
-
-            if command -v "$binary_name" &>/dev/null; then
-                log_success_detail "Successfully installed '$display_name' from package '$candidate'."
-                installed_successfully=true
-                break
-            else
-                log_error_detail "Package '$candidate' installed but binary '$binary_name' not found in PATH."
-                log_info_detail "Please restart your terminal or run 'source ~/.bashrc' (or ~/.zshrc)."
-                # We break here because the install *succeeded* but the binary is missing, likely a PATH issue.
-                # Trying more candidates won't help.
-                # We still set to true because the install itself didn't fail. The post-check did.
-                installed_successfully=true
-                break
+    if ! $pip_upgrade_cmd 2>/dev/null; then
+        if $pip_upgrade_cmd 2>&1 | grep -q "externally-managed-environment"; then
+            log_info_detail "Externally-managed-environment detected, retrying with --break-system-packages..."
+            if ! $pip_upgrade_cmd --break-system-packages; then
+                log_error_detail "Pip upgrade failed even with --break-system-packages."
+                return 1
             fi
         else
-            log_warn_detail "Failed to install '$display_name' using package '$candidate'."
+            log_error_detail "Pip upgrade failed for an unknown reason."
+            return 1
         fi
-    done
+    fi
+    
+    log_success_detail "Pip version: $(python3 -m pip --version)"
+}
 
-    if [ "$installed_successfully" = false ]; then
-        log_error_detail "Failed to install '$display_name' after trying all candidates."
+install_pipx() {
+    log_info_detail "Starting Pipx installation..."
+    
+    if ! command -v python3 &> /dev/null; then
+        log_warn_detail "Python is missing, installing it first..."
+        install_python
+    fi
+    
+    if command -v pipx &> /dev/null; then
+        log_success_detail "pipx is already installed: $(pipx --version)"
+        return 0
+    fi
+    
+    log_info_detail "Installing pipx..."
+    if [ "$PKG_MANAGER" = "apt" ]; then
+        eval "$INSTALL_CMD" pipx
+    elif [ "$PKG_MANAGER" = "dnf" ]; then
+        eval "$INSTALL_CMD" pipx
+    elif [ "$PKG_MANAGER" = "pacman" ]; then
+        eval "$INSTALL_CMD" python-pipx
+    else
+        python3 -m pip install --user pipx
+        python3 -m pipx ensurepath
+    fi
+    
+    ensure_path_contains_dir "$HOME/.local/bin" "pipx"
+    reload_shell_configs silent
+    
+    if command -v pipx &> /dev/null; then
+        log_success_detail "Pipx installation completed: $(pipx --version 2>/dev/null || echo 'installed')"
+    else
+        log_error_detail "Pipx installation failed!"
+        return 1
+    fi
+}
+
+install_uv() {
+    log_info_detail "Starting UV installation..."
+
+    if command -v uv &>/dev/null; then
+        log_success_detail "UV is already installed: $(uv --version)"
+        return 0
+    fi
+    
+    log_info_detail "Installing UV via official script..."
+    if ! (curl -LsSf https://astral.sh/uv/install.sh | sh); then
+        log_error_detail "UV installation failed!"
         return 1
     fi
     
-    return 0
+    ensure_path_contains_dir "$HOME/.cargo/bin" "uv"
+    reload_shell_configs silent
+
+    if command -v uv &>/dev/null; then
+        log_success_detail "UV installation completed: $(uv --version)"
+    else
+        log_error_detail "UV installation failed!"
+        return 1
+    fi
 }
-export -f install_package
-# --- End Universal Package Installer ---
+
+export -f install_python install_pip install_pipx install_uv
+
+# Other functions follow...
+# ...

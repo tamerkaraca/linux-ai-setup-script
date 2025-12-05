@@ -117,19 +117,19 @@ run_python_tools_menu() {
             [ -z "$selection" ] && continue
             case "$selection" in
                 1)
-                    run_module "setup/python"
+                    install_python
                     action_performed=true
                     ;;
                 2)
-                    run_module "setup/pip"
+                    install_pip
                     action_performed=true
                     ;;
                 3)
-                    run_module "setup/pipx"
+                    install_pipx
                     action_performed=true
                     ;;
                 4)
-                    run_module "setup/uv"
+                    install_uv
                     action_performed=true
                     ;;
                 *)
@@ -150,10 +150,10 @@ run_python_tools_menu() {
 }
 
 install_python_stack() {
-    run_module "setup/python"
-    run_module "setup/pip"
-    run_module "setup/pipx"
-    run_module "setup/uv"
+    install_python
+    install_pip
+    install_pipx
+    install_uv
     reload_shell_configs
     log_success_detail "Python tooling installation completed!"
 }

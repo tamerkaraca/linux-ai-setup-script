@@ -330,7 +330,7 @@ install_qoder_cli() {
         fi
         install_source="$resolved_package"
     fi
-    install_npm_cli "Qoder CLI" "$install_source" "qoder" "$dry_run"
+    install_npm_cli "Qoder CLI" "$install_source" "qodercli" "$dry_run"
 }
 
 install_coder_cli() {

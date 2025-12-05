@@ -190,6 +190,7 @@ This new menu, accessible via option `8` in the main menu, groups together tools
 | `2` | [specify-cli](https://github.com/github/spec-kit) | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. Requires Python tools to be installed. |
 | `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
 | `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
+| `5` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | Installs a collection of agents for `opencode` from the darrenhinde/OpenAgents repository. |
 | `A` | Install All | Installs all auxiliary tools sequentially. |
 
 #### AI Framework Menu
@@ -357,6 +358,7 @@ Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon od
 | `2` | [specify-cli](https://github.com/github/spec-kit) | GitHub'ın `spec-kit` deposundan `specify-cli` aracını `uv` ile kurar. Python araçlarının kurulu olmasını gerektirir. |
 | `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
 | `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | `wshobson/agents` koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
+| `5` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | `opencode` için darrenhinde/OpenAgents deposundan bir ajan koleksiyonu kurar. |
 | `A` | Hepsini Kur | Tüm yardımcı araçları sırayla kurar. |
 
 #### AI Framework Menüsü

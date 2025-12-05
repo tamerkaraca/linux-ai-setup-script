@@ -147,9 +147,9 @@ source_module() {
     fi
 }
 
-source_module "./modules/utils.sh" "modules/utils.sh"
-source_module "./modules/banner.sh" "modules/banner.sh"
-source_module "./modules/platform_detection.sh" "modules/platform_detection.sh"
+source_module "./modules/utils/utils.bash" "modules/utils/utils.bash"
+source_module "./modules/utils/banner.bash" "modules/utils/banner.bash"
+source_module "./modules/utils/platform_detection.bash" "modules/utils/platform_detection.bash"
 BASE_URL="${BASE_URL:-${SCRIPT_BASE_URL}/modules}"
 export BASE_URL
 
@@ -162,8 +162,8 @@ prepare_remote_module_dir() {
     fi
     REMOTE_MODULE_DIR="$(mktemp -d)"
     mkdir -p "$REMOTE_MODULE_DIR/modules"
-    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils.sh" -o "$REMOTE_MODULE_DIR/modules/utils.sh" || return 1
-    curl -fsSL "${SCRIPT_BASE_URL}/modules/banner.sh" -o "$REMOTE_MODULE_DIR/modules/banner.sh" || true
+    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils/utils.bash" -o "$REMOTE_MODULE_DIR/modules/utils/utils.bash" || return 1
+    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils/banner.bash" -o "$REMOTE_MODULE_DIR/modules/utils/banner.bash" || true
     export REMOTE_MODULE_DIR
     return 0
 }
@@ -178,8 +178,8 @@ trap cleanup_remote_modules EXIT
 # Script çalıştırma fonksiyonu
 run_module() {
     local module_name="$1"
-    local local_path="./modules/${module_name}.sh"
-    local module_url="$BASE_URL/$module_name.sh"
+    local local_path="./modules/${module_name}.bash"
+    local module_url="$BASE_URL/${module_name}.bash"
     shift
 
     if [ -f "$local_path" ]; then
@@ -194,7 +194,7 @@ run_module() {
             echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
         }
-        local remote_file="${REMOTE_MODULE_DIR}/${module_name}.sh"
+        local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
         if [ ! -f "$remote_file" ]; then
             if ! curl -fsSL "$module_url" -o "$remote_file"; then
                 echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
@@ -310,119 +310,119 @@ main_menu() {
             case "$choice" in
                 1)
                     if is_macos; then
-                        run_module "install_homebrew"
+                        run_module "setup/homebrew"
                     else
                         update_system
-                        run_module "install_wslu"
+                        run_module "setup/wslu"
                     fi
                     ;;
-                2) run_module "install_python_tools" ;;
+                2) run_module "menus/python_tools" ;;
                 3)
                     if is_macos; then
-                        run_module "install_macos_ai_tools"
+                        run_module "setup/macos_ai_tools"
                     else
-                        run_module "install_node_menu"
+                        run_module "menus/node"
                     fi
                     ;;
                 4)
                     if is_macos; then
-                        run_module "install_macos_ai_frameworks"
+                        run_module "setup/macos_ai_frameworks"
                     else
-                        run_module "install_ai_cli_tools_menu"
+                        run_module "menus/ai_cli_tools"
                     fi
                     ;;
                 5)
                     if is_macos; then
-                        run_module "configure_git"
+                        run_module "setup/configure_git"
                     else
-                        run_module "install_ai_frameworks_menu"
+                        run_module "menus/ai_frameworks"
                     fi
                     ;;
                 6)
                     if is_macos; then
-                        run_module "configure_glm_claude"
+                        run_module "setup/configure_glm_claude"
                     else
-                        run_module "configure_git"
+                        run_module "setup/configure_git"
                     fi
                     ;;
                 7)
                     if is_macos; then
-                        run_module "install_aux_tools_menu"
+                        run_module "menus/aux_tools"
                     else
-                        run_module "configure_glm_claude"
+                        run_module "setup/configure_glm_claude"
                     fi
                     ;;
                 8)
                     if is_macos; then
-                        run_module "install_php_composer"
+                        run_module "setup/php_composer"
                     else
-                        run_module "install_aux_tools_menu"
+                        run_module "menus/aux_tools"
                     fi
                     ;;
                 9)
                     if is_macos; then
-                        run_module "install_github_cli"
+                        run_module "setup/github_cli"
                     else
-                        run_module "install_php_composer"
+                        run_module "setup/php_composer"
                     fi
                     ;;
                 10)
                     if is_macos; then
-                        run_module "remove_ai_frameworks_menu"
+                        run_module "menus/remove_ai_frameworks"
                     else
-                        run_module "install_github_cli"
+                        run_module "setup/github_cli"
                     fi
                     ;;
                 11)
                     if is_macos; then
-                        run_module "manage_mcp_servers_menu"
+                        run_module "menus/mcp_servers"
                     else
-                        run_module "remove_ai_frameworks_menu"
+                        run_module "menus/remove_ai_frameworks"
                     fi
                     ;;
                 12)
                     if is_macos; then
                         log_info "Option not available on macOS"
                     else
-                        run_module "manage_mcp_servers_menu"
+                        run_module "menus/mcp_servers"
                     fi
                     ;;
-                13) run_module "install_terminal_tools_menu" ;;
+                13) run_module "menus/terminal_tools" ;;
                 L)
                     language_menu
                     ;; 
                 A)
                     if is_macos; then
-                        run_module "install_homebrew"
-                        run_module "install_python_tools"
-                        run_module "install_macos_ai_tools" "all"
-                        run_module "install_macos_ai_frameworks" "all"
-                        run_module "configure_git"
-                        run_module "configure_glm_claude"
-                        run_module "install_aux_tools_menu" "all"
-                        run_module "install_github_cli"
-                        run_module "install_terminal_tools_menu" "all"
+                        run_module "setup/homebrew"
+                        run_module "menus/python_tools"
+                        run_module "setup/macos_ai_tools" "all"
+                        run_module "setup/macos_ai_frameworks" "all"
+                        run_module "setup/configure_git"
+                        run_module "setup/configure_glm_claude"
+                        run_module "menus/aux_tools" "all"
+                        run_module "setup/github_cli"
+                        run_module "menus/terminal_tools" "all"
                         echo -e "\n${YELLOW}$(setup_text prompt_install_php)${NC}"
                         read -r install_php_choice </dev/tty
                         if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
-                            run_module "install_php_composer"
+                            run_module "setup/php_composer"
                         fi
                     else
                         update_system
-                        run_module "install_wslu"
-                        run_module "install_python_tools"
-                        run_module "install_node_menu" "all"
-                        run_module "install_ai_cli_tools_menu" "all"
-                        run_module "install_aux_tools_menu" "all"
-                        run_module "install_ai_frameworks_menu" "all"
-                        run_module "configure_git"
-                        run_module "configure_glm_claude"
-                        run_module "install_github_cli"
-                        run_module "install_terminal_tools_menu" "all"
+                        run_module "setup/wslu"
+                        run_module "menus/python_tools"
+                        run_module "menus/node" "all"
+                        run_module "menus/ai_cli_tools" "all"
+                        run_module "menus/aux_tools" "all"
+                        run_module "menus/ai_frameworks" "all"
+                        run_module "setup/configure_git"
+                        run_module "setup/configure_glm_claude"
+                        run_module "setup/github_cli"
+                        run_module "menus/terminal_tools" "all"
                         echo -e "\n${YELLOW}$(setup_text prompt_install_php)${NC}"
                         read -r install_php_choice </dev/tty
                         if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
-                            run_module "install_php_composer"
+                            run_module "setup/php_composer"
                         fi
                     fi
                     ;; 

@@ -247,6 +247,7 @@ resolve_qoder_package() {
     local explicit_package="${3:-}"
     local skip_probe="${4:-false}"
     local -a candidates=(
+        "@qoder-ai/qodercli"
         "@qoderhq/qoder"
         "@qoderhq/cli"
         "@qoder/cli"

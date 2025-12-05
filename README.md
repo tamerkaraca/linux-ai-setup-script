@@ -26,20 +26,20 @@
 [![Zsh](https://img.shields.io/badge/Zsh-000000?style=flat-square&logo=zsh&logoColor=white)](https://zsh.sourceforge.io/)
 
 ### AI Tools & Frameworks
-[![Claude Code](https://img.shields.io/badge/Claude%20Code-000000?style=flat-square&logo=anthropic&logoColor=white)](https://claude.ai/)
-[![Gemini CLI](https://img.shields.io/badge/Gemini%20CLI-4285F4?style=flat-square&logo=google&logoColor=white)](https://gemini.google.com/)
-[![OpenCode](https://img.shields.io/badge/OpenCode-000000?style=flat-square&logo=github&logoColor=white)](https://opencode.ai)
-[![Qoder](https://img.shields.io/badge/Qoder-000000?style=flat-square)](https://qoder.ai/)
-[![Qwen](https://img.shields.io/badge/Qwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://qwen.ai/)
-[![OpenAI Codex](https://img.shields.io/badge/OpenAI%20Codex-412991?style=flat-square&logo=openai&logoColor=white)](https://openai.com/)
-[![Cursor Agent](https://img.shields.io/badge/Cursor%20Agent-000000?style=flat-square&logo=cursor&logoColor=white)](https://cursor.sh/)
-[![Cline](https://img.shields.io/badge/Cline-000000?style=flat-square)](https://cline.ai/)
-[![Aider](https://img.shields.io/badge/Aider-000000?style=flat-square&logo=python&logoColor=white)](https://aider.chat/)
-[![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-000000?style=flat-square&logo=github&logoColor=white)](https://github.com/features/copilot)
-[![Kilocode](https://img.shields.io/badge/Kilocode-000000?style=flat-square)](https://kilocode.ai/)
-[![Auggie](https://img.shields.io/badge/Auggie-000000?style=flat-square)](https://auggie.dev/)
-[![Droid](https://img.shields.io/badge/Droid-000000?style=flat-square)](https://droid.ai/)
-[![Jules](https://img.shields.io/badge/Jules-4285F4?style=flat-square&logo=google&logoColor=white)](https://jules.google.com/)
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-000000?style=flat-square&logo=anthropic&logoColor=white)](https://github.com/anthropics/claude-code)
+[![Gemini CLI](https://img.shields.io/badge/Gemini%20CLI-4285F4?style=flat-square&logo=google&logoColor=white)](https://github.com/google-gemini/gemini-cli)
+[![OpenCode](https://img.shields.io/badge/OpenCode-000000?style=flat-square&logo=github&logoColor=white)](https://github.com/opencode-ai/opencode)
+[![Qoder](https://img.shields.io/badge/Qoder-000000?style=flat-square)](https://docs.qoder.com/cli/quick-start/)
+[![Qwen](https://img.shields.io/badge/Qwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://github.com/QwenLM/qwen-code/)
+[![OpenAI Codex](https://img.shields.io/badge/OpenAI%20Codex-412991?style=flat-square&logo=openai&logoColor=white)](https://github.com/openai/codex/)
+[![Cursor Agent](https://img.shields.io/badge/Cursor%20Agent-000000?style=flat-square&logo=cursor&logoColor=white)](https://cursor.com/cli/)
+[![Cline](https://img.shields.io/badge/Cline-000000?style=flat-square)](https://github.com/cline/cline/)
+[![Aider](https://img.shields.io/badge/Aider-000000?style=flat-square&logo=python&logoColor=white)](https://github.com/Aider-AI/aider/)
+[![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-000000?style=flat-square&logo=github&logoColor=white)](https://github.com/github/copilot-cli/)
+[![Kilocode](https://img.shields.io/badge/Kilocode-000000?style=flat-square)](https://github.com/Kilo-Org/kilocode/)
+[![Auggie](https://img.shields.io/badge/Auggie-000000?style=flat-square)](https://github.com/augmentcode/auggie/)
+[![Droid](https://img.shields.io/badge/Droid-000000?style=flat-square)](https://factory.ai/)
+[![Jules](https://img.shields.io/badge/Jules-4285F4?style=flat-square&logo=google&logoColor=white)](https://jules.google/docs/)
 [![SuperGemini](https://img.shields.io/badge/SuperGemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://github.com/SuperClaude-Org/SuperGemini_Framework)
 [![SuperQwen](https://img.shields.io/badge/SuperQwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://github.com/SuperClaude-Org/SuperQwen_Framework)
 [![SuperClaude](https://img.shields.io/badge/SuperClaude-000000?style=flat-square&logo=anthropic&logoColor=white)](https://github.com/SuperClaude-Org/SuperClaude_Framework)
@@ -364,9 +364,9 @@ Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon od
 
 | Seçenek | Framework | Detaylar |
 |---------|-----------|----------|
-| `1` | SuperGemini | `pipx` ile kurulur, PATH güncellemesini ve gerekli login komutlarını otomatik özetler. |
-| `2` | SuperQwen | `attach_tty_and_run` ile sarıldığı için Qwen kimlik doğrulamaları kesintisiz ilerler. |
-| `3` | SuperClaude | Aynı TTY korumalarıyla Anthropic araçlarını kurar, gerekirse temizleme yordamları sağlar. |
+| `1` | [SuperGemini](https://github.com/SuperClaude-Org/SuperGemini_Framework) | `pipx` ile kurulur, PATH güncellemesini ve gerekli login komutlarını otomatik özetler. |
+| `2` | [SuperQwen](https://github.com/SuperClaude-Org/SuperQwen_Framework) | `attach_tty_and_run` ile sarıldığı için Qwen kimlik doğrulamaları kesintisiz ilerler. |
+| `3` | [SuperClaude](https://github.com/SuperClaude-Org/SuperClaude_Framework) | Aynı TTY korumalarıyla Anthropic araçlarını kurar, gerekirse temizleme yordamları sağlar. |
 | `4` | Hepsini Kur | Tüm Super* framework’lerini arka arkaya kurar; daha önce kurulanlar atlanır veya güncellenir. |
 
 ### Kullanım Notları

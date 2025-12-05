@@ -81,10 +81,10 @@ install_terminal_tools_menu() {
         if [ -z "$install_all" ]; then
             clear
             print_heading_panel "$(terminal_menu_text menu_title)"
-            log_info_detail "  1 - $(terminal_menu_text option1)"
-            log_info_detail "  A - $(terminal_menu_text optionA)"
-            log_info_detail "  0 - $(terminal_menu_text option_return)"
-            log_info_detail "$(terminal_menu_text menu_hint)"
+            echo -e "  ${GREEN}1${NC} - $(terminal_menu_text option1)"
+            echo -e "  ${GREEN}A${NC} - $(terminal_menu_text optionA)"
+            echo -e "  ${GREEN}0${NC} - $(terminal_menu_text option_return)"
+            echo -e "${YELLOW}$(terminal_menu_text menu_hint)${NC}"
 
             read -r -p "$(terminal_menu_text prompt_choice): " choices </dev/tty
             if [ "$choices" = "0" ] || [ -z "$choices" ]; then

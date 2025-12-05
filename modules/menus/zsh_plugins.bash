@@ -93,16 +93,16 @@ install_zsh_plugins_menu() {
         if [ -z "$install_all" ]; then
             clear
             print_heading_panel "$(zsh_plugins_menu_text menu_title)"
-            log_info_detail "  1 - $(zsh_plugins_menu_text option1)"
-            log_info_detail "  2 - $(zsh_plugins_menu_text option2)"
-            log_info_detail "  3 - $(zsh_plugins_menu_text option3)"
-            log_info_detail "  4 - $(zsh_plugins_menu_text option4)"
-            log_info_detail "  5 - $(zsh_plugins_menu_text option5)"
-            log_info_detail "  6 - $(zsh_plugins_menu_text option6)"
-            log_info_detail "  7 - $(zsh_plugins_menu_text option7)"
-            log_info_detail "  A - $(zsh_plugins_menu_text optionA)"
-            log_info_detail "  0 - $(zsh_plugins_menu_text option_return)"
-            log_info_detail "$(zsh_plugins_menu_text menu_hint)"
+            echo -e "  ${GREEN}1${NC} - $(zsh_plugins_menu_text option1)"
+            echo -e "  ${GREEN}2${NC} - $(zsh_plugins_menu_text option2)"
+            echo -e "  ${GREEN}3${NC} - $(zsh_plugins_menu_text option3)"
+            echo -e "  ${GREEN}4${NC} - $(zsh_plugins_menu_text option4)"
+            echo -e "  ${GREEN}5${NC} - $(zsh_plugins_menu_text option5)"
+            echo -e "  ${GREEN}6${NC} - $(zsh_plugins_menu_text option6)"
+            echo -e "  ${GREEN}7${NC} - $(zsh_plugins_menu_text option7)"
+            echo -e "  ${GREEN}A${NC} - $(zsh_plugins_menu_text optionA)"
+            echo -e "  ${GREEN}0${NC} - $(zsh_plugins_menu_text option_return)"
+            echo -e "${YELLOW}$(zsh_plugins_menu_text menu_hint)${NC}"
 
             read -r -p "$(zsh_plugins_menu_text prompt_choice): " choices </dev/tty
             if [ "$choices" = "0" ] || [ -z "$choices" ]; then

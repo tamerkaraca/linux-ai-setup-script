@@ -89,14 +89,14 @@ install_aux_tools_menu() {
         if [ -z "$install_all" ]; then
             clear
             print_heading_panel "$(aux_menu_text menu_title)"
-            log_info_detail "  1 - $(aux_menu_text option1)"
-            log_info_detail "  2 - $(aux_menu_text option2)"
-            log_info_detail "  3 - $(aux_menu_text option3)"
-            log_info_detail "  4 - $(aux_menu_text option4)"
-            log_info_detail "  5 - $(aux_menu_text option5)"
-            log_info_detail "  A - $(aux_menu_text optionA)"
-            log_info_detail "  0 - $(aux_menu_text option_return)"
-            log_info_detail "$(aux_menu_text menu_hint)"
+            echo -e "  ${GREEN}1${NC} - $(aux_menu_text option1)"
+            echo -e "  ${GREEN}2${NC} - $(aux_menu_text option2)"
+            echo -e "  ${GREEN}3${NC} - $(aux_menu_text option3)"
+            echo -e "  ${GREEN}4${NC} - $(aux_menu_text option4)"
+            echo -e "  ${GREEN}5${NC} - $(aux_menu_text option5)"
+            echo -e "  ${GREEN}A${NC} - $(aux_menu_text optionA)"
+            echo -e "  ${GREEN}0${NC} - $(aux_menu_text option_return)"
+            echo -e "${YELLOW}$(aux_menu_text menu_hint)${NC}"
 
             read -r -p "$(aux_menu_text prompt_choice): " choices </dev/tty
             if [ "$choices" = "0" ] || [ -z "$choices" ]; then

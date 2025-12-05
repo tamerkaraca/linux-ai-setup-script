@@ -101,7 +101,7 @@ ai_cli_menu_text() {
 if ! declare -f run_module >/dev/null 2>&1; then
     run_module() {
         local module_name="$1"
-        local module_url="${BASE_URL}/${module_name}.sh"
+        local module_url="${BASE_URL}/${module_name}.bash"
         shift
         if ! curl -fsSL "$module_url" | LANGUAGE="$LANGUAGE" bash -s -- "$@"; then
             echo -e "${RED}${ERROR_TAG}${NC} $module_name modülü çalıştırılırken bir hata oluştu."
@@ -242,23 +242,23 @@ install_ai_cli_tools_menu() {
         clear
         if [ -z "$install_all" ]; then
             print_heading_panel "$(ai_cli_menu_text ai_menu_title)"
-            log_info_detail "  1 $(ai_cli_menu_text ai_option1)"
-            log_info_detail "  2 $(ai_cli_menu_text ai_option2)"
-            log_info_detail "  3 $(ai_cli_menu_text ai_option3)"
-            log_info_detail "  4 $(ai_cli_menu_text ai_option4)"
-            log_info_detail "  5 $(ai_cli_menu_text ai_option5)"
-            log_info_detail "  6 $(ai_cli_menu_text ai_option6)"
-            log_info_detail "  7 $(ai_cli_menu_text ai_option7)"
-            log_info_detail "  8 $(ai_cli_menu_text ai_option8)"
-            log_info_detail "  9 $(ai_cli_menu_text ai_option9)"
-            log_info_detail "  10 $(ai_cli_menu_text ai_option10)"
-            log_info_detail "  11 $(ai_cli_menu_text ai_option11)"
-            log_info_detail "  12 $(ai_cli_menu_text ai_option12)"
-            log_info_detail "  13 $(ai_cli_menu_text ai_option13)"
-            log_info_detail "  14 $(ai_cli_menu_text ai_option14)"
-            log_info_detail "  A $(ai_cli_menu_text ai_optionA)"
-            log_info_detail "  0 $(ai_cli_menu_text ai_option_return)"
-            log_info_detail "$(ai_cli_menu_text ai_menu_hint)"
+            echo -e "  ${GREEN}1${NC} - $(ai_cli_menu_text ai_option1)"
+            echo -e "  ${GREEN}2${NC} - $(ai_cli_menu_text ai_option2)"
+            echo -e "  ${GREEN}3${NC} - $(ai_cli_menu_text ai_option3)"
+            echo -e "  ${GREEN}4${NC} - $(ai_cli_menu_text ai_option4)"
+            echo -e "  ${GREEN}5${NC} - $(ai_cli_menu_text ai_option5)"
+            echo -e "  ${GREEN}6${NC} - $(ai_cli_menu_text ai_option6)"
+            echo -e "  ${GREEN}7${NC} - $(ai_cli_menu_text ai_option7)"
+            echo -e "  ${GREEN}8${NC} - $(ai_cli_menu_text ai_option8)"
+            echo -e "  ${GREEN}9${NC} - $(ai_cli_menu_text ai_option9)"
+            echo -e "  ${GREEN}10${NC} - $(ai_cli_menu_text ai_option10)"
+            echo -e "  ${GREEN}11${NC} - $(ai_cli_menu_text ai_option11)"
+            echo -e "  ${GREEN}12${NC} - $(ai_cli_menu_text ai_option12)"
+            echo -e "  ${GREEN}13${NC} - $(ai_cli_menu_text ai_option13)"
+            echo -e "  ${GREEN}14${NC} - $(ai_cli_menu_text ai_option14)"
+            echo -e "  ${GREEN}A${NC} - $(ai_cli_menu_text ai_optionA)"
+            echo -e "  ${GREEN}0${NC} - $(ai_cli_menu_text ai_option_return)"
+            echo -e "${YELLOW}$(ai_cli_menu_text ai_menu_hint)${NC}"
             echo
             read -r -p "${YELLOW}$(ai_cli_menu_text prompt_choice):${NC} " cli_choices </dev/tty
             if [ -z "$(echo "$cli_choices" | tr -d '[:space:]')" ]; then

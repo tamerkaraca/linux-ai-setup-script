@@ -79,13 +79,13 @@ node_menu_text() {
 show_node_menu() {
     clear
     print_heading_panel "$(node_menu_text node_menu_title)"
-    log_info_detail "$(node_menu_text node_menu_subtitle)"
-    log_info_detail "  1 - $(node_menu_text node_option1)"
-    log_info_detail "  2 - $(node_menu_text node_option2)"
-    log_info_detail "  3 - $(node_menu_text node_option3)"
-    log_info_detail "  A - $(node_menu_text node_optionA)"
-    log_info_detail "  0 - $(node_menu_text node_option0)"
-    log_info_detail "$(node_menu_text menu_multi_hint)"
+    echo -e "${YELLOW}$(node_menu_text node_menu_subtitle)${NC}"
+    echo -e "  ${GREEN}1${NC} - $(node_menu_text node_option1)"
+    echo -e "  ${GREEN}2${NC} - $(node_menu_text node_option2)"
+    echo -e "  ${GREEN}3${NC} - $(node_menu_text node_option3)"
+    echo -e "  ${GREEN}A${NC} - $(node_menu_text node_optionA)"
+    echo -e "  ${GREEN}0${NC} - $(node_menu_text node_option0)"
+    echo -e "${YELLOW}$(node_menu_text menu_multi_hint)${NC}"
 }
 
 run_node_choice() {

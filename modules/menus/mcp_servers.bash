@@ -24,6 +24,13 @@ elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/platform_detection.bash" "modules/utils/platform_detection.bash"
 fi
 
+: "${RED:=$'\033[0;31m'}"
+: "${GREEN:=$'\033[0;32m'}"
+: "${YELLOW:=$'\033[1;33m'}"
+: "${BLUE:=$'\033[0;34m'}"
+: "${CYAN:=$'\033[0;36m'}"
+: "${NC:=$'\033[0m'}"
+
 declare -A MCP_TEXT_EN=(
     [menu_title]="MCP Server Management Menu"
     [option1]="Manage SuperGemini MCP settings"
@@ -138,12 +145,12 @@ manage_mcp_servers_menu() {
     while true; do
         clear
         print_heading_panel "$(mcp_text menu_title)"
-        log_info_detail "  1 - $(mcp_text option1)"
-        log_info_detail "  2 - $(mcp_text option2)"
-        log_info_detail "  3 - $(mcp_text option3)"
-        log_info_detail "  A - $(mcp_text optionA)"
-        log_info_detail "  0 - $(mcp_text option0)"
-        log_info_detail "$(mcp_text hint)"
+        echo -e "  ${GREEN}1${NC} - $(mcp_text option1)"
+        echo -e "  ${GREEN}2${NC} - $(mcp_text option2)"
+        echo -e "  ${GREEN}3${NC} - $(mcp_text option3)"
+        echo -e "  ${GREEN}A${NC} - $(mcp_text optionA)"
+        echo -e "  ${GREEN}0${NC} - $(mcp_text option0)"
+        echo -e "${YELLOW}$(mcp_text hint)${NC}"
 
         read -r -p "$(mcp_text prompt): " mcp_choices </dev/tty
         if [ "$mcp_choices" = "0" ] || [ -z "$mcp_choices" ]; then

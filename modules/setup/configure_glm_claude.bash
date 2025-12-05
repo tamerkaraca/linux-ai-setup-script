@@ -25,121 +25,19 @@ elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/platform_detection.bash" "modules/utils/platform_detection.bash"
 fi
 
+: "${RED:='\033[0;31m'}"
+: "${GREEN:='\033[0;32m'}"
+: "${YELLOW:='\033[1;33m'}"
+: "${BLUE:='\033[0;34m'}"
+: "${CYAN:='\033[0;36m'}"
+: "${NC:='\033[0m'}"
+
 CLAUDE_DIR="$HOME/.claude"
 SETTINGS_FILE="$CLAUDE_DIR/settings.json"
-CURRENT_LANG="${LANGUAGE:-en}"
-
-
-
-declare -A GL_TEXT_EN=(
-    ["glm_title"]="Starting GLM-4.6 configuration for Claude Code..."
-    ["glm_steps_header"]="GLM API Key Instructions:"
-    ["glm_step1"]="1. Visit https://z.ai/model-api"
-    ["glm_step2"]="2. Sign up or sign in"
-    ["glm_step3"]="3. Generate an API key at https://z.ai/manage-apikey/apikey-list"
-    ["glm_step4"]="4. Copy your API key"
-    ["glm_api_prompt"]="GLM API Key"
-    ["glm_keep_existing"]="Keeping previously saved API key."
-    ["glm_empty_key"]="API key cannot be empty!"
-    ["glm_settings_creating"]="Creating settings.json..."
-    ["glm_settings_path"]="Configuration file:"
-    ["glm_config_header"]="Model summary:"
-    ["glm_launch_hint"]="Launch Claude Code with: claude"
-    ["glm_status_hint"]="Run /status inside Claude Code to check model state."
-    ["glm_plan_header"]="About the GLM Coding Plan:"
-    ["glm_plan_point1"]="• Premium coding experience starting at \$3/month"
-    ["glm_plan_point2"]="• Vision & Web Search MCP support on PRO and higher tiers"
-    ["glm_plan_point3"]="• Details: https://z.ai/subscribe"
-    ["kimi_title"]="Starting Moonshot (kimi-k2) configuration for Claude Code..."
-    ["kimi_steps_header"]="Moonshot API Key Steps:"
-    ["kimi_step1"]="1. Complete the \"K2 Vendor Verifier\" steps in the official guide."
-    ["kimi_step2"]="2. Create an API key at https://platform.moonshot.ai/console/api-keys"
-    ["kimi_step3"]="3. Copy the key (it starts with \"moonshot-\")."
-    ["kimi_step4"]="4. Ensure Claude Code CLI is up to date (this module can reinstall it)."
-    ["kimi_reinstall_prompt"]="Reinstall Claude Code CLI? (y/n) [n]: "
-    ["kimi_api_prompt"]="Moonshot API Key"
-    ["kimi_keep_existing"]="Keeping previously saved API key."
-    ["kimi_empty_key"]="API key cannot be empty."
-    ["kimi_model_prompt"]="Select the preferred kimi model:"
-    ["kimi_model_opt1"]="1 kimi-k2-0711-preview (recommended)"
-    ["kimi_model_opt2"]="2 kimi-k2-turbo-preview"
-    ["kimi_model_opt3"]="3 Enter model name manually"
-    ["kimi_model_manual_prompt"]="Model name: "
-    ["kimi_model_manual_error"]="Model name cannot be empty."
-    ["reinstall_missing_npm"]="npm not found; skipping Claude Code CLI reinstall."
-    ["reinstall_done"]="Claude Code CLI updated."
-    ["reinstall_fail"]="Claude Code CLI could not be reinstalled."
-    ["reinstall_running"]="Reinstalling Claude Code CLI..."
-    ["api_masked_default"]="Not set"
-    ["settings_saved"]="Configuration saved"
-    ["kimi_success_title"]="Moonshot (kimi-k2) configuration completed."
-    ["kimi_success_path"]="Settings file updated"
-    ["kimi_success_run"]="Run claude to start coding with"
-    ["prov_menu_title"]="Claude Code Provider Setup"
-    ["prov_option1"]="GLM-4.6 (z.ai) provider"
-    ["prov_option2"]="Moonshot kimi-k2 provider"
-    ["prov_option0"]="Return to main menu"
-    ["prov_prompt"]="Your choice"
-    ["prov_returning"]="Returning to the main menu..."
-    ["prov_invalid"]="Invalid selection."
-)
-
-declare -A GL_TEXT_TR=(
-    ["glm_title"]="Claude Code için GLM-4.6 yapılandırması başlatılıyor..."
-    ["glm_steps_header"]="GLM API Key Alma Talimatları:"
-    ["glm_step1"]="1. https://z.ai/model-api adresine gidin"
-    ["glm_step2"]="2. Kayıt olun veya giriş yapın"
-    ["glm_step3"]="3. https://z.ai/manage-apikey/apikey-list sayfasından API Key oluşturun"
-    ["glm_step4"]="4. API Key'inizi kopyalayın"
-    ["glm_api_prompt"]="GLM API Key"
-    ["glm_keep_existing"]="Mevcut API key korunuyor."
-    ["glm_empty_key"]="API key boş olamaz!"
-    ["glm_settings_creating"]="settings.json dosyası oluşturuluyor..."
-    ["glm_config_header"]="Model yapılandırması:"
-    ["glm_launch_hint"]="Claude Code'u başlatmak için: claude"
-    ["glm_status_hint"]="Model durumunu kontrol etmek için: /status komutunu kullanın."
-    ["glm_plan_header"]="GLM Coding Plan hakkında:"
-    ["glm_plan_point1"]="• \$3/aydan başlayan fiyatlarla premium kodlama deneyimi"
-    ["glm_plan_point2"]="• PRO ve üzeri planlarda Vision ve Web Search MCP desteği"
-    ["glm_plan_point3"]="• Daha fazla bilgi: https://z.ai/subscribe"
-    ["kimi_title"]="Moonshot (kimi-k2) sağlayıcısı için Claude Code yapılandırması başlatılıyor..."
-    ["kimi_steps_header"]="Moonshot API Key Alma Adımları:"
-    ["kimi_step1"]="1. Resmi rehberdeki \"K2 Vendor Verifier\" adımlarını tamamlayın."
-    ["kimi_step2"]="2. https://platform.moonshot.ai/console/api-keys adresinden API key oluşturun."
-    ["kimi_step3"]="3. API key'i kopyalayın (\"moonshot-\" ile başlar)."
-    ["kimi_step4"]="4. Claude Code CLI'nin güncel olduğundan emin olun (gerekirse bu modül yeniden kurabilir)."
-    ["kimi_reinstall_prompt"]="Claude Code CLI'yi yeniden kurmak ister misiniz? (e/h) [h]: "
-    ["kimi_api_prompt"]="Moonshot API Key"
-    ["kimi_keep_existing"]="Mevcut API key korunuyor."
-    ["kimi_empty_key"]="API key boş olamaz."
-    ["kimi_model_prompt"]="Kullanmak istediğiniz modeli seçin:"
-    ["kimi_model_opt1"]="1 kimi-k2-0711-preview (önerilen)"
-    ["kimi_model_opt2"]="2 kimi-k2-turbo-preview"
-    ["kimi_model_opt3"]="3 Manuel model adı gir"
-    ["kimi_model_manual_prompt"]="Model adı: "
-    ["kimi_model_manual_error"]="Model adı boş olamaz."
-    ["reinstall_missing_npm"]="npm bulunamadı; Claude Code CLI yeniden kurulumu atlandı."
-    ["reinstall_done"]="Claude Code CLI güncellendi."
-    ["reinstall_fail"]="Claude Code CLI yeniden kurulamadı."
-    ["reinstall_running"]="Claude Code CLI yeniden kuruluyor..."
-    ["api_masked_default"]="Henüz ayarlı değil"
-    ["settings_saved"]="Yapılandırma kaydedildi"
-    ["kimi_success_title"]="Moonshot (kimi-k2) yapılandırması tamamlandı."
-    ["kimi_success_path"]="Güncellenen dosya"
-    ["kimi_success_run"]="Claude Code'da claude komutunu çalıştırarak kullanabilirsiniz"
-    ["prov_menu_title"]="Claude Code Sağlayıcı Yapılandırması"
-    ["prov_option1"]="GLM-4.6 (z.ai) sağlayıcısı"
-    ["prov_option2"]="Moonshot kimi-k2 sağlayıcısı"
-    ["prov_option0"]="Ana menüye dön"
-    ["prov_prompt"]="Seçiminiz"
-    ["prov_returning"]="Ana menüye dönülüyor..."
-    ["prov_invalid"]="Geçersiz seçim."
-)
-
 gl_text() {
     local key="$1"
     local default_value="${GL_TEXT_EN[$key]:-$key}"
-    if [ "$CURRENT_LANG" = "tr" ]; then
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
         echo "${GL_TEXT_TR[$key]:-$default_value}"
     else
         echo "$default_value"
@@ -260,10 +158,10 @@ configure_kimi_provider() {
     require_node_version 18 "Moonshot kimi-k2 Claude Code"
 
     log_info_detail "$(gl_text kimi_steps_header)"
-    log_info_detail "1. $(gl_text kimi_step1)"
-    log_info_detail "2. $(gl_text kimi_step2)"
-    log_info_detail "3. $(gl_text kimi_step3)"
-    log_info_detail "4. $(gl_text kimi_step4)"
+    echo -e "  ${CYAN}1.${NC} $(gl_text kimi_step1)"
+    echo -e "  ${CYAN}2.${NC} $(gl_text kimi_step2)"
+    echo -e "  ${CYAN}3.${NC} $(gl_text kimi_step3)"
+    echo -e "  ${CYAN}4.${NC} $(gl_text kimi_step4)"
 
     maybe_reinstall_claude_cli
 
@@ -290,10 +188,11 @@ configure_kimi_provider() {
 
     local MOONSHOT_BASE_URL="$default_base_url"
 
-    log_info_detail "$(gl_text kimi_model_prompt)"
-    log_info_detail "  1 $(gl_text kimi_model_opt1)"
-    log_info_detail "  2 $(gl_text kimi_model_opt2)"
-    log_info_detail "  3 $(gl_text kimi_model_opt3)"
+    echo
+    echo -e "${YELLOW}$(gl_text kimi_model_prompt)${NC}"
+    echo -e "  ${GREEN}1${NC} - $(gl_text kimi_model_opt1)"
+    echo -e "  ${GREEN}2${NC} - $(gl_text kimi_model_opt2)"
+    echo -e "  ${GREEN}3${NC} - $(gl_text kimi_model_opt3)"
     read -r -p "$(gl_text prov_prompt) [1]: " model_choice </dev/tty
     local selected_model
     case "${model_choice:-1}" in
@@ -332,9 +231,9 @@ EOF
 configure_menu() {
     while true; do
         print_heading_panel "$(gl_text prov_menu_title)"
-        log_info_detail "  1 $(gl_text prov_option1)"
-        log_info_detail "  2 $(gl_text prov_option2)"
-        log_info_detail "  0 $(gl_text prov_option0)"
+        echo -e "  ${GREEN}1${NC} - $(gl_text prov_option1)"
+        echo -e "  ${GREEN}2${NC} - $(gl_text prov_option2)"
+        echo -e "  ${GREEN}0${NC} - $(gl_text prov_option0)"
         read -r -p "$(gl_text prov_prompt): " cfg_choice </dev/tty
         case "${cfg_choice:-}" in
             1)

@@ -91,12 +91,12 @@ install_ai_frameworks_menu() {
         if [ -z "$install_all" ]; then
             clear
             print_heading_panel "$(ai_fw_menu_text fw_menu_title)"
-            log_info_detail "  1 - $(ai_fw_menu_text fw_option1)"
-            log_info_detail "  2 - $(ai_fw_menu_text fw_option2)"
-            log_info_detail "  3 - $(ai_fw_menu_text fw_option3)"
-            log_info_detail "  A - $(ai_fw_menu_text fw_optionA)"
-            log_info_detail "  0 - $(ai_fw_menu_text fw_option_return)"
-            log_info_detail "$(ai_fw_menu_text fw_menu_hint)"
+            echo -e "  ${GREEN}1${NC} - $(ai_fw_menu_text fw_option1)"
+            echo -e "  ${GREEN}2${NC} - $(ai_fw_menu_text fw_option2)"
+            echo -e "  ${GREEN}3${NC} - $(ai_fw_menu_text fw_option3)"
+            echo -e "  ${GREEN}A${NC} - $(ai_fw_menu_text fw_optionA)"
+            echo -e "  ${GREEN}0${NC} - $(ai_fw_menu_text fw_option_return)"
+            echo -e "${YELLOW}$(ai_fw_menu_text fw_menu_hint)${NC}"
 
             read -r -p "$(ai_fw_menu_text prompt_choice): " framework_choices </dev/tty
             if [ "$framework_choices" = "0" ] || [ -z "$framework_choices" ]; then

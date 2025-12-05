@@ -91,7 +91,7 @@
 |-----------|-------------|
 | **Self-healing launcher** | Detects CRLF, re-runs itself after fixing permissions/line endings. |
 | **Remote-safe modules** | When invoked via `bash -c "$(curl …)"`, `setup` downloads helper modules to a temp directory and exports helper functions so nested scripts operate as if run locally. |
-| **Banner system** | `modules/banner.sh` now renders wide box-drawing panels with pure Bash, so no external banner CLI has to be installed. |
+
 | **Menu runner** | `run_module` prefers local `./modules/*.sh`; otherwise downloads from GitHub and passes environment variables (`PKG_MANAGER`, `INSTALL_CMD` etc.) to sub-processes. |
 
 ### Requirements
@@ -260,7 +260,7 @@ This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) f
 |---------|---------|
 | **Kendini onaran başlatıcı** | CRLF algılar, izin/dosya sorunlarını düzeltip script’i yeniden başlatır. |
 | **Uzaktan güvenli modüller** | `bash -c "$(curl …)"` yöntemiyle çalıştırıldığında yardımcı modülleri geçici dizine indirir ve alt süreçlerle paylaşır. |
-| **Banner sistemi** | `modules/banner.sh`, kutu çizgileriyle geniş panoları doğrudan Bash içinde çizer; ek paket gerektirmez. |
+
 | **Menü çalıştırıcısı** | Önce yerel `./modules/*.sh` dosyalarını, yoksa GitHub sürümlerini kullanır. |
 
 ### Gereksinimler

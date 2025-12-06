@@ -54,6 +54,7 @@ declare -A SETUP_TEXT_EN=(
     ["menu_option12"]="Manage MCP Servers"
     ["menu_option13"]="Install Terminal Tools (Zsh, Oh My Zsh)"
     ["menu_optionA"]="Install Everything (Recommended)"
+    ["menu_optionR"]="Uninstall All Tools"
     ["menu_option0"]="Exit"
     ["menu_multi_hint"]="You can make multiple selections with commas (e.g., 1,2,5)."
     ["warning_no_selection"]="No selection made. Please try again."
@@ -92,6 +93,7 @@ declare -A SETUP_TEXT_TR=(
     ["menu_option12"]="MCP Sunucularını Yönet"
     ["menu_option13"]="Terminal Araçlarını Kur (Zsh, Oh My Zsh)"
     ["menu_optionA"]="Tümünü Kur (Önerilen)"
+    ["menu_optionR"]="Tüm Araçları Kaldır"
     ["menu_option0"]="Çıkış"
     ["menu_multi_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2,5)."
     ["warning_no_selection"]="Hiçbir seçim yapılmadı. Lütfen tekrar deneyin."
@@ -264,6 +266,7 @@ main_menu() {
             echo -e "  ${GREEN}11${NC} - $(setup_text menu_option12)"
             echo -e "  ${GREEN}A${NC} - Install Everything (macOS)"
             echo -e "  ${GREEN}L${NC} - $(setup_text menu_language_option) ($(get_language_label "$LANGUAGE"))"
+            echo -e "  ${RED}R${NC} - $(setup_text menu_optionR)"
             echo -e "  ${RED}0${NC} - $(setup_text menu_option0)"
         else
             echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
@@ -287,6 +290,7 @@ main_menu() {
             echo -e "  ${GREEN}13${NC} - $(setup_text menu_option13)"
             echo -e "  ${GREEN}A${NC} - $(setup_text menu_optionA)"
             echo -e "  ${GREEN}L${NC} - $(setup_text menu_language_option) ($(get_language_label "$LANGUAGE"))"
+            echo -e "  ${RED}R${NC} - $(setup_text menu_optionR)"
             echo -e "  ${RED}0${NC} - $(setup_text menu_option0)"
         fi
         echo -e "\n${YELLOW}$(setup_text menu_multi_hint)${NC}"
@@ -392,7 +396,10 @@ main_menu() {
                 13) run_module "menus/terminal_tools" ;;
                 L)
                     language_menu
-                    ;; 
+                    ;;
+                R)
+                    run_module "utils/cleanup_all"
+                    ;;
                 A)
                     if is_macos; then
                         run_module "setup/homebrew"

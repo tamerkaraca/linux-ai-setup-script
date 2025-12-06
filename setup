@@ -146,7 +146,7 @@ source_module() {
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
             rm "$temp_file"
             exit 1
-        }
+        fi
         source "$temp_file" || {
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
             rm "$temp_file"

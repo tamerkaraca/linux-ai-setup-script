@@ -135,18 +135,31 @@ source_module() {
         # shellcheck source=/dev/null
         source "$local_path"
     else
-        if ! command -v curl &> /dev/null; then
+        if ! command -v curl &> /dev/null && ! command -v wget &> /dev/null; then
             echo "${ERROR_TAG} $(setup_text_fmt curl_missing "$remote_rel_path")"
             exit 1
         fi
         local remote_url="${SCRIPT_BASE_URL}/${remote_rel_path}"
         local temp_file
         temp_file=$(mktemp)
-        if ! curl -fsSL "$remote_url" -o "$temp_file"; then
+
+        # Try enhanced download with fallback
+        if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
+           --user-agent "linux-ai-setup-script" "$remote_url" -o "$temp_file" 2>/dev/null; then
+            :  # Success
+        elif command -v wget &> /dev/null; then
+            if ! wget --timeout=10 --tries=2 --user-agent="linux-ai-setup-script" \
+                    -qO "$temp_file" "$remote_url" 2>/dev/null; then
+                echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
+                rm "$temp_file"
+                exit 1
+            fi
+        else
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
             rm "$temp_file"
             exit 1
         fi
+
         source "$temp_file" || {
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
             rm "$temp_file"
@@ -166,14 +179,22 @@ export BASE_URL
 REMOTE_MODULE_DIR=""
 export REMOTE_MODULE_DIR
 
+# Enhanced prepare_remote_module_dir using improved download methods
 prepare_remote_module_dir() {
     if [ -n "${REMOTE_MODULE_DIR:-}" ]; then
         return 0
     fi
     REMOTE_MODULE_DIR="$HOME/.linux-ai-setup-script/remote_modules_$$"
     mkdir -p "$REMOTE_MODULE_DIR/modules/utils"
-    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils/utils.bash" -o "$REMOTE_MODULE_DIR/modules/utils/utils.bash" || return 1
-    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils/banner.bash" -o "$REMOTE_MODULE_DIR/modules/utils/banner.bash" || return 1
+
+    # Enhanced download with fallback for critical modules
+    if ! download_with_fallback "${SCRIPT_BASE_URL}/modules/utils/utils.bash" "$REMOTE_MODULE_DIR/modules/utils/utils.bash"; then
+        return 1
+    fi
+    if ! download_with_fallback "${SCRIPT_BASE_URL}/modules/utils/banner.bash" "$REMOTE_MODULE_DIR/modules/utils/banner.bash"; then
+        return 1
+    fi
+
     export REMOTE_MODULE_DIR
     return 0
 }
@@ -206,7 +227,7 @@ run_module() {
         fi
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
         if [ ! -f "$remote_file" ]; then
-            if ! retry_command "curl -fsSL --user-agent \"linux-ai-setup-script\" \"$module_url\" -o \"$remote_file\""; then
+            if ! download_with_fallback "$module_url" "$remote_file"; then
                 echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
                 return 1
             fi

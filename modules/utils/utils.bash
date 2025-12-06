@@ -478,13 +478,48 @@ install_package() {
 }
 export -f install_package
 
+# Enhanced retry command with WSL-specific fixes
 retry_command() {
     local -i n=1
     local -i max_attempts=5
     local delay=1
     local cmd="$@"
 
+    # Check if this is a curl command and add WSL-specific options
+    if [[ "$cmd" == *"curl"* ]]; then
+        # Add --connect-timeout and --max-time for better timeout handling
+        if [[ "$cmd" != *"--connect-timeout"* ]]; then
+            cmd="${cmd//curl /curl --connect-timeout 10 --max-time 60 }"
+        fi
+        # Add --retry for curl's built-in retry mechanism
+        if [[ "$cmd" != *"--retry"* ]]; then
+            cmd="${cmd//curl /curl --retry 3 --retry-delay 1 }"
+        fi
+    fi
+
     while true; do
+        # Pre-flight checks for WSL environments
+        if [[ "$cmd" == *"curl"* ]] && grep -qi microsoft /proc/version 2>/dev/null; then
+            # Check available disk space before attempting download
+            local target_dir
+            target_dir=$(echo "$cmd" | grep -oE '\-o [^[:space:]]+' | cut -d' ' -f2 | xargs dirname 2>/dev/null || echo "/tmp")
+            if [ ! -d "$target_dir" ]; then
+                target_dir="/tmp"
+            fi
+
+            local available_space
+            available_space=$(df "$target_dir" | awk 'NR==2 {print $4}')
+            if [ "$available_space" -lt 1024 ]; then  # Less than 1MB
+                log_error_detail "Insufficient disk space in $target_dir"
+                return 1
+            fi
+
+            # Test network connectivity
+            if ! ping -c 1 raw.githubusercontent.com >/dev/null 2>&1; then
+                log_warn_detail "Network connectivity issue detected"
+            fi
+        fi
+
         if eval "$cmd"; then
             return 0
         else
@@ -493,6 +528,17 @@ retry_command() {
                 sleep "$delay"
                 ((n++))
                 delay=$((delay * 2))
+
+                # For WSL, add extra delay and cleanup between retries
+                if grep -qi microsoft /proc/version 2>/dev/null; then
+                    sleep 2
+                    # Clear any partial downloads
+                    if [[ "$cmd" == *"-o "* ]]; then
+                        local target_file
+                        target_file=$(echo "$cmd" | grep -oE '\-o [^[:space:]]+' | cut -d' ' -f2)
+                        [ -f "$target_file" ] && rm -f "$target_file"
+                    fi
+                fi
             else
                 log_error_detail "The command has failed after $n attempts: $cmd"
                 return 1
@@ -500,7 +546,39 @@ retry_command() {
         fi
     done
 }
+
+# Fallback download function using wget when curl fails
+download_with_fallback() {
+    local url="$1"
+    local output="$2"
+    local max_attempts=3
+
+    for ((i=1; i<=max_attempts; i++)); do
+        # Try curl first
+        if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
+           --user-agent "linux-ai-setup-script" "$url" -o "$output" 2>/dev/null; then
+            return 0
+        fi
+
+        # Fallback to wget if available
+        if command -v wget &> /dev/null; then
+            if wget --timeout=10 --tries=2 --user-agent="linux-ai-setup-script" \
+                    -qO "$output" "$url" 2>/dev/null; then
+                return 0
+            fi
+        fi
+
+        if [ $i -lt $max_attempts ]; then
+            log_warn_detail "Download attempt $i/$max_attempts failed, retrying..."
+            sleep 2
+        fi
+    done
+
+    log_error_detail "Failed to download after $max_attempts attempts: $url"
+    return 1
+}
 export -f retry_command
+export -f download_with_fallback
 
 clean_windows_paths_from_rc() {
     log_info_detail "Cleaning Windows paths from shell configs..."

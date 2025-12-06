@@ -137,9 +137,8 @@ source_module() {
     else
         if ! command -v curl &> /dev/null;
         then
-            echo "${ERROR_TAG} $(setup_text_fmt curl_missing "$remote_rel_path")"
             exit 1
-        }
+        fi
         local remote_url="${SCRIPT_BASE_URL}/${remote_rel_path}"
         # shellcheck disable=SC1090
         source <(curl -fsSL "$remote_url") || {

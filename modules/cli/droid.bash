@@ -115,7 +115,8 @@ install_droid_cli() {
     log_info_detail "$(droid_text curl_note)"
     log_info_detail "  curl -fsSL ${INSTALL_SCRIPT_URL} | sh"
 
-    if ! curl -fsSL "$INSTALL_SCRIPT_URL" | sh; then
+    local install_cmd="curl -fsSL \"$INSTALL_SCRIPT_URL\" | sh"
+    if ! retry_command "$install_cmd"; then
         log_error_detail "$(droid_text install_failed) ${DOC_URL}"
         return 1
     fi

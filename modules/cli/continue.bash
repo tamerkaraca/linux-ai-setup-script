@@ -70,26 +70,10 @@ check_node_npm() {
     fi
 }
 
-# Function to check if Continue CLI is already installed
-is_continue_cli_installed() {
-    command -v continue >/dev/null 2>&1
-}
-
 # Main installation function
 install_continue_cli() {
-    log_info "$(message check_if_installed)"
-    if is_continue_cli_installed; then
-        log_success "$(message already_installed)"
-    else
-        log_info "$(message install_continue_cli)"
-        if npm i -g @continuedev/cli; then
-            log_success "$(message install_continue_cli_success)"
-        else
-            log_error "$(message install_continue_cli_fail)"
-            return 1
-        fi
-    fi
-    return 0
+    install_package "Continue CLI" "npm" "continue" "@continuedev/cli"
+    return $?
 }
 
 # Ensure Node.js and npm are available before attempting installation

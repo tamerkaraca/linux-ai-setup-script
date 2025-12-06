@@ -88,7 +88,8 @@ main() {
 
     if ! command -v cursor-agent &>/dev/null; then
         log_info_detail "Installing Cursor Agent CLI via curl script..."
-        if ! (curl https://cursor.com/install -fsS | bash); then
+        local install_cmd="curl https://cursor.com/install -fsS | bash"
+        if ! retry_command "$install_cmd"; then
             log_error_detail "Cursor Agent CLI installation failed."
             return 1
         fi

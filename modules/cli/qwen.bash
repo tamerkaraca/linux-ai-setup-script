@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-: "${NPM_LAST_INSTALL_PREFIX:=}"
 : "${QWEN_NPM_PACKAGE:=@qwen-code/qwen-code@latest}"
 : "${QWEN_MIN_NODE_VERSION:=18}"
 
@@ -113,7 +112,7 @@ main() {
         require_node_version "$QWEN_MIN_NODE_VERSION" "Qwen CLI" || return 1
 
         log_info_detail "Installing Qwen CLI using package: $package_spec"
-        if ! npm_install_global_with_fallback "$package_spec" "Qwen CLI"; then
+        if ! install_package "Qwen CLI" "npm" "qwen" "$package_spec"; then
             log_error_detail "$(qwen_text install_fail "$package_spec")"
             return 1
         fi

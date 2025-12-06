@@ -83,7 +83,7 @@ main() {
         installer_script=$(mktemp)
         
         log_info_detail "$(aider_text downloading)"
-        if ! curl -sSf "https://aider.chat/install.sh" -o "$installer_script"; then
+        if ! retry_command "curl -sSf \"https://aider.chat/install.sh\" -o \"$installer_script\""; then
             log_error_detail "$(aider_text download_fail)"
             rm -f "$installer_script"
             return 1

@@ -112,20 +112,18 @@ main() {
     require_node_version "$CURSOR_MIN_NODE_VERSION" "Cursor Agent CLI" || return 1
 
     if ! command -v cursor-agent &>/dev/null && ! command -v cursor &>/dev/null; then
-        log_info_detail "Installing Cursor Agent CLI using package: $package_spec"
-        if ! npm_install_global_with_fallback "$package_spec" "Cursor Agent CLI"; then
-            log_error_detail "$(cursor_text install_fail "$package_spec")"
+        if ! install_package "Cursor Agent CLI" "npm" "cursor-agent" "cursor-agent" "cursor"; then
             return 1
         fi
-        reload_shell_configs silent
-        hash -r 2>/dev/null || true
     fi
 
     local cursor_cmd=""
-    if cursor_cmd="$(locate_npm_binary "cursor-agent")"; then
+    if command -v cursor-agent &> /dev/null; then
+        cursor_cmd="cursor-agent"
         log_info_detail "Found 'cursor-agent' binary."
-    elif cursor_cmd="$(locate_npm_binary "cursor")"; then
-        log_warn_detail "$(cursor_text command_fallback "${cursor_cmd##*/}")"
+    elif command -v cursor &> /dev/null; then
+        cursor_cmd="cursor"
+        log_warn_detail "$(cursor_text command_fallback "cursor")"
     else
         log_error_detail "$(cursor_text command_missing)"
         return 1

@@ -40,6 +40,7 @@
 [![Auggie](https://img.shields.io/badge/Auggie-000000?style=flat-square)](https://github.com/augmentcode/auggie/)
 [![Droid](https://img.shields.io/badge/Droid-000000?style=flat-square)](https://factory.ai/)
 [![Jules](https://img.shields.io/badge/Jules-4285F4?style=flat-square&logo=google&logoColor=white)](https://jules.google/docs/)
+[![Continue](https://img.shields.io/badge/Continue-000000?style=flat-square&logo=vercel&logoColor=white)](https://www.continue.dev/)
 [![SuperGemini](https://img.shields.io/badge/SuperGemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://github.com/SuperClaude-Org/SuperGemini_Framework)
 [![SuperQwen](https://img.shields.io/badge/SuperQwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://github.com/SuperClaude-Org/SuperQwen_Framework)
 [![SuperClaude](https://img.shields.io/badge/SuperClaude-000000?style=flat-square&logo=anthropic&logoColor=white)](https://github.com/SuperClaude-Org/SuperClaude_Framework)
@@ -143,7 +144,8 @@ bash -n setup && shellcheck setup  # optional
 | `10` | Install GitHub CLI with official repo keys. |
 | `11` | Remove all AI frameworks (Linux only). |
 | `12` | MCP server management (macOS only; list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
-| `A` | Install everything sequentially (skips interactive logins, prints summaries). |
+| `A` | Install essential development environment | Installs options `1, 2, 3, 4, 6, 10` sequentially (skips interactive logins, prints summaries). |
+| `R` | Uninstall All Tools | Removes all tools and configurations installed by the script, resetting to a clean state. |
 | `L` | Switch the interface language (English ↔ Türkçe, auto-detected default). |
 | `0` | Exit. |
 
@@ -168,14 +170,14 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `14` shortcut tha
 | `1` | [Claude Code CLI](https://github.com/anthropics/claude-code) | Attaches to `/dev/tty` so Anthropic’s Ink prompts work even during remote runs. |
 | `2` | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | Requires Node.js ≥ 20, performs npm fallback installs, and reminds you to run `gemini auth`. |
 | `3` | [OpenCode CLI](https://github.com/opencode-ai/opencode) | Handles remote-safe installs for the OpenCode beta tooling and prints `opencode login` hints. |
-| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Probes several npm scopes and accepts overrides (`QODER_NPM_PACKAGE`, `QODER_CLI_BUNDLE`, `--skip-probe`) plus local bundle installs. |
+| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Probes several npm scopes and attempts installation using a list of candidate package names, ensuring robust installation. |
 | `5` | [Qwen CLI](https://github.com/QwenLM/qwen-code/) | Enforces Node.js ≥ 18, bootstraps Node when missing, and uses `/dev/tty` for `qwen login` prompts with a `--package` override. |
 | `6` | [OpenAI Codex CLI](https://github.com/openai/codex/) | Installs Codex/Cursor helpers and points you to the ChatGPT or `OPENAI_API_KEY` auth flow. |
-| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Requires Node.js ≥ 18, installs `cursor-agent` via npm, and reminds you to run `cursor-agent login` (interactive runs open `/dev/tty`). |
-| `8` | [Cline CLI](https://github.com/cline/cline/) | Requires Node.js ≥ 18, installs the `@cline/cli` package, and prompts for `cline login` only during interactive runs. |
+| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Installs `cursor-agent` via its official curl script, ensures `cursor-agent` command availability, and reminds you to run `cursor-agent login` (interactive runs open `/dev/tty`). |
+| `8` | [Cline CLI](https://github.com/cline/cline/) | Requires Node.js ≥ 18, attempts installation using a list of candidate npm package names (`cline`, `@cline/cli`, `cline-cli`), and prompts for `cline login` only during interactive runs. |
 | `9` | [Aider CLI](https://github.com/Aider-AI/aider/) | Uses the official `aider-install` script for a robust installation, handling Python versions and dependencies automatically. |
 | `10` | [GitHub Copilot CLI](https://github.com/github/copilot-cli/) | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
-| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | Installs `@kilocode/cli`, enforces Node.js ≥ 18, and prints reminders to run `kilocode config` plus architect/debug/auto modes. |
+| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | Installs `@kilocode/cli` via npm, enforces Node.js ≥ 18, includes robust Python compatibility checks and fallbacks, and prints reminders to run `kilocode config` plus architect/debug/auto modes. |
 | `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | Installs `@augmentcode/auggie` (Node.js ≥ 22) and walks through `auggie login`, `.augment/commands`, and CI-friendly flags. |
 | `13` | [Droid CLI](https://factory.ai/) | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
 | `14` | [Jules CLI](https://jules.google/docs/) | Installs `@google/jules` globally (Node.js ≥ 18) and guides through `jules login` for authentication. |
@@ -311,7 +313,8 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `10` | GitHub CLI. |
 | `11` | AI Framework kaldırma menüsü (sadece Linux). |
 | `12` | MCP sunucu yönetimi (sadece macOS; listele, `~/.gemini`, `~/.qwen`, `~/.claude` temizle). |
-| `A` | Hepsini sırayla kurar (interaktif girişler daha sonra hatırlatılır). |
+| `A` | Temel geliştirme ortamını kurar | `1, 2, 3, 4, 6, 10` seçeneklerini sırayla kurar (interaktif girişleri atlar, özetleri yazdırır). |
+| `R` | Tüm Araçları Kaldır | Script tarafından kurulan tüm araçları ve yapılandırmaları kaldırarak sistemi temiz bir duruma getirir. |
 | `L` | Dili değiştir (varsayılan İngilizce, `tr` lokalli sistemlerde otomatik Türkçe açılır). |
 | `0` | Çıkış. |
 
@@ -336,14 +339,14 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `14` kısayolu
 | `1` | [Claude Code CLI](https://github.com/anthropics/claude-code) | Anthropic’in Ink tabanlı arayüzünü `/dev/tty` üzerinden açar, uzaktan çalıştırmalarda bile kesinti olmaz. |
 | `2` | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | Node.js ≥ 20 gereksinimini kontrol eder, npm fallback kurulumları yapar ve `gemini auth` hatırlatması verir. |
 | `3` | [OpenCode CLI](https://github.com/opencode-ai/opencode) | Beta OpenCode araçlarını uzaktan güvenli şekilde kurar ve `opencode login` komutunu hatırlatır. |
-| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Birden çok npm paket adını dener; `QODER_NPM_PACKAGE` gibi override seçeneklerini destekler. |
+| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Birden çok npm paket adını dener ve sağlam kurulum sağlamak için aday paket adlarının bir listesini kullanarak kurulumu dener. |
 | `5` | [Qwen CLI](https://github.com/QwenLM/qwen-code/) | Node.js ≥ 18 şartını uygular, gerekirse Node kurulumunu başlatır, `/dev/tty` ile `qwen login` akışını yönetir. |
 | `6` | [OpenAI Codex CLI](https://github.com/openai/codex/) | Codex/Cursor yardımcılarını yükler, ChatGPT veya `OPENAI_API_KEY` tabanlı giriş akışını açıklar. |
-| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Node.js ≥ 18 gerektirir, `cursor-agent` paketini npm ile kurar ve interaktif modda `cursor-agent login` komutunu çalıştırır. |
-| `8` | [Cline CLI](https://github.com/cline/cline/) | Node.js ≥ 18 gerektirir, `@cline/cli` paketini kurar ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
+| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Resmi curl betiği aracılığıyla `cursor-agent` kurar, `cursor-agent` komutunun kullanılabilirliğini sağlar ve `cursor-agent login` komutunu çalıştırmanızı hatırlatır (interaktif çalıştırmalar `/dev/tty` açar). |
+| `8` | [Cline CLI](https://github.com/cline/cline/) | Node.js ≥ 18 gerektirir, aday npm paket adlarının bir listesini (`cline`, `@cline/cli`, `cline-cli`) kullanarak kurulumu dener ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
 | `9` | [Aider CLI](https://github.com/Aider-AI/aider/) | Kurulum için resmi `aider-install` betiğini kullanır, bu sayede Python sürümleri ve bağımlılıklar otomatik olarak yönetilir. |
 | `10` | [GitHub Copilot CLI](https://github.com/github/copilot-cli/) | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
-| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | `@kilocode/cli` paketini kurar, `kilocode config` / architect-debug modları için yönergeler verir. |
+| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | `@kilocode/cli` paketini npm aracılığıyla kurar, Node.js ≥ 18'i uygular, sağlam Python uyumluluk kontrolleri ve geri dönüşleri içerir ve `kilocode config` ile architect/debug/auto modlarını çalıştırmanızı hatırlatır. |
 | `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | `@augmentcode/auggie` paketini Node.js ≥ 22 doğrulaması ile kurar, `auggie login` ve `.augment/commands` içeriğini hatırlatır. |
 | `13` | [Droid CLI](https://factory.ai/) | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir. |
 | `14` | [Jules CLI](https://jules.google/docs/) | `@google/jules` paketini global kurar (Node.js ≥ 18); `jules login` ile kimlik doğrulaması yapmanızı sağlar. |

@@ -478,6 +478,30 @@ install_package() {
 }
 export -f install_package
 
+retry_command() {
+    local -i n=1
+    local -i max_attempts=5
+    local delay=1
+    local cmd="$@"
+
+    while true; do
+        if eval "$cmd"; then
+            return 0
+        else
+            if (( n < max_attempts )); then
+                log_warn_detail "Command failed. Attempt $n/$max_attempts. Retrying in $delay seconds..."
+                sleep "$delay"
+                ((n++))
+                delay=$((delay * 2))
+            else
+                log_error_detail "The command has failed after $n attempts: $cmd"
+                return 1
+            fi
+        fi
+    done
+}
+export -f retry_command
+
 clean_windows_paths_from_rc() {
     log_info_detail "Cleaning Windows paths from shell configs..."
 

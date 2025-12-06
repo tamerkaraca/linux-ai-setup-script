@@ -16,25 +16,21 @@ log_info_detail "Starting the cleanup process..."
 
 # Uninstall NPM packages
 NPM_PACKAGES=(
+    "@google/generative-ai-cli"
+    "opencode-cli"
     "@qoder-ai/qodercli"
-    "@kilocode/cli"
-    "@continuedev/cli"
+    "qwen-cli"
+    "codex"
     "cline"
     "@cline/cli"
     "cline-cli"
-    "cursor-agent"
-    "codex"
-    "gemini-cli"
-    "@google/generative-ai-cli"
-    "opencode-cli"
-    "qwen-cli"
-    "jules-cli"
-    "@julep/cli"
+    "@github/copilot-cli"
+    "@kilocode/cli"
     "auggie"
     "@auggie/cli"
-    "droid-factory"
-    "@github/copilot-cli"
-    "aider-chat"
+    "jules-cli"
+    "@julep/cli"
+    "@continuedev/cli"
 )
 
 log_info_detail "Uninstalling NPM packages..."
@@ -49,14 +45,15 @@ else
     log_warn_detail "npm not found, skipping npm package uninstallation."
 fi
 
-
 # Uninstall pipx packages
 PIPX_PACKAGES=(
+    "claude-cli"
+    "anthropic-cli"
+    "aider-chat"
+    "droid-factory"
     "superclaude"
     "supergemini"
     "superqwen"
-    "claude-cli"
-    "anthropic-cli"
 )
 
 log_info_detail "Uninstalling pipx packages..."
@@ -69,6 +66,13 @@ if command -v pipx &> /dev/null; then
     done
 else
     log_warn_detail "pipx not found, skipping pipx package uninstallation."
+fi
+
+# Uninstall curl-installed packages
+if [ -f "/usr/local/bin/cursor-agent" ]; then
+    log_info_detail "Removing cursor-agent..."
+    rm -f "/usr/local/bin/cursor-agent"
+    log_success_detail "cursor-agent removed."
 fi
 
 # Clean up shell configuration files

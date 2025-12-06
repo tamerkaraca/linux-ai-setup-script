@@ -152,22 +152,26 @@ main() {
     if ! command -v kilocode &>/dev/null; then
         if ! check_python_compatibility; then
             log_info_detail "$(kilocode_text alt_install_no_native)"
-            if npm install -g --ignore-scripts "$package_spec" 2>/dev/null; then
+            if retry_command "npm install -g --ignore-scripts \"$package_spec\" 2>/dev/null"; then
                 log_success_detail "Kilocode CLI installed successfully (without native dependencies)."
             elif command -v python3.12 &>/dev/null; then
                 log_info_detail "$(kilocode_text alt_install_python312)"
-                PYTHON=/usr/bin/python3.12 npm install -g "$package_spec" 2>/dev/null || {
+                if retry_command "PYTHON=/usr/bin/python3.12 npm install -g \"$package_spec\" 2>/dev/null"; then
+                    log_success_detail "Kilocode CLI installed successfully (with Python 3.12)."
+                else
                     log_info_detail "$(kilocode_text alt_install_no_optional)"
-                    npm install -g --no-optional "$package_spec" 2>/dev/null || {
+                    if retry_command "npm install -g --no-optional \"$package_spec\" 2>/dev/null"; then
+                        log_success_detail "Kilocode CLI installed successfully (without optional dependencies)."
+                    else
                         log_error_detail "$(kilocode_text alt_install_failed)"
                         log_info_detail "$(kilocode_text alt_install_suggest)"
                         log_error_detail "$(kilocode_text install_fail \""$package_spec"\")"
                         return 1
-                    }
-                }
+                    fi
+                fi
             else
                 log_info_detail "$(kilocode_text alt_install_no_optional)"
-                if npm install -g --no-optional "$package_spec"; then
+                if retry_command "npm install -g --no-optional \"$package_spec\""; then
                     log_success_detail "Kilocode CLI installed successfully (without optional dependencies)."
                 else
                     log_error_detail "$(kilocode_text install_fail \""$package_spec"\")"

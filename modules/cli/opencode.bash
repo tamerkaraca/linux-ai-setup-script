@@ -25,8 +25,6 @@ elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/platform_detection.bash" "modules/utils/platform_detection.bash"
 fi
 
-: "${NPM_LAST_INSTALL_PREFIX:=}"
-
 # --- Start: OpenCode-specific logic ---
 
 declare -A OPCODE_TEXT_EN=(
@@ -121,12 +119,12 @@ main() {
     if command -v opencode &> /dev/null; then
         log_success_detail "OpenCode CLI is already installed: $(opencode --version)"
     else
-        if ! npm_install_global_with_fallback "opencode-ai" "OpenCode CLI" true; then
+        if ! install_package "OpenCode CLI" "npm" "opencode" "opencode-ai"; then
             log_error_detail "$(opencode_text install_fail)"
             return 1
         fi
         
-        local install_prefix="${NPM_LAST_INSTALL_PREFIX:-$(npm_prepare_user_prefix)}"
+        local install_prefix="$(npm config get prefix -g)"
         ensure_opencode_binary "$install_prefix" || log_warn_detail "$(opencode_text shim_warning)"
 
         reload_shell_configs silent

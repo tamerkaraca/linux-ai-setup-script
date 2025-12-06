@@ -146,7 +146,7 @@ source_module() {
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
             rm "$temp_file"
             exit 1
-        }
+        fi
         source "$temp_file" || {
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
             rm "$temp_file"
@@ -200,13 +200,13 @@ run_module() {
         fi
     else
         echo -e "${CYAN}${INFO_TAG}${NC} Downloading and running module '$module_name'..."
-        prepare_remote_module_dir || {
+        if ! prepare_remote_module_dir; then
             echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
-        }
+        fi
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
         if [ ! -f "$remote_file" ]; then
-            if ! retry_command "curl -fsSL \"$module_url\" -o \"$remote_file\""; then
+            if ! retry_command "curl -fsSL --user-agent \"linux-ai-setup-script\" \"$module_url\" -o \"$remote_file\""; then
                 echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
                 return 1
             fi

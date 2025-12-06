@@ -162,10 +162,10 @@ prepare_remote_module_dir() {
     if [ -n "${REMOTE_MODULE_DIR:-}" ]; then
         return 0
     fi
-    REMOTE_MODULE_DIR="$(mktemp -d)"
-    mkdir -p "$REMOTE_MODULE_DIR/modules"
+    REMOTE_MODULE_DIR="$HOME/.linux-ai-setup-script/remote_modules_$$"
+    mkdir -p "$REMOTE_MODULE_DIR/modules/utils"
     curl -fsSL "${SCRIPT_BASE_URL}/modules/utils/utils.bash" -o "$REMOTE_MODULE_DIR/modules/utils/utils.bash" || return 1
-    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils/banner.bash" -o "$REMOTE_MODULE_DIR/modules/utils/banner.bash" || true
+    curl -fsSL "${SCRIPT_BASE_URL}/modules/utils/banner.bash" -o "$REMOTE_MODULE_DIR/modules/utils/banner.bash" || return 1
     export REMOTE_MODULE_DIR
     return 0
 }

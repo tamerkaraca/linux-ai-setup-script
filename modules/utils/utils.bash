@@ -469,5 +469,28 @@ install_package() {
 }
 export -f install_package
 
+clean_windows_paths_from_rc() {
+    log_info_detail "Cleaning Windows paths from shell configs..."
+
+    # Clean current PATH for this session
+    local original_path="$PATH"
+    local new_path=""
+    new_path=$(echo "$original_path" | tr ':' '\n' | grep -v '^/mnt/' | tr '\n' ':' | sed 's/:$//')
+    export PATH="$new_path"
+
+    for rc_file in "$HOME/.bashrc" "$HOME/.zshrc"; do
+        if [ -f "$rc_file" ]; then
+            # Backup the original file
+            cp "$rc_file" "${rc_file}.bak"
+            
+            # Remove lines that export a PATH containing /mnt/
+            sed -i '/export PATH=.*\/mnt\//d' "$rc_file"
+            
+            log_success_detail "Cleaned Windows paths from $rc_file."
+        fi
+    done
+}
+export -f clean_windows_paths_from_rc
+
 # Other functions follow...
 # ...

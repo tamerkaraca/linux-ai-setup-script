@@ -414,8 +414,8 @@ install_package() {
     local name="$1"
     local manager="$2"
     local cmd="$3"
-    local package="$4"
-    local args="${5:-}"
+    shift 3
+    local packages=("$@")
 
     log_info_detail "Installing $name..."
 
@@ -424,40 +424,49 @@ install_package() {
         return 0
     fi
 
-    case "$manager" in
-        npm)
-            require_node_version 18 "$name" || return 1
-            if ! npm install -g "$package" $args; then
-                log_error_detail "Failed to install $name via npm."
+    local installed=false
+    for package in "${packages[@]}"; do
+        log_info_detail "Attempting to install '$package'..."
+        case "$manager" in
+            npm)
+                require_node_version 18 "$name" || return 1
+                if npm install -g "$package"; then
+                    installed=true
+                    break
+                fi
+                ;;
+            pip)
+                install_pip || return 1
+                if python3 -m pip install "$package"; then
+                    installed=true
+                    break
+                fi
+                ;;
+            cargo)
+                install_uv || return 1
+                if uv tool install "$package"; then
+                    installed=true
+                    break
+                fi
+                ;;
+            pipx)
+                install_pipx || return 1
+                if pipx install "$package"; then
+                    installed=true
+                    break
+                fi
+                ;;
+            *)
+                log_error_detail "Unsupported package manager: $manager"
                 return 1
-            fi
-            ;;
-        pip)
-            install_pip || return 1
-            if ! python3 -m pip install "$package" $args; then
-                log_error_detail "Failed to install $name via pip."
-                return 1
-            fi
-            ;;
-        cargo)
-            install_uv || return 1
-            if ! uv tool install "$package" $args; then
-                log_error_detail "Failed to install $name via uv."
-                return 1
-            fi
-            ;;
-        pipx)
-            install_pipx || return 1
-            if ! pipx install "$package" $args; then
-                log_error_detail "Failed to install $name via pipx."
-                return 1
-            fi
-            ;;
-        *)
-            log_error_detail "Unsupported package manager: $manager"
-            return 1
-            ;;
-    esac
+                ;;
+        esac
+    done
+
+    if [ "$installed" = false ]; then
+        log_error_detail "Failed to install $name after trying all candidates."
+        return 1
+    fi
 
     if command -v "$cmd" &> /dev/null; then
         log_success_detail "$name installed successfully."

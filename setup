@@ -316,21 +316,24 @@ run_module() {
             echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
         fi
-        local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
-        mkdir -p "$(dirname "$remote_file")"
-        if [ ! -f "$remote_file" ]; then
-            # Use the inline download_file function for better error reporting
+        # Download directly to the final location in /tmp
+        local temp_output="/tmp/download_$$_${module_name##*/}.bash"
+        if [ ! -f "$temp_output" ]; then
             echo -e "${INFO_TAG} Attempting to download: $(basename "$module_url")"
-            if ! download_file "$module_url" "$remote_file"; then
+            if ! download_file "$module_url" "$temp_output"; then
                 echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
                 echo -e "${ERROR_TAG} Attempted URL: $module_url"
                 return 1
             fi
         fi
-        if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
+        # Run the module directly from /tmp
+        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$temp_output" "$@"; then
             echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
+            rm -f "$temp_output"
             return 1
         fi
+        # Clean up the downloaded file
+        rm -f "$temp_output"
     fi
     return 0
 }

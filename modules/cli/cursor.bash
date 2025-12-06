@@ -1,10 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-: "${NPM_LAST_INSTALL_PREFIX:=}"
-: "${CURSOR_NPM_PACKAGE:=cursor-agent}"
-: "${CURSOR_MIN_NODE_VERSION:=18}"
-
 # Resolve the directory this script lives in so sources work regardless of CWD
 script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 utils_local="$script_dir/../utils/utils.bash"
@@ -83,52 +79,31 @@ cursor_text() {
 
 main() {
     local interactive_mode="true"
-    local package_spec="${CURSOR_NPM_PACKAGE}"
-
     if [[ $# -gt 0 && "$1" != --* ]]; then
         interactive_mode="$1"
         shift
     fi
 
-    while [[ $# -gt 0 ]]; do
-        case "$1" in
-            --package)
-                if [ -z "${2:-}" ]; then
-                    log_error_detail "$(cursor_text package_required)"
-                    return 1
-                fi
-                package_spec="$2"
-                shift
-                ;;
-            *)
-                log_warn_detail "$(cursor_text unknown_arg "$1")"
-                ;;
-        esac
-        shift || true
-    done
-
     log_info_detail "$(cursor_text install_title)"
 
-    require_node_version "$CURSOR_MIN_NODE_VERSION" "Cursor Agent CLI" || return 1
-
-    if ! command -v cursor-agent &>/dev/null && ! command -v cursor &>/dev/null; then
-        if ! install_package "Cursor Agent CLI" "npm" "cursor-agent" "cursor-agent" "cursor"; then
+    if ! command -v cursor-agent &>/dev/null; then
+        log_info_detail "Installing Cursor Agent CLI via curl script..."
+        if ! (curl https://cursor.com/install -fsS | bash); then
+            log_error_detail "Cursor Agent CLI installation failed."
             return 1
         fi
+        reload_shell_configs silent
+        hash -r 2>/dev/null || true
+    else
+        log_success_detail "Cursor Agent CLI is already installed."
     fi
 
-    local cursor_cmd=""
-    if command -v cursor-agent &> /dev/null; then
-        cursor_cmd="cursor-agent"
-        log_info_detail "Found 'cursor-agent' binary."
-    elif command -v cursor &> /dev/null; then
-        cursor_cmd="cursor"
-        log_warn_detail "$(cursor_text command_fallback "cursor")"
-    else
+    local cursor_cmd="cursor-agent"
+    if ! command -v "$cursor_cmd" &> /dev/null; then
         log_error_detail "$(cursor_text command_missing)"
         return 1
     fi
-
+    
     log_success_detail "$(cursor_text version_info "$("$cursor_cmd" --version 2>/dev/null)")"
 
     if [ "$interactive_mode" = true ]; then

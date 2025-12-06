@@ -434,8 +434,14 @@ main_menu() {
                         run_module "setup/homebrew"
                     else
                         update_system
-                        run_module "setup/wslu"
-                        run_module "setup/configure_windows_apps"
+                        if ! run_module "setup/wslu"; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: wslu module failed to download. This is optional for browser integration."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
+                        if ! run_module "setup/configure_windows_apps"; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: Windows apps configuration module failed to download."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
                         clean_windows_paths_from_rc
                     fi
                     ;;
@@ -540,7 +546,10 @@ main_menu() {
                             echo -e "${YELLOW}${WARN_TAG}${NC} Warning: wslu module failed to download. This is optional for browser integration."
                             echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
                         fi
-                        run_module "setup/configure_windows_apps"
+                        if ! run_module "setup/configure_windows_apps"; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: Windows apps configuration module failed to download."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
                         clean_windows_paths_from_rc
                         
                         # Option 2

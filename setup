@@ -317,6 +317,7 @@ run_module() {
             return 1
         fi
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
+        mkdir -p "$(dirname "$remote_file")"
         if [ ! -f "$remote_file" ]; then
             # Use the inline download_file function for better error reporting
             echo -e "${INFO_TAG} Attempting to download: $(basename "$module_url")"

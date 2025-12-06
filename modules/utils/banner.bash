@@ -10,7 +10,7 @@ export SCRIPT_VERSION="V2.0.1"
 : "${NC:=$'\033[0m'}"
 : "${BOLD:=$'\033[1m'}"
 
-HEADING_WIDTH=71
+HEADING_WIDTH=70
 
 center_text() {
     local text="$1"
@@ -72,22 +72,22 @@ print_info_panel() {
     local version_value="${GREEN}${version}${NC}"
     local version_plain
     version_plain=$(printf '%s' "$version_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local version_pad=$((50 - ${#version_plain}))
+    local version_pad=$((49 - ${#version_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${version_label}" "$version_value" "$version_pad" "" "${BLUE}║${NC}"
     local developer_value="${GREEN}Tamer KARACA${NC}"
     local developer_plain
     developer_plain=$(printf '%s' "$developer_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local developer_pad=$((50 - ${#developer_plain}))
+    local developer_pad=$((49 - ${#developer_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${developer_label}" "$developer_value" "$developer_pad" "" "${BLUE}║${NC}"
     local github_value="${CYAN}@tamerkaraca${NC}"
     local github_plain
     github_plain=$(printf '%s' "$github_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local github_pad=$((50 - ${#github_plain}))
+    local github_pad=$((49 - ${#github_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${github_label}" "$github_value" "$github_pad" "" "${BLUE}║${NC}"
     local repo_value="${CYAN}${repo}${NC}"
     local repo_plain
     repo_plain=$(printf '%s' "$repo_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local repo_pad=$((50 - ${#repo_plain}))
+    local repo_pad=$((49 - ${#repo_plain}))
     printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${repo_label}" "$repo_value" "$repo_pad" "" "${BLUE}║${NC}"
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
 }

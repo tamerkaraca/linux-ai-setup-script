@@ -31,8 +31,8 @@ create_windows_app_symlinks() {
     local windows_user
     windows_user=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
     if [ -z "$windows_user" ]; then
-        log_warning_detail "Could not automatically determine Windows username."
-        log_warning_detail "Using 'USER' as a placeholder. You may need to edit the paths below."
+        log_warn_detail "Could not automatically determine Windows username."
+        log_warn_detail "Using 'USER' as a placeholder. You may need to edit the paths below."
         windows_user="USER"
     fi
     
@@ -67,8 +67,8 @@ create_windows_app_symlinks() {
                 log_info_detail "Symlink for '$app_name' already exists."
             fi
         else
-            log_warning_detail "Executable for '$app_name' not found at expected path: $win_path"
-            log_warning_detail "Please verify the path and re-run the script if needed."
+            log_warn_detail "Executable for '$app_name' not found at expected path: $win_path"
+            log_warn_detail "Please verify the path and re-run the script if needed."
         fi
     done
 

@@ -253,6 +253,16 @@ detect_package_manager() {
     log_success_detail "Package manager: $PKG_MANAGER"
 }
 
+update_system() {
+    log_info_detail "Updating system packages..."
+    if [ -n "${UPDATE_CMD:-}" ]; then
+        eval "$UPDATE_CMD"
+    else
+        log_warn_detail "Update command not defined. Skipping system update."
+    fi
+}
+export -f update_system
+
 # Python Tooling
 install_python() {
     log_info_detail "Starting Python installation..."
@@ -297,15 +307,15 @@ install_pip() {
         log_success_detail "Pip installed via get-pip.py."
     fi
 
-    if ! $pip_upgrade_cmd 2>/dev/null; then
-        if $pip_upgrade_cmd 2>&1 | grep -q "externally-managed-environment"; then
+    if ! output=$($pip_upgrade_cmd 2>&1); then
+        if echo "$output" | grep -q "externally-managed-environment"; then
             log_info_detail "Externally-managed-environment detected, retrying with --break-system-packages..."
             if ! $pip_upgrade_cmd --break-system-packages; then
                 log_error_detail "Pip upgrade failed even with --break-system-packages."
                 return 1
             fi
         else
-            log_error_detail "Pip upgrade failed for an unknown reason."
+            log_error_detail "Pip upgrade failed. Output: $output"
             return 1
         fi
     fi
@@ -375,6 +385,89 @@ install_uv() {
 }
 
 export -f install_python install_pip install_pipx install_uv
+
+require_node_version() {
+    local min_version="$1"
+    local tool_name="$2"
+
+    if ! command -v node >/dev/null 2>&1; then
+        log_error_detail "Node.js is required for $tool_name but not found."
+        log_info_detail "Please install Node.js (v$min_version+) using the main menu."
+        return 1
+    fi
+
+    local current_version
+    current_version=$(node -v | cut -d'v' -f2)
+    local current_major
+    current_major=$(echo "$current_version" | cut -d'.' -f1)
+
+    if [ "$current_major" -lt "$min_version" ]; then
+        log_error_detail "$tool_name requires Node.js v$min_version or higher (current: v$current_version)."
+        log_info_detail "Please update Node.js using the main menu."
+        return 1
+    fi
+    return 0
+}
+export -f require_node_version
+
+install_package() {
+    local name="$1"
+    local manager="$2"
+    local cmd="$3"
+    local package="$4"
+    local args="${5:-}"
+
+    log_info_detail "Installing $name..."
+
+    if command -v "$cmd" &> /dev/null; then
+        log_success_detail "$name is already installed."
+        return 0
+    fi
+
+    case "$manager" in
+        npm)
+            require_node_version 18 "$name" || return 1
+            if ! npm install -g "$package" $args; then
+                log_error_detail "Failed to install $name via npm."
+                return 1
+            fi
+            ;;
+        pip)
+            install_pip || return 1
+            if ! python3 -m pip install "$package" $args; then
+                log_error_detail "Failed to install $name via pip."
+                return 1
+            fi
+            ;;
+        cargo)
+            install_uv || return 1
+            if ! uv tool install "$package" $args; then
+                log_error_detail "Failed to install $name via uv."
+                return 1
+            fi
+            ;;
+        pipx)
+            install_pipx || return 1
+            if ! pipx install "$package" $args; then
+                log_error_detail "Failed to install $name via pipx."
+                return 1
+            fi
+            ;;
+        *)
+            log_error_detail "Unsupported package manager: $manager"
+            return 1
+            ;;
+    esac
+
+    if command -v "$cmd" &> /dev/null; then
+        log_success_detail "$name installed successfully."
+        return 0
+    else
+        log_error_detail "$name installed but command '$cmd' not found."
+        return 1
+    fi
+}
+export -f install_package
 
 # Other functions follow...
 # ...

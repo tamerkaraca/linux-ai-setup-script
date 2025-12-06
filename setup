@@ -206,7 +206,7 @@ run_module() {
         }
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
         if [ ! -f "$remote_file" ]; then
-            if ! retry_command "curl -fsSL \"$module_url\" -o \"$remote_file\""; then
+            if ! retry_command "curl -fsSL --user-agent \"linux-ai-setup-script\" \"$module_url\" -o \"$remote_file\""; then
                 echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
                 return 1
             fi

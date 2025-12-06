@@ -1,6 +1,17 @@
 #!/bin/bash
 set -euo pipefail
 
+# Basic color definitions (will be overridden by utils.bash)
+INFO_TAG="[INFO]"
+WARN_TAG="[WARNING]"
+ERROR_TAG="[ERROR]"
+SUCCESS_TAG="[SUCCESS]"
+GREEN=""
+RED=""
+YELLOW=""
+CYAN=""
+NC=""
+
 # Windows CRLF düzeltme kontrolü
 if [ -f "$0" ] && command -v file &> /dev/null; then
     if file "$0" | grep -q "CRLF"; then
@@ -128,6 +139,59 @@ setup_text_fmt() {
 export -f setup_text_fmt
 # --- End Multi-language Setup ---
 
+# Simple inline download function for use before utils.bash is loaded
+download_file() {
+    local url="$1"
+    local output="$2"
+    local max_attempts=3
+    local attempt=1
+
+    # Debug output
+    echo "${INFO_TAG} Attempting to download: $(basename "$url")"
+
+    while [ $attempt -le $max_attempts ]; do
+        # Try curl first with enhanced parameters
+        if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
+           --user-agent "linux-ai-setup-script" "$url" -o "$output" 2>/tmp/curl_error.log 2>&1; then
+            echo "${SUCCESS_TAG} Download successful on attempt $attempt"
+            return 0
+        fi
+
+        # Show curl error if available
+        if [ -f /tmp/curl_error.log ] && [ -s /tmp/curl_error.log ]; then
+            echo "${WARN_TAG} curl error: $(cat /tmp/curl_error.log | head -1)"
+            rm -f /tmp/curl_error.log
+        fi
+
+        # Fallback to wget if available
+        if command -v wget &> /dev/null; then
+            echo "${INFO_TAG} Trying with wget..."
+            if wget --timeout=10 --tries=2 --user-agent="linux-ai-setup-script" \
+                    -qO "$output" "$url" 2>/tmp/wget_error.log 2>&1; then
+                echo "${SUCCESS_TAG} Download successful with wget on attempt $attempt"
+                return 0
+            fi
+            # Show wget error if available
+            if [ -f /tmp/wget_error.log ] && [ -s /tmp/wget_error.log ]; then
+                echo "${WARN_TAG} wget error: $(cat /tmp/wget_error.log | head -1)"
+                rm -f /tmp/wget_error.log
+            fi
+        fi
+
+        # Clean up partial file if it exists
+        [ -f "$output" ] && rm -f "$output"
+
+        if [ $attempt -lt $max_attempts ]; then
+            echo "${YELLOW}${WARN_TAG}${NC} Download attempt $attempt/$max_attempts failed, retrying in 2 seconds..."
+            sleep 2
+        fi
+        ((attempt++))
+    done
+
+    echo "${ERROR_TAG} All download attempts failed for: $(basename "$url")"
+    return 1
+}
+
 source_module() {
     local local_path="$1"
     local remote_rel_path="$2"
@@ -143,19 +207,14 @@ source_module() {
         local temp_file
         temp_file=$(mktemp)
 
-        # Try enhanced download with fallback
-        if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
-           --user-agent "linux-ai-setup-script" "$remote_url" -o "$temp_file" 2>/dev/null; then
-            :  # Success
-        elif command -v wget &> /dev/null; then
-            if ! wget --timeout=10 --tries=2 --user-agent="linux-ai-setup-script" \
-                    -qO "$temp_file" "$remote_url" 2>/dev/null; then
-                echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
-                rm "$temp_file"
-                exit 1
-            fi
-        else
+        # Use the inline download function
+        if ! download_file "$remote_url" "$temp_file"; then
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
+            echo "${ERROR_TAG} Please check your internet connection and try again."
+            # Check if we're in WSL
+            if grep -qi microsoft /proc/version 2>/dev/null; then
+                echo "${INFO_TAG} WSL detected: If the issue persists, try running from WSL2 instead of WSL1."
+            fi
             rm "$temp_file"
             exit 1
         fi
@@ -187,11 +246,14 @@ prepare_remote_module_dir() {
     REMOTE_MODULE_DIR="$HOME/.linux-ai-setup-script/remote_modules_$$"
     mkdir -p "$REMOTE_MODULE_DIR/modules/utils"
 
-    # Enhanced download with fallback for critical modules
-    if ! download_with_fallback "${SCRIPT_BASE_URL}/modules/utils/utils.bash" "$REMOTE_MODULE_DIR/modules/utils/utils.bash"; then
+    # Download critical modules using the inline download_file function
+    echo -e "${CYAN}${INFO_TAG}${NC} Downloading required utilities for remote execution..."
+    if ! download_file "${SCRIPT_BASE_URL}/modules/utils/utils.bash" "$REMOTE_MODULE_DIR/modules/utils/utils.bash"; then
+        echo -e "${RED}${ERROR_TAG}${NC} Failed to download utils.bash"
         return 1
     fi
-    if ! download_with_fallback "${SCRIPT_BASE_URL}/modules/utils/banner.bash" "$REMOTE_MODULE_DIR/modules/utils/banner.bash"; then
+    if ! download_file "${SCRIPT_BASE_URL}/modules/utils/banner.bash" "$REMOTE_MODULE_DIR/modules/utils/banner.bash"; then
+        echo -e "${RED}${ERROR_TAG}${NC} Failed to download banner.bash"
         return 1
     fi
 
@@ -227,9 +289,18 @@ run_module() {
         fi
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
         if [ ! -f "$remote_file" ]; then
-            if ! download_with_fallback "$module_url" "$remote_file"; then
-                echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
-                return 1
+            # Check if download_with_fallback is available (from utils.bash)
+            if declare -f download_with_fallback > /dev/null 2>&1; then
+                if ! download_with_fallback "$module_url" "$remote_file"; then
+                    echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
+                    return 1
+                fi
+            else
+                # Fallback to inline download_file function
+                if ! download_file "$module_url" "$remote_file"; then
+                    echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
+                    return 1
+                fi
             fi
         fi
         if ! (cd "$REMOTE_MODULE_DIR" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then

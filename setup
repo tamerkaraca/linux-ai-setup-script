@@ -35,8 +35,22 @@ if [ -f "$0" ] && command -v file &> /dev/null; then
     fi
 fi
 
-SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main}"
+# Detect if we're running from a specific branch
+if [ -f "$0" ] && command -v git &> /dev/null && [ -d .git ]; then
+    # Local execution - detect current branch
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+    SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/${CURRENT_BRANCH}}"
+else
+    # Remote execution - check if a specific branch was requested
+    if [ -n "${SETUP_BRANCH:-}" ]; then
+        SCRIPT_BASE_URL="https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/${SETUP_BRANCH}"
+    else
+        # Default to main for backward compatibility
+        SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main}"
+    fi
+fi
 export SCRIPT_BASE_URL
+export SETUP_BRANCH="${CURRENT_BRANCH:-main}"
 
 # --- Start Multi-language Setup ---
 declare -A SETUP_TEXT_EN=(
@@ -248,12 +262,13 @@ prepare_remote_module_dir() {
 
     # Download critical modules using the inline download_file function
     echo -e "${CYAN}${INFO_TAG}${NC} Downloading required utilities for remote execution..."
+    echo -e "${INFO_TAG} Using base URL: ${SCRIPT_BASE_URL}"
     if ! download_file "${SCRIPT_BASE_URL}/modules/utils/utils.bash" "$REMOTE_MODULE_DIR/modules/utils/utils.bash"; then
-        echo -e "${RED}${ERROR_TAG}${NC} Failed to download utils.bash"
+        echo -e "${RED}${ERROR_TAG}${NC} Failed to download utils.bash from ${SCRIPT_BASE_URL}/modules/utils/utils.bash"
         return 1
     fi
     if ! download_file "${SCRIPT_BASE_URL}/modules/utils/banner.bash" "$REMOTE_MODULE_DIR/modules/utils/banner.bash"; then
-        echo -e "${RED}${ERROR_TAG}${NC} Failed to download banner.bash"
+        echo -e "${RED}${ERROR_TAG}${NC} Failed to download banner.bash from ${SCRIPT_BASE_URL}/modules/utils/banner.bash"
         return 1
     fi
 
@@ -283,6 +298,7 @@ run_module() {
         fi
     else
         echo -e "${CYAN}${INFO_TAG}${NC} Downloading and running module '$module_name'..."
+        echo -e "${INFO_TAG} Module URL: $module_url"
         if ! prepare_remote_module_dir; then
             echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
@@ -299,6 +315,7 @@ run_module() {
                 # Fallback to inline download_file function
                 if ! download_file "$module_url" "$remote_file"; then
                     echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
+                    echo -e "${ERROR_TAG} Attempted URL: $module_url"
                     return 1
                 fi
             fi

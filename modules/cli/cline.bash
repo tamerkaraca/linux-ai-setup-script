@@ -1,7 +1,6 @@
 #!/bin/bash
 set -euo pipefail
 
-: "${CLINE_NPM_PACKAGE_CANDIDATES:=cline @cline/cli cline-cli}"
 : "${CLINE_MANUAL_URL:=https://cline.bot/cline-cli}"
 : "${CLINE_MIN_NODE_VERSION:=18}"
 
@@ -112,7 +111,7 @@ main() {
 
     # Use the universal installer
     # It tries each candidate package until one succeeds
-    install_package "Cline CLI" "npm" "cline" "${CLINE_NPM_PACKAGE_CANDIDATES}"
+    install_package "Cline CLI" "npm" "cline" "cline" "@cline/cli" "cline-cli"
     local install_status=$?
 
     if [ $install_status -ne 0 ]; then
@@ -120,12 +119,7 @@ main() {
         return 1
     fi
     
-    # The `install_package` function reloads the shell, but sometimes we need to locate the binary again
-    local cline_cmd
-    cline_cmd=$(locate_npm_binary "cline") || cline_cmd=$(locate_npm_binary "cline-cli") || {
-        log_error_detail "$(cline_text command_missing)"
-        return 1
-    }
+    local cline_cmd="cline"
 
     log_success_detail "Cline CLI found: $cline_cmd ($($cline_cmd --version 2>/dev/null))"
 

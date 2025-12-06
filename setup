@@ -6,11 +6,11 @@ INFO_TAG="[INFO]"
 WARN_TAG="[WARNING]"
 ERROR_TAG="[ERROR]"
 SUCCESS_TAG="[SUCCESS]"
-GREEN=""
-RED=""
-YELLOW=""
-CYAN=""
-NC=""
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
 
 # Windows CRLF düzeltme kontrolü
 if [ -f "$0" ] && command -v file &> /dev/null; then
@@ -536,7 +536,10 @@ main_menu() {
                     else
                         # Option 1
                         update_system
-                        run_module "setup/wslu"
+                        if ! run_module "setup/wslu"; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: wslu module failed to download. This is optional for browser integration."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
                         run_module "setup/configure_windows_apps"
                         clean_windows_paths_from_rc
                         

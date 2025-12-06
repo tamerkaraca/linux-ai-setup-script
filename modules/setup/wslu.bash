@@ -78,12 +78,14 @@ install_wslu() {
     if ! command -v wslview &> /dev/null; then
         log_info_detail "wslu package not found. Installing..."
         if ! sudo -v; then # Check for sudo permissions upfront
-             log_error_detail "Sudo permissions required. Please run the script with sudo or enter your password."
-             exit 1
+             log_warn_detail "Sudo permissions not available. Skipping wslu installation."
+             log_info_detail "Note: wslu is optional and provides WSL browser integration."
+             return 0
         fi
         if ! eval "$INSTALL_CMD" wslu; then
-            log_error_detail "Failed to install wslu. Please install it manually."
-            return 1
+            log_warn_detail "Failed to install wslu. This is optional for WSL browser integration."
+            log_info_detail "You can install wslu manually later with: sudo apt install wslu"
+            return 0  # Don't fail the entire installation for an optional package
         fi
         log_success_detail "wslu installed successfully."
     else

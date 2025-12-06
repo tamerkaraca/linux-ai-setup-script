@@ -302,6 +302,7 @@ install_composer() {
 }
 
 install_php_version() {
+    local version="$1"
     log_info_detail "PHP ${version} ve Laravel eklentileri kuruluyor..."
 
     ensure_php_repository || return 1

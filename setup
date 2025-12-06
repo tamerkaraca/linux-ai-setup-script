@@ -200,10 +200,10 @@ run_module() {
         fi
     else
         echo -e "${CYAN}${INFO_TAG}${NC} Downloading and running module '$module_name'..."
-        prepare_remote_module_dir || {
+        if ! prepare_remote_module_dir; then
             echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
-        }
+        fi
         local remote_file="${REMOTE_MODULE_DIR}/${module_name}.bash"
         if [ ! -f "$remote_file" ]; then
             if ! retry_command "curl -fsSL --user-agent \"linux-ai-setup-script\" \"$module_url\" -o \"$remote_file\""; then

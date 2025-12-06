@@ -164,6 +164,9 @@ download_file() {
     # Debug output
     echo "${INFO_TAG} Attempting to download: $(basename "$url")"
 
+    # Create directory if it doesn't exist
+    mkdir -p "$(dirname "$output")"
+
     while [ $attempt -le $max_attempts ]; do
         # Try curl first with enhanced parameters
         if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
@@ -173,7 +176,7 @@ download_file() {
                 echo "${SUCCESS_TAG} Download successful on attempt $attempt"
                 return 0
             else
-                echo "${WARN_TAG} Failed to move downloaded file to destination"
+                echo "${WARN_TAG} Failed to move downloaded file to destination: $output"
                 rm -f "$temp_output"
             fi
         fi
@@ -194,7 +197,7 @@ download_file() {
                     echo "${SUCCESS_TAG} Download successful with wget on attempt $attempt"
                     return 0
                 else
-                    echo "${WARN_TAG} Failed to move downloaded file to destination"
+                    echo "${WARN_TAG} Failed to move downloaded file to destination: $output"
                     rm -f "$temp_output"
                 fi
             fi

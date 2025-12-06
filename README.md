@@ -181,7 +181,8 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `14` shortcut tha
 | `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | Installs `@augmentcode/auggie` (Node.js ≥ 22) and walks through `auggie login`, `.augment/commands`, and CI-friendly flags. |
 | `13` | [Droid CLI](https://factory.ai/) | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
 | `14` | [Jules CLI](https://jules.google/docs/) | Installs `@google/jules` globally (Node.js ≥ 18) and guides through `jules login` for authentication. |
-| `15` | Install every CLI | Runs options `1-14` in batch mode (logins skipped, summary printed at the end). |
+| `15` | [Continue CLI](https://docs.continue.dev/cli/overview) | Installs `@continuedev/cli` via npm, providing access to the Continue developer assistant. |
+| `16` | Install every CLI | Runs options `1-15` in batch mode (logins skipped, summary printed at the end). |
 
 #### Auxiliary AI Tools Menu
 This new menu, accessible via option `8` in the main menu, groups together tools for spec-driven development and agent libraries.
@@ -350,7 +351,8 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `14` kısayolu
 | `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | `@augmentcode/auggie` paketini Node.js ≥ 22 doğrulaması ile kurar, `auggie login` ve `.augment/commands` içeriğini hatırlatır. |
 | `13` | [Droid CLI](https://factory.ai/) | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir. |
 | `14` | [Jules CLI](https://jules.google/docs/) | `@google/jules` paketini global kurar (Node.js ≥ 18); `jules login` ile kimlik doğrulaması yapmanızı sağlar. |
-| `15` | Hepsini Kur | `1-14` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+| `15` | [Continue CLI](https://docs.continue.dev/cli/overview) | `@continuedev/cli`'yi npm aracılığıyla kurar ve Continue geliştirici asistanına erişim sağlar. |
+| `16` | Hepsini Kur | `1-15` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 #### Yardımcı AI Araçları Menüsü
 Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon odaklı geliştirme araçlarını ve ajan kütüphanelerini bir araya getirir.

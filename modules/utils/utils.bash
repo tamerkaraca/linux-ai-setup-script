@@ -149,14 +149,14 @@ _log_detailed() {
     local color="${color_map[$level]:-$RED}"
     local tag="${tag_map[$level]:-$ERROR_TAG}"
 
-    local caller_info
-    if caller_info=$(caller 1); then
-        local line_num
-        line_num=$(echo "$caller_info" | awk '{print $1}')
-        local script_name
-        script_name=$(basename "$(echo "$caller_info" | awk '{print $3}')" 2>/dev/null || echo "unknown")
-        message="[${script_name}:${line_num}] ${message}"
-    fi
+    # local caller_info
+    # if caller_info=$(caller 1); then
+    #     local line_num
+    #     line_num=$(echo "$caller_info" | awk '{print $1}')
+    #     local script_name
+    #     script_name=$(basename "$(echo "$caller_info" | awk '{print $3}')" 2>/dev/null || echo "unknown")
+    #     message="[${script_name}:${line_num}] ${message}"
+    # fi
 
     echo -e "${color}${tag}${NC} ${message}"
 }

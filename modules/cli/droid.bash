@@ -30,10 +30,7 @@ fi
 
 CURRENT_LANG="${LANGUAGE:-en}"
 if [ "$CURRENT_LANG" != "tr" ]; then
-    INFO_TAG="[INFO]"
-    WARN_TAG="[WARNING]"
-    ERROR_TAG="[ERROR]"
-    SUCCESS_TAG="[SUCCESS]"
+    : # Placeholders if needed later
 fi
 
 declare -A DROID_TEXT_EN=(

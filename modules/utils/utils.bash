@@ -25,113 +25,9 @@ NC=$'\033[0m' # No Color
 export RED GREEN YELLOW BLUE CYAN NC
 
 # Global text definitions for internationalization
-declare -A GL_TEXT_EN
-GL_TEXT_EN=(
-    [prov_menu_title]="Claude AI Provider Configuration"
-    [prov_option1]="Configure GLM as Claude provider"
-    [prov_option2]="Configure Kimi as Claude provider"
-    [prov_option0]="Return to main menu"
-    [prov_prompt]="Enter your choice"
-    [prov_invalid]="Invalid choice!"
-    [prov_returning]="Returning to previous menu..."
-    [glm_title]="Configuring GLM as Claude provider..."
-    [glm_steps_header]="To get your GLM API Key, follow these steps:"
-    [glm_step1]="Go to https://open.bigmodel.cn/ and log in."
-    [glm_step2]="Navigate to 'API Keys' from the left menu."
-    [glm_step3]="Copy an existing key or create a new one."
-    [glm_step4]="Paste the key below when prompted."
-    [api_masked_default]="Not Set"
-    [glm_api_prompt]="Enter your GLM API Key"
-    [glm_keep_existing]="API Key not entered, keeping the existing one."
-    [glm_empty_key]="API Key cannot be empty."
-    [glm_settings_creating]="Creating settings file..."
-    [glm_settings_path]="GLM settings have been written to:"
-    [glm_config_header]="Your new Claude configuration:"
-    [glm_launch_hint]="To launch, you can now use 'claude' or 'cc' command."
-    [glm_status_hint]="To check status, use 'claude --status'."
-    [glm_plan_header]="With this free plan, you can use:"
-    [glm_plan_point1]="GLM-4.6 (Opus)"
-    [glm_plan_point2]="GLM-4.6 (Sonnet)"
-    [glm_plan_point3]="GLM-4.5-Air (Haiku)"
-    [kimi_title]="Configuring Moonshot Kimi as Claude provider..."
-    [kimi_steps_header]="To get your Kimi API Key, follow these steps:"
-    [kimi_step1]="Go to https://platform.moonshot.cn/ and log in."
-    [kimi_step2]="Navigate to 'API Key Management' from the left menu."
-    [kimi_step3]="Copy an existing key or create a new one."
-    [kimi_step4]="Paste the key below when prompted."
-    [kimi_reinstall_prompt]="Claude CLI is required. Reinstall to ensure compatibility? [Y/n]"
-    [reinstall_missing_npm]="NPM is not installed. Cannot check for Claude CLI updates."
-    [reinstall_running]="Re-installing Claude Code CLI..."
-    [reinstall_done]="Claude Code CLI re-installation complete."
-    [reinstall_fail]="Claude Code CLI re-installation failed."
-    [kimi_api_prompt]="Enter your Moonshot (Kimi) API Key"
-    [kimi_keep_existing]="API Key not entered, keeping the existing one."
-    [kimi_empty_key]="API Key cannot be empty."
-    [kimi_model_prompt]="Which Kimi model do you want to use?"
-    [kimi_model_opt1]="kimi-k2-0711-preview (Default)"
-    [kimi_model_opt2]="kimi-k2-turbo-preview"
-    [kimi_model_opt3]="Enter manually"
-    [kimi_model_manual_prompt]="Enter the Kimi model name"
-    [kimi_model_manual_error]="Model name cannot be empty."
-    [kimi_success_title]="Moonshot Kimi configuration is complete!"
-    [kimi_success_path]="Settings are saved to"
-    [kimi_success_run]="You can now run Claude with the Kimi model"
-    [settings_saved]="Settings saved"
-)
 
-declare -A GL_TEXT_TR
-GL_TEXT_TR=(
-    [prov_menu_title]="Claude AI Sağlayıcı Yapılandırması"
-    [prov_option1]="GLM'yi Claude sağlayıcısı olarak yapılandır"
-    [prov_option2]="Kimi'yi Claude sağlayıcısı olarak yapılandır"
-    [prov_option0]="Ana menüye dön"
-    [prov_prompt]="Seçiminizi yapın"
-    [prov_invalid]="Geçersiz seçim!"
-    [prov_returning]="Önceki menüye dönülüyor..."
-    [glm_title]="GLM, Claude sağlayıcısı olarak yapılandırılıyor..."
-    [glm_steps_header]="GLM API Anahtarınızı almak için şu adımları izleyin:"
-    [glm_step1]="https://open.bigmodel.cn/ adresine gidin ve giriş yapın."
-    [glm_step2]="Sol menüden 'API Keys' bölümüne gidin."
-    [glm_step3]="Mevcut bir anahtarı kopyalayın veya yeni bir tane oluşturun."
-    [glm_step4]="İstendiğinde anahtarı aşağıya yapıştırın."
-    [api_masked_default]="Ayarlanmadı"
-    [glm_api_prompt]="GLM API Anahtarınızı girin"
-    [glm_keep_existing]="API Anahtarı girilmedi, mevcut olan korunuyor."
-    [glm_empty_key]="API Anahtarı boş olamaz."
-    [glm_settings_creating]="Ayar dosyası oluşturuluyor..."
-    [glm_settings_path]="GLM ayarları şuraya yazıldı:"
-    [glm_config_header]="Yeni Claude yapılandırmanız:"
-    [glm_launch_hint]="Başlatmak için artık 'claude' veya 'cc' komutunu kullanabilirsiniz."
-    [glm_status_hint]="Durumu kontrol etmek için 'claude --status' kullanın."
-    [glm_plan_header]="Bu ücretsiz planla şunları kullanabilirsiniz:"
-    [glm_plan_point1]="GLM-4.6 (Opus)"
-    [glm_plan_point2]="GLM-4.6 (Sonnet)"
-    [glm_plan_point3]="GLM-4.5-Air (Haiku)"
-    [kimi_title]="Moonshot Kimi, Claude sağlayıcısı olarak yapılandırılıyor..."
-    [kimi_steps_header]="Kimi API Anahtarınızı almak için şu adımları izleyin:"
-    [kimi_step1]="https://platform.moonshot.cn/ adresine gidin ve giriş yapın."
-    [kimi_step2]="Sol menüden 'API Key Management' bölümüne gidin."
-    [kimi_step3]="Mevcut bir anahtarı kopyalayın veya yeni bir tane oluşturun."
-    [kimi_step4]="İstendiğinde anahtarı aşağıya yapıştırın."
-    [kimi_reinstall_prompt]="Claude CLI gerekli. Uyumluluğu sağlamak için yeniden yüklensin mi? [E/h]"
-    [reinstall_missing_npm]="NPM kurulu değil. Claude CLI güncellemeleri kontrol edilemiyor."
-    [reinstall_running]="Claude Code CLI yeniden kuruluyor..."
-    [reinstall_done]="Claude Code CLI yeniden kurulumu tamamlandı."
-    [reinstall_fail]="Claude Code CLI yeniden kurulumu başarısız oldu."
-    [kimi_api_prompt]="Moonshot (Kimi) API Anahtarınızı girin"
-    [kimi_keep_existing]="API Anahtarı girilmedi, mevcut olan korunuyor."
-    [kimi_empty_key]="API Anahtarı boş olamaz."
-    [kimi_model_prompt]="Hangi Kimi modelini kullanmak istersiniz?"
-    [kimi_model_opt1]="kimi-k2-0711-preview (Varsayılan)"
-    [kimi_model_opt2]="kimi-k2-turbo-preview"
-    [kimi_model_opt3]="Manuel olarak gir"
-    [kimi_model_manual_prompt]="Kimi model adını girin"
-    [kimi_model_manual_error]="Model adı boş olamaz."
-    [kimi_success_title]="Moonshot Kimi yapılandırması tamamlandı!"
-    [kimi_success_path]="Ayarlar şuraya kaydedildi"
-    [kimi_success_run]="Artık Claude'u Kimi modeliyle çalıştırabilirsiniz"
-    [settings_saved]="Ayarlar kaydedildi"
-)
+
+
 
 
 # Log functions
@@ -236,7 +132,7 @@ _log_detailed() {
     local level="$1"
     local message="$2"
     local timestamp
-    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    # timestamp=$(date +"%Y-%m-%d %H:%M:%S")
 
     declare -A color_map
     color_map["INFO"]="$CYAN"
@@ -288,7 +184,7 @@ reload_shell_configs() {
     local sourced_file=""
     for rc_file in "${candidates[@]}"; do
         if source_shell_config "$rc_file"; then
-            sourced_file="$rc_file"
+            # sourced_file="$rc_file"
             break
         fi
     done
@@ -347,7 +243,7 @@ detect_package_manager() {
         INSTALL_CMD="sudo yum install -y"
     elif command -v pacman &> /dev/null; then
         PKG_MANAGER="pacman"
-        UPDATE_CMD="sudo pacman -Syu --noconfirm"
+        # UPDATE_CMD="sudo pacman -Syu --noconfirm"
         INSTALL_CMD="sudo pacman -S --noconfirm"
     else
         log_error_detail "No supported package manager was found!"

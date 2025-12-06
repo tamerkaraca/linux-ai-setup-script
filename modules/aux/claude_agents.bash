@@ -82,6 +82,7 @@ require_git() {
 install_agents_repo() {
     local repo_url="$1"
     local label="$2"
+    local msg=""
     log_info_detail "$(agent_printf "msg" "installing" "$label" && echo "$msg")"
 
     require_git || return 1

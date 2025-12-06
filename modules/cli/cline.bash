@@ -112,7 +112,7 @@ main() {
 
     # Use the universal installer
     # It tries each candidate package until one succeeds
-    install_package "Cline CLI" "npm" "cline" ${CLINE_NPM_PACKAGE_CANDIDATES}
+    install_package "Cline CLI" "npm" "cline" "${CLINE_NPM_PACKAGE_CANDIDATES}"
     local install_status=$?
 
     if [ $install_status -ne 0 ]; then

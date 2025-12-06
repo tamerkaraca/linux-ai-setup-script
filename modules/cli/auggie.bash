@@ -116,7 +116,7 @@ main() {
     local install_status=$?
 
     if [ $install_status -ne 0 ]; then
-        log_error_detail "$(auggie_text install_fail \"$package_spec\")"
+        log_error_detail "$(auggie_text install_fail \""$package_spec"\")"
         return 1
     fi
     
@@ -145,10 +145,10 @@ main() {
         fi
         read -r -p "$(auggie_text press_enter)" </dev/tty || true
     else
-        log_info_detail "$(auggie_text batch_skip \"${GREEN}auggie login${NC}\")"
+        log_info_detail "$(auggie_text batch_skip \""${GREEN}"auggie login"${NC}"\")"
     fi
 
-    log_success_detail "$(auggie_text install_done \"$AUGGIE_DOC_URL\")"
+    log_success_detail "$(auggie_text install_done \""$AUGGIE_DOC_URL"\")"
 }
 
 main "$@"

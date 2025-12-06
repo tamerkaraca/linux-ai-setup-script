@@ -161,7 +161,7 @@ main() {
                     npm install -g --no-optional "$package_spec" 2>/dev/null || {
                         log_error_detail "$(kilocode_text alt_install_failed)"
                         log_info_detail "$(kilocode_text alt_install_suggest)"
-                        log_error_detail "$(kilocode_text install_fail \"$package_spec\")"
+                        log_error_detail "$(kilocode_text install_fail \""$package_spec"\")"
                         return 1
                     }
                 }
@@ -170,7 +170,7 @@ main() {
                 if npm install -g --no-optional "$package_spec"; then
                     log_success_detail "Kilocode CLI installed successfully (without optional dependencies)."
                 else
-                    log_error_detail "$(kilocode_text install_fail \"$package_spec\")"
+                    log_error_detail "$(kilocode_text install_fail \""$package_spec"\")"
                     log_info_detail "$(kilocode_text alt_install_suggest_cmd)"
                     return 1
                 fi
@@ -178,7 +178,7 @@ main() {
         else
             log_info_detail "$(kilocode_text install_start)"
             if ! npm_install_global_with_fallback "$package_spec" "Kilocode CLI"; then
-                log_error_detail "$(kilocode_text install_fail \"$package_spec\")"
+                log_error_detail "$(kilocode_text install_fail \""$package_spec"\")"
                 return 1
             fi
         fi
@@ -219,7 +219,7 @@ main() {
         log_info_detail "$(kilocode_text batch_note "${GREEN}kilocode config${NC}" "${GREEN}kilocode --mode architect${NC}")"
     fi
     
-    log_success_detail "$(kilocode_text install_done \"$KILOCODE_DOC_URL\")"
+    log_success_detail "$(kilocode_text install_done \""$KILOCODE_DOC_URL"\")"
 }
 
 main "$@"

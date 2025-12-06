@@ -163,7 +163,7 @@ main() {
                         if [ -f "$rc_file" ]; then
                              echo '' >> "$rc_file"
                              echo "export OPENAI_API_KEY=\"$OPENAI_KEY\"" >> "$rc_file"
-                             log_success_detail "$(codex_printf \"msg\" \"api_key_saved\" \"$rc_file\" && echo \"$msg\")"
+                             log_success_detail "$(codex_printf "msg" "api_key_saved" ""$rc_file"" && echo "$msg")"
                         fi
                     done
                     export OPENAI_API_KEY="$OPENAI_KEY"
@@ -182,7 +182,7 @@ main() {
     else
         echo
         log_info_detail "$(codex_text bulk_skip)"
-        log_info_detail "$(codex_printf \"msg\" \"bulk_reminder\" \"${GREEN}codex${NC}\" && echo \"$msg\")"
+        log_info_detail "$(codex_printf "msg" "bulk_reminder" ""${GREEN}"codex"${NC}"" && echo "$msg")"
     fi
     
     echo -e "\n${BLUE}╔═══════════════════════════════════════════════╗${NC}"

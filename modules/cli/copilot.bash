@@ -173,7 +173,7 @@ main() {
     echo -e "  ${GREEN}•${NC} $(copilot_text usage_request)"
     echo -e "  ${GREEN}•${NC} $(copilot_text usage_explain)"
     log_info_detail "  ${GREEN}•${NC} $(copilot_text usage_alias_reload) ${GREEN}eval \"\\[\$(copilot alias -- ${detected_shell})\\]\"${NC}"
-    log_info_detail "  ${GREEN}•${NC} $(copilot_text usage_more)
+    log_info_detail "  ${GREEN}•${NC} $(copilot_text usage_more)"
     
     echo
     log_success_detail "$(copilot_text install_done)"

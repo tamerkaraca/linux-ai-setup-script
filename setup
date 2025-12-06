@@ -314,6 +314,7 @@ main_menu() {
                     else
                         update_system
                         run_module "setup/wslu"
+                        run_module "setup/configure_windows_apps"
                     fi
                     ;;
                 2) run_module "menus/python_tools" ;;
@@ -410,6 +411,7 @@ main_menu() {
                     else
                         update_system
                         run_module "setup/wslu"
+                        run_module "setup/configure_windows_apps"
                         run_module "menus/python_tools"
                         run_module "menus/node" "all"
                         run_module "menus/ai_cli_tools" "all"

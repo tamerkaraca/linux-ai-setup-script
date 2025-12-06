@@ -28,6 +28,41 @@ else
     exit 1 # Keep this exit 1 as it's crucial for WSL check
 fi
 
+configure_wsl_conf() {
+    if ! is_wsl; then
+        return
+    fi
+
+    log_info_detail "Configuring wsl.conf to optimize WSL/Windows interop..."
+
+    local wsl_conf_content="[boot]\nsystemd=true\n\n[interop]\nappendWindowsPath = false\n"
+    local wsl_conf_file="/etc/wsl.conf"
+
+    # Use a temporary file to assemble the new content
+    local temp_conf
+    temp_conf=$(mktemp)
+
+    # Pre-populate with the desired state
+    echo "$wsl_conf_content" > "$temp_conf"
+
+    # Check if the file exists and if changes are actually needed
+    if [ -f "$wsl_conf_file" ] && cmp -s "$temp_conf" "$wsl_conf_file"; then
+        log_info_detail "wsl.conf is already correctly configured."
+        rm "$temp_conf"
+        return
+    fi
+
+    log_info_detail "Writing new configuration to $wsl_conf_file..."
+    # Use sudo to write the final content to the system location
+    # Quoting the here-string marker ensures variables inside aren't expanded
+    sudo tee "$wsl_conf_file" > /dev/null < "$temp_conf"
+
+    rm "$temp_conf"
+
+    log_success_detail "wsl.conf configured. A WSL restart is required for changes to take effect."
+    log_info_detail "You can restart WSL by running 'wsl.exe --shutdown' in PowerShell or CMD."
+}
+
 
 install_wslu() {
     if ! is_wsl; then
@@ -35,10 +70,17 @@ install_wslu() {
         return
     fi
 
+    # It's better to configure wsl.conf first
+    configure_wsl_conf
+
     log_info_detail "Running in WSL, proceeding with wslu installation."
 
     if ! command -v wslview &> /dev/null; then
         log_info_detail "wslu package not found. Installing..."
+        if ! sudo -v; then # Check for sudo permissions upfront
+             log_error_detail "Sudo permissions required. Please run the script with sudo or enter your password."
+             exit 1
+        fi
         if ! eval "$INSTALL_CMD" wslu; then
             log_error_detail "Failed to install wslu. Please install it manually."
             return 1
@@ -47,7 +89,7 @@ install_wslu() {
     else
         log_info_detail "wslu is already installed."
     fi
-
+    
     log_info_detail "Configuring BROWSER environment variable for WSL."
 
     local browser_export='export BROWSER="/usr/bin/wslview"'
@@ -69,3 +111,5 @@ install_wslu() {
 }
 
 install_wslu
+
+

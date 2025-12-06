@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Resolve the directory this script lives in so sources work regardless of CWD
-script_dir="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+script_dir="$(dirname "${BASH_SOURCE[0]}")"
 utils_local="$script_dir/../utils/utils.bash"
 platform_local="$script_dir/../utils/platform_detection.bash"
 

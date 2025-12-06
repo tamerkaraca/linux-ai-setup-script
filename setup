@@ -135,16 +135,24 @@ source_module() {
         # shellcheck source=/dev/null
         source "$local_path"
     else
-        if ! command -v curl &> /dev/null;
-        then
+        if ! command -v curl &> /dev/null; then
+            echo "${ERROR_TAG} $(setup_text_fmt curl_missing "$remote_rel_path")"
             exit 1
         fi
         local remote_url="${SCRIPT_BASE_URL}/${remote_rel_path}"
-        # shellcheck disable=SC1090
-        source <(curl -fsSL "$remote_url") || {
+        local temp_file
+        temp_file=$(mktemp)
+        if ! curl -fsSL "$remote_url" -o "$temp_file"; then
             echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
+            rm "$temp_file"
             exit 1
         }
+        source "$temp_file" || {
+            echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
+            rm "$temp_file"
+            exit 1
+        }
+        rm "$temp_file"
     fi
 }
 source_module "./modules/utils/utils.bash" "modules/utils/utils.bash"

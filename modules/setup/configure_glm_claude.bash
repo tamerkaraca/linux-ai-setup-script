@@ -248,7 +248,7 @@ maybe_reinstall_claude_cli() {
     if [[ "$reinstall_choice" =~ ^([eEyY])$ ]]; then
         require_node_version 18 "Claude Code CLI"
         log_info_detail "$(gl_text reinstall_running)"
-        if npm_install_global_with_fallback "@anthropic-ai/claude-code" "Claude Code CLI"; then
+        if install_package "Claude Code CLI" "npm" "claude" "@anthropic-ai/claude-code"; then
             log_success_detail "$(gl_text reinstall_done)"
         else
             log_error_detail "$(gl_text reinstall_fail)"

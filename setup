@@ -316,24 +316,42 @@ run_module() {
             echo -e "${RED}${ERROR_TAG}${NC} Failed to prepare remote module directory."
             return 1
         fi
-        # Download directly to the final location in /tmp
-        local temp_output="/tmp/download_$$_${module_name##*/}.bash"
-        if [ ! -f "$temp_output" ]; then
-            echo -e "${INFO_TAG} Attempting to download: $(basename "$module_url")"
-            if ! download_file "$module_url" "$temp_output"; then
-                echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
-                echo -e "${ERROR_TAG} Attempted URL: $module_url"
-                return 1
-            fi
-        fi
-        # Run the module directly from /tmp
-        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$temp_output" "$@"; then
-            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
-            rm -f "$temp_output"
+        # Download to /tmp and prepare environment
+        local temp_dir="/tmp/linux-ai-module-$$"
+        mkdir -p "$temp_dir/modules/utils"
+
+        # Download utils.bash first
+        if ! download_file "${SCRIPT_BASE_URL}/modules/utils/utils.bash" "$temp_dir/modules/utils/utils.bash"; then
+            echo -e "${RED}${ERROR_TAG}${NC} Failed to download utils.bash"
+            rm -rf "$temp_dir"
             return 1
         fi
-        # Clean up the downloaded file
-        rm -f "$temp_output"
+
+        # Download banner.bash
+        if ! download_file "${SCRIPT_BASE_URL}/modules/utils/banner.bash" "$temp_dir/modules/utils/banner.bash"; then
+            echo -e "${RED}${ERROR_TAG}${NC} Failed to download banner.bash"
+            rm -rf "$temp_dir"
+            return 1
+        fi
+
+        # Download the module itself
+        local module_file="${temp_dir}/${module_name}.bash"
+        echo -e "${INFO_TAG} Attempting to download: $(basename "$module_url")"
+        if ! download_file "$module_url" "$module_file"; then
+            echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
+            echo -e "${ERROR_TAG} Attempted URL: $module_url"
+            rm -rf "$temp_dir"
+            return 1
+        fi
+
+        # Run the module with proper environment
+        if ! (cd "$temp_dir" && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$module_file" "$@"); then
+            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
+            rm -rf "$temp_dir"
+            return 1
+        fi
+        # Clean up
+        rm -rf "$temp_dir"
     fi
     return 0
 }

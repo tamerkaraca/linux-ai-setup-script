@@ -176,10 +176,8 @@ main() {
                 fi
             fi
         else
-            log_info_detail "$(kilocode_text install_start)"
-            if ! npm_install_global_with_fallback "$package_spec" "Kilocode CLI"; then
-                log_error_detail "$(kilocode_text install_fail \""$package_spec"\")"
-                return 1
+            if ! install_package "Kilocode CLI" "npm" "kilocode" "@kilocode/cli"; then
+                 return 1
             fi
         fi
         reload_shell_configs silent

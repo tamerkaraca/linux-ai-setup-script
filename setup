@@ -410,24 +410,26 @@ main_menu() {
                             run_module "setup/php_composer"
                         fi
                     else
+                        # Option 1
                         update_system
                         run_module "setup/wslu"
                         run_module "setup/configure_windows_apps"
-                        run_module "menus/python_tools"
-                        run_module "menus/node" "all"
-                        run_module "menus/ai_cli_tools" "all"
-                        run_module "menus/aux_tools" "all"
-                        run_module "menus/ai_frameworks" "all"
-                        run_module "setup/configure_git"
-                        run_module "setup/configure_glm_claude"
-                        run_module "setup/github_cli"
-                        run_module "menus/terminal_tools" "all"
-                        echo -e "\n${YELLOW}$(setup_text prompt_install_php)${NC}"
-                        read -r install_php_choice </dev/tty
-                        if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
-                            run_module "setup/php_composer"
-                        fi
                         clean_windows_paths_from_rc
+                        
+                        # Option 2
+                        run_module "menus/python_tools" "all"
+                        
+                        # Option 3
+                        run_module "menus/node" "all"
+                        
+                        # Option 4
+                        run_module "menus/ai_cli_tools" "all"
+                        
+                        # Option 6
+                        run_module "setup/configure_git"
+                        
+                        # Option 10
+                        run_module "setup/github_cli"
                     fi
                     ;; 
                 0)

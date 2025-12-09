@@ -56,8 +56,6 @@ export SETUP_BRANCH="${CURRENT_BRANCH:-main}"
 declare -A SETUP_TEXT_EN=(
     ["log_module_local"]="Running module '%s' from local file..."
     ["log_module_error"]="An error occurred while running the '%s' module."
-    ["log_module_at"]="Module was at: %s"
-    ["log_working_dir"]="Working directory was: %s"
     ["log_module_remote"]="Downloading and running module '%s'..."
     ["log_remote_prepare_failed"]="Failed to prepare remote module directory."
     ["log_module_download_failed"]="Failed to download module '%s'."
@@ -97,8 +95,6 @@ declare -A SETUP_TEXT_EN=(
 declare -A SETUP_TEXT_TR=(
     ["log_module_local"]="'%s' modülü yerel dosyadan çalıştırılıyor..."
     ["log_module_error"]="'%s' modülü çalıştırılırken bir hata oluştu."
-    ["log_module_at"]="Modül konumu: %s"
-    ["log_working_dir"]="Çalışma dizini: %s"
     ["log_module_remote"]="'%s' modülü indiriliyor ve çalıştırılıyor..."
     ["log_remote_prepare_failed"]="Uzak modül dizini hazırlanamadı."
     ["log_module_download_failed"]="'%s' modülü indirilemedi."
@@ -133,12 +129,6 @@ declare -A SETUP_TEXT_TR=(
     ["crlf_restarting"]="Düzeltme tamamlandı, script yeniden başlatılıyor..."
     ["curl_missing"]="'curl' komutu bulunamadı; '%s' modülü yüklenemiyor."
     ["module_load_failed"]="'%s' adresinden modül yüklenemedi."
-    ["download_attempt"]="İndirme deneniyor: %s"
-    ["download_success"]="%d. denemede indirme başarılı"
-    ["download_failed"]="Tüm indirme denemeleri başarısız: %s"
-    ["download_attempt"]="Attempting to download: %s"
-    ["download_success"]="Download successful on attempt %d"
-    ["download_failed"]="All download attempts failed for: %s"
 )
 
 setup_text() {
@@ -330,32 +320,6 @@ run_module() {
 # Remote helper functions for modules
 set -euo pipefail
 
-# Simple text function for remote modules (fallback)
-setup_text() {
-    local key="$1"
-    case "$key" in
-        "info_tag") echo "BİLGİ" ;;
-        "success_tag") echo "BAŞARILI" ;;
-        "warning_tag") echo "UYARI" ;;
-        "error_tag") echo "HATA" ;;
-        *) echo "$key" ;;
-    esac
-}
-
-setup_text_fmt() {
-    local key="$1"
-    shift
-    local fmt
-    case "$key" in
-        "download_attempt") fmt="İndirme deneniyor: %s" ;;
-        "download_success") fmt="%d. denemede indirme başarılı" ;;
-        "download_failed") fmt="Tüm indirme denemeleri başarısız: %s" ;;
-        *) fmt="$key" ;;
-    esac
-    # shellcheck disable=SC2059
-    printf "$fmt" "$@"
-}
-
 # Download function for remote modules
 download_file() {
     local url="$1"
@@ -363,44 +327,30 @@ download_file() {
     local max_attempts=3
     local attempt=1
 
-    # Use i18n messages if available, fallback to English
-    local info_tag="[INFO]"
-    local success_tag="[SUCCESS]"
-    local warning_tag="[WARNING]"
-    local error_tag="[ERROR]"
-
-    # Try to get localized tags if setup_text function is available
-    if declare -f setup_text &>/dev/null; then
-        info_tag="[$(setup_text info_tag)]"
-        success_tag="[$(setup_text success_tag)]"
-        warning_tag="[$(setup_text warning_tag)]"
-        error_tag="[$(setup_text error_tag)]"
-    fi
-
-    echo "$info_tag $(setup_text_fmt download_attempt "$(basename "$url")")"
+    echo "[INFO] Attempting to download: $(basename "$url")"
     mkdir -p "$(dirname "$output")"
 
     while [ $attempt -le $max_attempts ]; do
         if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
            --user-agent "linux-ai-setup-script" "$url" -o "$output" 2>/tmp/curl_error.log; then
-            echo "$success_tag $(setup_text_fmt download_success "$attempt")"
+            echo "[SUCCESS] Download successful on attempt $attempt"
             return 0
         fi
 
         if [ -f /tmp/curl_error.log ] && [ -s /tmp/curl_error.log ]; then
-            echo "$warning_tag curl error: $(cat /tmp/curl_error.log | head -1)"
+            echo "[WARNING] curl error: $(cat /tmp/curl_error.log | head -1)"
             rm -f /tmp/curl_error.log
         fi
 
         if command -v wget &> /dev/null; then
-            echo "$info_tag Trying with wget..."
+            echo "[INFO] Trying with wget..."
             if wget --timeout=10 --tries=2 --user-agent="linux-ai-setup-script" \
                     -qO "$output" "$url" 2>/tmp/wget_error.log; then
-                echo "$success_tag $(setup_text_fmt download_success "$attempt")"
+                echo "[SUCCESS] Download successful with wget on attempt $attempt"
                 return 0
             fi
             if [ -f /tmp/wget_error.log ] && [ -s /tmp/wget_error.log ]; then
-                echo "$warning_tag wget error: $(cat /tmp/wget_error.log | head -1)"
+                echo "[WARNING] wget error: $(cat /tmp/wget_error.log | head -1)"
                 rm -f /tmp/wget_error.log
             fi
         fi
@@ -408,13 +358,13 @@ download_file() {
         [ -f "$output" ] && rm -f "$output"
 
         if [ $attempt -lt $max_attempts ]; then
-            echo "$warning_tag Download attempt $attempt/$max_attempts failed, retrying in 2 seconds..."
+            echo "[WARNING] Download attempt $attempt/$max_attempts failed, retrying in 2 seconds..."
             sleep 2
         fi
         ((attempt++))
     done
 
-    echo "$error_tag $(setup_text_fmt download_failed "$(basename "$url")")"
+    echo "[ERROR] All download attempts failed for: $(basename "$url")"
     return 1
 }
 
@@ -493,9 +443,9 @@ EOF
         # Run the module with proper environment
         echo -e "${INFO_TAG} Running module from: $(dirname "$remote_file")"
         if ! (cd "$remote_dir" && source utils/remote_helper.bash && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
-            echo -e "${RED}${ERROR_TAG}${NC} $(setup_text_fmt log_module_error "$module_name")"
-            echo -e "${ERROR_TAG} $(setup_text_fmt log_module_at "$remote_file")"
-            echo -e "${ERROR_TAG} $(setup_text_fmt log_working_dir "$remote_dir")"
+            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
+            echo -e "${ERROR_TAG} Module was at: $remote_file"
+            echo -e "${ERROR_TAG} Working directory was: $remote_dir"
             rm -rf "$remote_dir"
             return 1
         fi

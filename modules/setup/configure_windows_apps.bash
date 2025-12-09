@@ -126,8 +126,12 @@ create_windows_app_symlinks() {
         if [ -f "$win_path" ]; then
             if [ ! -L "$symlink_path" ]; then
                 log_info_detail "Creating symlink for '$app_name'..."
-                sudo ln -s "$win_path" "$symlink_path"
-                log_success_detail "Symlink for '$app_name' created at $symlink_path."
+                if sudo ln -s "$win_path" "$symlink_path" 2>/dev/null; then
+                    log_success_detail "Symlink for '$app_name' created at $symlink_path."
+                else
+                    log_warn_detail "Failed to create symlink for '$app_name' (sudo required)."
+                    log_info_detail "You can create it manually: sudo ln -s '$win_path' '$symlink_path'"
+                fi
             else
                 log_info_detail "Symlink for '$app_name' already exists."
             fi
@@ -140,4 +144,5 @@ create_windows_app_symlinks() {
     log_success "Windows application symlinking process complete."
 }
 
-create_windows_app_symlinks
+# Run the function and always exit successfully
+create_windows_app_symlinks || true

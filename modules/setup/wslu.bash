@@ -34,7 +34,7 @@ if [ "$utils_loaded" = false ] && declare -f source_module > /dev/null 2>&1; the
 fi
 
 if [ "$utils_loaded" = false ]; then
-    echo "[ERROR] Unable to load utils.bash (tried multiple locations)" >&2
+    log_error "Unable to load utils.bash (tried multiple locations)"
     exit 1
 fi
 
@@ -57,7 +57,7 @@ fi
 
 # Platform detection is crucial for WSL check
 if [ "$platform_loaded" = false ]; then
-    echo "[ERROR] Unable to load platform_detection.bash (tried multiple locations)" >&2
+    log_error "Unable to load platform_detection.bash (tried multiple locations)"
     exit 1
 fi
 

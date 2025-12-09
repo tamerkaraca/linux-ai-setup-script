@@ -8,7 +8,7 @@ if [ -f "$utils_local" ]; then
     # shellcheck source=/dev/null
     source "$utils_local"
 else
-    echo "[ERROR] Unable to load utils.bash" >&2
+    log_error "Unable to load utils.bash" >&2
     exit 1
 fi
 

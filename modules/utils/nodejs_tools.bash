@@ -22,7 +22,7 @@ elif [ -f "./utils.bash" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    echo "[ERROR] Unable to load utils.bash (tried $utils_local)" >&2
+    log_error "Unable to load utils.bash (tried $utils_local)"
     exit 1
 fi
 

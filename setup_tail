@@ -1,0 +1,10 @@
+        if [ "$exit_menu" = true ]; then
+            exit 0
+        fi
+        echo -e "\n${YELLOW}$(setup_text prompt_press_enter)${NC}"
+        read -r </dev/tty
+    done
+}
+
+# Script başladığında ana menüyü çağır
+main_menu

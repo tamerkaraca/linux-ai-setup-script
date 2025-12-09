@@ -12,7 +12,7 @@ elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/banner.bash" "modules/utils/banner.bash"
 else
     # We can't print a fancy error because the banner functions are what we're trying to source.
-    echo "[ERROR] CRITICAL: Unable to load banner.bash (tried $banner_local)" >&2
+    log_error "CRITICAL: Unable to load banner.bash (tried $banner_local)" >&2
 fi
 
 # Renkli çıktı için tanımlamalar
@@ -127,12 +127,34 @@ get_language_label() {
     esac
 }
 
+# Standard text function for all modules
+module_text() {
+    local key="$1"
+    local default_value="$2"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        # Try to find Turkish text in module-specific arrays
+        local tr_var="${key}_TR"
+        if declare -p "$tr_var" 2>/dev/null | grep -q "declare.*A"; then
+            local tr_value
+            eval "tr_value=\${$tr_var[\"\$key\"]:-\"\$default_value\"}"
+            if [ "$tr_value" != "$default_value" ]; then
+                echo "$tr_value"
+                return
+            fi
+        fi
+    fi
+    echo "$default_value"
+}
+
 # Detailed Logging System
 _log_detailed() {
     local level="$1"
     local message="$2"
     local timestamp
     # timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+
+    # Refresh language tags to ensure we have current language settings
+    refresh_language_tags
 
     declare -A color_map
     color_map["INFO"]="$CYAN"

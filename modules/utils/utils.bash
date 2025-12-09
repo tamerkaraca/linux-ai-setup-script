@@ -150,17 +150,26 @@ module_text() {
 get_i18n_message() {
     local key="$1"
     local default="$2"
+    local param="${3:-}"
+
+    # Use the passed parameter for file paths, otherwise use default
+    local message="$default"
     if [ "${LANGUAGE:-en}" = "tr" ]; then
         case "$key" in
-            "updating_system_packages") echo "Sistem paketleri güncelleniyor..." ;;
-            "update_cmd_not_defined") echo "Güncelleme komutu tanımlanmamış. Sistem güncellemesi atlanıyor." ;;
-            "cleaning_windows_paths") echo "Kabuk yapılandırmalarından Windows yolları temizleniyor..." ;;
-            "cleaned_windows_paths") echo "$2 dosyasından Windows yolları temizlendi." ;;
-            *) echo "$default" ;;
+            "updating_system_packages") message="Sistem paketleri güncelleniyor..." ;;
+            "update_cmd_not_defined") message="Güncelleme komutu tanımlanmamış. Sistem güncellemesi atlanıyor." ;;
+            "cleaning_windows_paths") message="Kabuk yapılandırmalarından Windows yolları temizleniyor..." ;;
+            "cleaned_windows_paths") message="$param dosyasından Windows yolları temizlendi." ;;
+            *) message="$default" ;;
         esac
-    else
-        echo "$default"
     fi
+
+    # Replace %s placeholder if param is provided
+    if [ -n "$param" ] && [[ "$message" == *"%s"* ]]; then
+        message="${message//%s/$param}"
+    fi
+
+    echo "$message"
 }
 
 # Detailed Logging System

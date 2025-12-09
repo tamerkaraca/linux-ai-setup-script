@@ -140,6 +140,9 @@ declare -A SETUP_TEXT_TR=(
     ["update_cmd_not_defined"]="Güncelleme komutu tanımlanmamış. Sistem güncellemesi atlanıyor."
     ["cleaning_windows_paths"]="Kabuk yapılandırmalarından Windows yolları temizleniyor..."
     ["cleaned_windows_paths"]="%s dosyasından Windows yolları temizlendi."
+    ["downloading_utils"]="utils.bash %s konumuna indiriliyor..."
+    ["from_url"]="URL'den: %s"
+    ["utils_downloaded"]="utils.bash başarıyla indirildi"
     ["download_attempt"]="Attempting to download: %s"
     ["download_success"]="Download successful on attempt %d"
     ["download_failed"]="All download attempts failed for: %s"
@@ -147,6 +150,9 @@ declare -A SETUP_TEXT_TR=(
     ["update_cmd_not_defined"]="Update command not defined. Skipping system update."
     ["cleaning_windows_paths"]="Cleaning Windows paths from shell configs..."
     ["cleaned_windows_paths"]="Cleaned Windows paths from %s."
+    ["downloading_utils"]="Downloading utils.bash to %s..."
+    ["from_url"]="From URL: %s"
+    ["utils_downloaded"]="utils.bash downloaded successfully"
 )
 
 setup_text() {
@@ -299,8 +305,8 @@ run_module() {
             return 1
         fi
     else
-        echo -e "${CYAN}${INFO_TAG}${NC} Downloading and running module '$module_name'..."
-        echo -e "${INFO_TAG} Module URL: $module_url"
+        echo -e "${CYAN}${INFO_TAG}${NC} $(setup_text_fmt log_module_remote "$module_name")"
+        echo -e "${INFO_TAG} $(setup_text_fmt log_module_url "$module_url")"
 
         # Create remote module directory structure
         local remote_dir="$HOME/.linux-ai-setup-script/remote_modules_$$"
@@ -460,8 +466,8 @@ EOF
 
         # Download utils.bash using the remote_helper's download_file function
         if [ ! -f "$remote_dir/utils/utils.bash" ]; then
-            echo -e "${INFO_TAG} Downloading utils.bash to $remote_dir/utils/utils.bash..."
-            echo -e "${INFO_TAG} From URL: ${SCRIPT_BASE_URL}/modules/utils/utils.bash"
+            echo -e "${INFO_TAG} $(setup_text_fmt downloading_utils "$remote_dir/utils/utils.bash")"
+            echo -e "${INFO_TAG} $(setup_text_fmt from_url "${SCRIPT_BASE_URL}/modules/utils/utils.bash")"
             if ! (cd "$remote_dir" && source utils/remote_helper.bash && download_file "${SCRIPT_BASE_URL}/modules/utils/utils.bash" "utils/utils.bash"); then
                 echo -e "${RED}${ERROR_TAG}${NC} Failed to download utils.bash"
                 echo -e "${ERROR_TAG} Directory contents:"
@@ -469,7 +475,7 @@ EOF
                 rm -rf "$remote_dir"
                 return 1
             fi
-            echo -e "${SUCCESS_TAG} utils.bash downloaded successfully"
+            echo -e "${SUCCESS_TAG} $(setup_text utils_downloaded)"
         fi
 
         # Download banner.bash

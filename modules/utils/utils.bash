@@ -146,6 +146,23 @@ module_text() {
     echo "$default_value"
 }
 
+# i18n support for utils
+get_i18n_message() {
+    local key="$1"
+    local default="$2"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        case "$key" in
+            "updating_system_packages") echo "Sistem paketleri güncelleniyor..." ;;
+            "update_cmd_not_defined") echo "Güncelleme komutu tanımlanmamış. Sistem güncellemesi atlanıyor." ;;
+            "cleaning_windows_paths") echo "Kabuk yapılandırmalarından Windows yolları temizleniyor..." ;;
+            "cleaned_windows_paths") echo "$2 dosyasından Windows yolları temizlendi." ;;
+            *) echo "$default" ;;
+        esac
+    else
+        echo "$default"
+    fi
+}
+
 # Detailed Logging System
 _log_detailed() {
     local level="$1"
@@ -276,11 +293,11 @@ detect_package_manager() {
 }
 
 update_system() {
-    log_info_detail "Updating system packages..."
+    log_info_detail "$(get_i18n_message "updating_system_packages" "Updating system packages...")"
     if [ -n "${UPDATE_CMD:-}" ]; then
         eval "$UPDATE_CMD"
     else
-        log_warn_detail "Update command not defined. Skipping system update."
+        log_warn_detail "$(get_i18n_message "update_cmd_not_defined" "Update command not defined. Skipping system update.")"
     fi
 }
 export -f update_system
@@ -603,7 +620,7 @@ export -f retry_command
 export -f download_with_fallback
 
 clean_windows_paths_from_rc() {
-    log_info_detail "Cleaning Windows paths from shell configs..."
+    log_info_detail "$(get_i18n_message "cleaning_windows_paths" "Cleaning Windows paths from shell configs...")"
 
     # Clean current PATH for this session
     local original_path="$PATH"
@@ -619,7 +636,7 @@ clean_windows_paths_from_rc() {
             # Remove lines that export a PATH containing /mnt/
             sed -i '/export PATH=.*\/mnt\//d' "$rc_file"
             
-            log_success_detail "Cleaned Windows paths from $rc_file."
+            log_success_detail "$(get_i18n_message "cleaned_windows_paths" "Cleaned Windows paths from $rc_file." "$rc_file")"
         fi
     done
 }

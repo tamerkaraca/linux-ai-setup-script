@@ -1,0 +1,16 @@
+GEMINI.md
+AGENTS.md
+CLAUDE.md
+WARP.md
+.qoder/
+.claude/
+.serena/
+.qwen/
+.codex/
+openspec/
+.aider*
+.github/
+.gitlab/
+.vscode/
+.idea/
+*.log

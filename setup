@@ -80,6 +80,7 @@ declare -A SETUP_TEXT_EN=(
     ["menu_option11"]="Remove AI Frameworks"
     ["menu_option12"]="Manage MCP Servers"
     ["menu_option13"]="Install Terminal Tools (Zsh, Oh My Zsh)"
+    ["menu_option14"]="ASDF Version Manager (Node, Java, PHP)"
     ["menu_optionA"]="Install Everything (Recommended)"
     ["menu_optionR"]="Uninstall All Tools"
     ["menu_option0"]="Exit"
@@ -121,6 +122,7 @@ declare -A SETUP_TEXT_TR=(
     ["menu_option11"]="AI Framework'lerini Kaldır"
     ["menu_option12"]="MCP Sunucularını Yönet"
     ["menu_option13"]="Terminal Araçlarını Kur (Zsh, Oh My Zsh)"
+    ["menu_option14"]="ASDF Sürüm Yöneticisi (Node, Java, PHP)"
     ["menu_optionA"]="Tümünü Kur (Önerilen)"
     ["menu_optionR"]="Tüm Araçları Kaldır"
     ["menu_option0"]="Çıkış"
@@ -599,6 +601,7 @@ main_menu() {
             echo -e "  ${GREEN}11${NC} - $(setup_text menu_option11)"
             echo -e "  ${GREEN}12${NC} - $(setup_text menu_option12)"
             echo -e "  ${GREEN}13${NC} - $(setup_text menu_option13)"
+            echo -e "  ${GREEN}14${NC} - $(setup_text menu_option14)"
             echo -e "  ${GREEN}A${NC} - $(setup_text menu_optionA)"
             echo -e "  ${GREEN}L${NC} - $(setup_text menu_language_option) ($(get_language_label "$LANGUAGE"))"
             echo -e "  ${RED}R${NC} - $(setup_text menu_optionR)"
@@ -713,6 +716,7 @@ main_menu() {
                     fi
                     ;;
                 13) run_module "menus/terminal_tools" ;;
+                14) run_module "menus/asdf_tools" ;;
                 L)
                     language_menu
                     ;;

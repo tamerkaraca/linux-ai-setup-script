@@ -26,6 +26,15 @@ fi
 
 CURRENT_LANG="${LANGUAGE:-en}"
 
+# Helper function to run commands with TTY attached
+attach_tty_and_run() {
+    if [ -e /dev/tty ] && [ -r /dev/tty ]; then
+        "$@" </dev/tty
+    else
+        "$@"
+    fi
+}
+
 # Text definitions for PHP version installation
 declare -A PHP_TEXT_EN=(
     ["menu_title"]="PHP Version Installation Menu"

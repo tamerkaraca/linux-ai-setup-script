@@ -356,7 +356,12 @@ install_php_deps() {
                 libgd-dev libcurl4-openssl-dev libedit-dev libicu-dev libjpeg-dev \
                 libmysqlclient-dev libonig-dev libpng-dev libpq-dev libreadline-dev \
                 libsqlite3-dev libssl-dev libxml2-dev libzip-dev openssl pkg-config \
-                re2c zlib1g-dev >/dev/null 2>&1
+                re2c zlib1g-dev mlocate >/dev/null 2>&1 || \
+            sudo apt-get install -y autoconf bison build-essential curl gettext git \
+                libgd-dev libcurl4-openssl-dev libedit-dev libicu-dev libjpeg-dev \
+                libmysqlclient-dev libonig-dev libpng-dev libpq-dev libreadline-dev \
+                libsqlite3-dev libssl-dev libxml2-dev libzip-dev openssl pkg-config \
+                re2c zlib1g-dev plocate >/dev/null 2>&1 || true
             ;;
         dnf|dnf5|yum)
             sudo ${PKG_MANAGER:-dnf} install -y autoconf bison gcc gcc-c++ git curl \
@@ -454,7 +459,25 @@ install_java_via_asdf() {
 }
 
 install_php_via_asdf() {
-    install_asdf_plugin "php" "https://github.com/asdf-community/asdf-php.git" "latest" "install_php_deps" "php"
+    # Note: asdf-php plugin is incompatible with ASDF v0.18+
+    # Redirect users to the dedicated PHP installation menu
+    local msg_title msg_reason msg_use_menu
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        msg_title="PHP ASDF Eklentisi Uyumsuz"
+        msg_reason="asdf-php eklentisi ASDF v0.18+ ile uyumlu değil."
+        msg_use_menu="PHP kurmak için ana menüden seçenek 9'u (PHP Sürümleri) kullanın."
+    else
+        msg_title="PHP ASDF Plugin Incompatible"
+        msg_reason="The asdf-php plugin is not compatible with ASDF v0.18+."
+        msg_use_menu="To install PHP, use option 9 (PHP Versions) from the main menu."
+    fi
+    
+    echo
+    log_warn_detail "$msg_title"
+    log_warn_detail "$msg_reason"
+    log_info_detail "$msg_use_menu"
+    echo
+    return 0
 }
 
 # --- Main ---

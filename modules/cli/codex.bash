@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -58,6 +58,8 @@ declare -A CODEX_TEXT_EN=(
     ["usage_model"]="Switch model"
     ["usage_upgrade"]="Upgrade Codex CLI"
     ["install_done"]="OpenAI Codex CLI installation completed!"
+    ["install_failed"]="Codex CLI installation failed. Aborting."
+    ["cmd_not_found"]="Codex command not found after installation. Aborting post-install steps."
 )
 
 declare -A CODEX_TEXT_TR=(
@@ -91,6 +93,8 @@ declare -A CODEX_TEXT_TR=(
     ["usage_model"]="Model değiştirme"
     ["usage_upgrade"]="Güncelle"
     ["install_done"]="OpenAI Codex CLI kurulumu tamamlandı!"
+    ["install_failed"]="Codex CLI kurulumu başarısız oldu. İptal ediliyor."
+    ["cmd_not_found"]="Codex komutu kurulumdan sonra bulunamadı. Kurulum sonrası adımlar iptal ediliyor."
 )
 
 codex_text() {
@@ -126,13 +130,13 @@ main() {
     local install_status=$?
 
     if [ $install_status -ne 0 ]; then
-        log_error_detail "Codex CLI installation failed. Aborting."
+        log_error_detail "$(codex_text install_failed)"
         return 1
     fi
     
     # If the command is still not found after successful install (e.g. PATH issue), exit.
     if ! command -v codex &> /dev/null; then
-        log_error_detail "Codex command not found after installation. Aborting post-install steps."
+        log_error_detail "$(codex_text cmd_not_found)"
         return 1
     fi
 

@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -42,6 +42,7 @@ declare -A AIDER_TEXT_EN=(
     ["batch_skip"]="API key setup skipped in batch mode."
     ["batch_note"]="Before running '%s', please export the necessary API keys (e.g., OPENAI_API_KEY)."
     ["install_done"]="Aider CLI installation completed successfully!"
+    ["already_installed"]="Aider CLI is already installed:"
 )
 
 declare -A AIDER_TEXT_TR=(
@@ -56,6 +57,7 @@ declare -A AIDER_TEXT_TR=(
     ["batch_skip"]="Toplu kurulum modunda API anahtarı kurulumu atlandı."
     ["batch_note"]="'%s' komutunu çalıştırmadan önce, lütfen gerekli API anahtarlarını (örn. OPENAI_API_KEY) export edin."
     ["install_done"]="Aider CLI kurulumu başarıyla tamamlandı!"
+    ["already_installed"]="Aider CLI zaten kurulu:"
 )
 
 aider_text() {
@@ -77,7 +79,7 @@ main() {
     log_info_detail "$(aider_text install_title)"
     
     if command -v aider &>/dev/null; then
-        log_success_detail "Aider CLI is already installed: $(aider --version 2>/dev/null || echo 'unknown')"
+        log_success_detail "$(aider_text already_installed) $(aider --version 2>/dev/null || echo 'unknown')"
     else
         local installer_script
         installer_script=$(mktemp)

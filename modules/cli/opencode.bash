@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -42,6 +42,11 @@ declare -A OPCODE_TEXT_EN=(
     ["manual_hint"]="Manual login may be required."
     ["install_done"]="OpenCode CLI installation completed!"
     ["auth_prompt"]="Press Enter to continue..."
+    ["already_installed"]="OpenCode CLI is already installed:"
+    ["installed_success"]="OpenCode CLI installed:"
+    ["shim_not_found"]="Binary 'opencode' not found in '%s'. Attempting to create a shim."
+    ["shim_created"]="Successfully created a shim for 'opencode' at '%s'."
+    ["shim_fail"]="Could not create shim. Main JS entry not found at '%s'."
 )
 
 declare -A OPCODE_TEXT_TR=(
@@ -59,6 +64,11 @@ declare -A OPCODE_TEXT_TR=(
     ["manual_hint"]="Manuel oturum açma gerekebilir."
     ["install_done"]="OpenCode CLI kurulumu tamamlandı!"
     ["auth_prompt"]="Devam etmek için Enter'a basın..."
+    ["already_installed"]="OpenCode CLI zaten kurulu:"
+    ["installed_success"]="OpenCode CLI kuruldu:"
+    ["shim_not_found"]="'%s' içinde 'opencode' binary dosyası bulunamadı. Shim oluşturmaya çalışılıyor."
+    ["shim_created"]="'%s' konumunda 'opencode' için shim başarıyla oluşturuldu."
+    ["shim_fail"]="Shim oluşturulamadı. Ana JS giriş dosyası '%s' konumunda bulunamadı."
 )
 
 opencode_text() {
@@ -88,7 +98,7 @@ ensure_opencode_binary() {
         return 0
     fi
 
-    log_warn_detail "Binary 'opencode' not found in '${prefix}/bin'. Attempting to create a shim."
+    log_warn_detail "$(printf "$(opencode_text shim_not_found)" "${prefix}/bin")"
     local pkg_root="${prefix}/lib/node_modules/opencode-ai"
     local js_entry="${pkg_root}/bin/opencode.js"
     if [ -f "$js_entry" ]; then
@@ -99,10 +109,10 @@ exec "\$NODE_BIN" "$js_entry" "\$@"
 EOF
         chmod +x "$bin_path"
         ensure_path_contains_dir "${prefix}/bin" "OpenCode CLI shim"
-        log_success_detail "Successfully created a shim for 'opencode' at '$bin_path'."
+        log_success_detail "$(printf "$(opencode_text shim_created)" "$bin_path")"
         return 0
     fi
-    log_error_detail "Could not create shim. Main JS entry not found at '$js_entry'."
+    log_error_detail "$(printf "$(opencode_text shim_fail)" "$js_entry")"
     return 1
 }
 
@@ -117,7 +127,7 @@ main() {
     ensure_npm_ready || return 1
 
     if command -v opencode &> /dev/null; then
-        log_success_detail "OpenCode CLI is already installed: $(opencode --version)"
+        log_success_detail "$(opencode_text already_installed) $(opencode --version)"
     else
         if ! install_package "OpenCode CLI" "npm" "opencode" "opencode-ai"; then
             log_error_detail "$(opencode_text install_fail)"
@@ -131,7 +141,7 @@ main() {
         hash -r 2>/dev/null || true
 
         if command -v opencode &> /dev/null; then
-            log_success_detail "OpenCode CLI installed: $(opencode --version)"
+            log_success_detail "$(opencode_text installed_success) $(opencode --version)"
         else
             log_error_detail "$(opencode_text command_missing)"
             return 1

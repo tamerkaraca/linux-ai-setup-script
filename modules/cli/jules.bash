@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -41,6 +41,8 @@ declare -A JULES_TEXT_EN=(
     ["manual_hint"]="Manual authentication may be required."
     ["install_done"]="Jules CLI installation completed!"
     ["auth_prompt"]="Press Enter to continue..."
+    ["cmd_not_found"]="Jules command not found after installation."
+    ["version_info"]="Jules CLI version:"
 )
 
 declare -A JULES_TEXT_TR=(
@@ -54,6 +56,8 @@ declare -A JULES_TEXT_TR=(
     ["manual_hint"]="Manuel oturum açma gerekebilir."
     ["install_done"]="Jules CLI kurulumu tamamlandı!"
     ["auth_prompt"]="Devam etmek için Enter'a basın..."
+    ["cmd_not_found"]="Jules komutu kurulumdan sonra bulunamadı."
+    ["version_info"]="Jules CLI sürümü:"
 )
 
 jules_text() {
@@ -84,11 +88,11 @@ main() {
     fi
 
     if ! command -v jules &> /dev/null; then
-        log_error_detail "Jules command not found after installation."
+        log_error_detail "$(jules_text cmd_not_found)"
         return 1
     fi
     
-    log_success_detail "Jules CLI version: $(jules --version)"
+    log_success_detail "$(jules_text version_info) $(jules --version)"
     
     if [ "$interactive_mode" = true ]; then
         echo

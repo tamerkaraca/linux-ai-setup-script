@@ -17,7 +17,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -49,6 +49,8 @@ declare -A AUGGIE_TEXT_EN=(
     ["press_enter"]="Press Enter to continue..."
     ["batch_skip"]="Authentication skipped in batch mode. Run '%s' later."
     ["install_done"]="Auggie CLI installation completed! Docs: %s"
+    ["package_required"]="'--package' option requires a value."
+    ["unknown_arg"]="Unknown argument: %s"
 )
 
 declare -A AUGGIE_TEXT_TR=(
@@ -67,6 +69,8 @@ declare -A AUGGIE_TEXT_TR=(
     ["press_enter"]="Devam etmek için Enter'a basın..."
     ["batch_skip"]="Toplu modda kimlik doğrulama atlandı. Kurulum sonrası '%s' komutunu çalıştırmayı unutmayın."
     ["install_done"]="Auggie CLI kurulumu tamamlandı! Detaylı rehber: %s"
+    ["package_required"]="'--package' seçeneği bir değer gerektirir."
+    ["unknown_arg"]="Bilinmeyen argüman: %s"
 )
 
 auggie_text() {
@@ -95,14 +99,14 @@ main() {
         case "$1" in
             --package)
                 if [ -z "${2:-}" ]; then
-                    log_error_detail "'--package' option requires a value."
+                    log_error_detail "$(auggie_text package_required)"
                     return 1
                 fi
                 package_spec="$2"
                 shift
                 ;;
             *)
-                log_warn_detail "Unknown argument: $1"
+                log_warn_detail "$(printf "$(auggie_text unknown_arg)" "$1")"
                 ;;
         esac
         shift || true

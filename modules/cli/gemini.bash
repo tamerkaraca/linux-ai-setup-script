@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -36,10 +36,12 @@ declare -A GEMINI_TEXT_EN=(
     ["interactive_command"]="Please run 'gemini auth' and complete the flow."
     ["interactive_wait"]="Press Enter once authentication is complete."
     ["manual_skip"]="Authentication skipped in 'Install All' mode."
-    ["manual_reminder"]="Please run '${GREEN}gemini auth${NC}' manually later."
+    ["manual_reminder"]="Please run 'gemini auth' manually later."
     ["manual_hint"]="Manual authentication may be required."
     ["install_done"]="Gemini CLI installation and configuration finished!"
     ["auth_prompt"]="Press Enter to continue..."
+    ["install_failed"]="Gemini CLI installation failed. Aborting post-install steps."
+    ["cmd_not_found"]="Gemini command not found after installation. Aborting post-install steps."
 )
 
 declare -A GEMINI_TEXT_TR=(
@@ -47,10 +49,12 @@ declare -A GEMINI_TEXT_TR=(
     ["interactive_command"]="Lütfen 'gemini auth' komutunu çalıştırıp oturumu tamamlayın."
     ["interactive_wait"]="Kimlik doğrulama tamamlanınca Enter'a basın."
     ["manual_skip"]="'Tümünü Kur' modunda kimlik doğrulama atlandı."
-    ["manual_reminder"]="Lütfen daha sonra '${GREEN}gemini auth${NC}' komutunu manuel olarak çalıştırın."
+    ["manual_reminder"]="Lütfen daha sonra 'gemini auth' komutunu manuel olarak çalıştırın."
     ["manual_hint"]="Manuel oturum açma gerekebilir."
     ["install_done"]="Gemini CLI kurulumu ve yapılandırması tamamlandı!"
     ["auth_prompt"]="Devam etmek için Enter'a basın..."
+    ["install_failed"]="Gemini CLI kurulumu başarısız. Kurulum sonrası adımlar iptal ediliyor."
+    ["cmd_not_found"]="Gemini komutu kurulumdan sonra bulunamadı. Kurulum sonrası adımlar iptal ediliyor."
 )
 
 gemini_text() {
@@ -78,13 +82,13 @@ main() {
 
     # If installation failed, exit
     if [ $install_status -ne 0 ]; then
-        log_error_detail "Gemini CLI installation failed. Aborting post-install steps."
+        log_error_detail "$(gemini_text install_failed)"
         return 1
     fi
     
     # If the command is still not found after successful install (e.g. PATH issue), exit.
     if ! command -v gemini &> /dev/null; then
-        log_error_detail "Gemini command not found after installation. Aborting post-install steps."
+        log_error_detail "$(gemini_text cmd_not_found)"
         return 1
     fi
 

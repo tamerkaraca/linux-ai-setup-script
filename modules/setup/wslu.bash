@@ -34,7 +34,7 @@ if [ "$utils_loaded" = false ] && declare -f source_module > /dev/null 2>&1; the
 fi
 
 if [ "$utils_loaded" = false ]; then
-    log_error "Unable to load utils.bash (tried multiple locations)"
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried multiple locations)"
     exit 1
 fi
 
@@ -57,16 +57,80 @@ fi
 
 # Platform detection is crucial for WSL check
 if [ "$platform_loaded" = false ]; then
-    log_error "Unable to load platform_detection.bash (tried multiple locations)"
+    echo "[HATA/ERROR] platform_detection.bash yüklenemedi / Unable to load platform_detection.bash (tried multiple locations)"
     exit 1
 fi
+
+# --- i18n Support ---
+declare -A WSLU_TEXT_EN=(
+    ["not_wsl"]="Not running in WSL, skipping wslu installation."
+    ["config_wsl_conf"]="Configuring wsl.conf to optimize WSL/Windows interop..."
+    ["wsl_conf_ok"]="wsl.conf is already correctly configured."
+    ["wsl_conf_writing"]="Writing new configuration to %s..."
+    ["wsl_conf_done"]="wsl.conf configured. A WSL restart is required for changes to take effect."
+    ["wsl_restart_hint"]="You can restart WSL by running 'wsl.exe --shutdown' in PowerShell or CMD."
+    ["running_wsl"]="Running in WSL, proceeding with wslu installation."
+    ["wslu_not_found"]="wslu package not found. Installing..."
+    ["sudo_not_available"]="Sudo permissions not available. Skipping wslu installation."
+    ["wslu_optional"]="Note: wslu is optional and provides WSL browser integration."
+    ["wslu_install_failed"]="Failed to install wslu. This is optional for WSL browser integration."
+    ["wslu_manual_hint"]="You can install wslu manually later with: sudo apt install wslu"
+    ["wslu_installed"]="wslu installed successfully."
+    ["wslu_already"]="wslu is already installed."
+    ["config_browser"]="Configuring BROWSER environment variable for WSL."
+    ["adding_browser"]="Adding BROWSER export to %s"
+    ["browser_exists"]="BROWSER export already exists in %s."
+    ["browser_done"]="WSL browser integration configured. Please restart your shell or run 'source ~/.bashrc' (or ~/.zshrc)."
+    ["no_pkg_manager"]="No supported package manager found for wslu installation."
+)
+
+declare -A WSLU_TEXT_TR=(
+    ["not_wsl"]="WSL'de çalışmıyor, wslu kurulumu atlanıyor."
+    ["config_wsl_conf"]="wsl.conf WSL/Windows etkileşimi için yapılandırılıyor..."
+    ["wsl_conf_ok"]="wsl.conf zaten doğru yapılandırılmış."
+    ["wsl_conf_writing"]="Yeni yapılandırma %s dosyasına yazılıyor..."
+    ["wsl_conf_done"]="wsl.conf yapılandırıldı. Değişikliklerin geçerli olması için WSL yeniden başlatılmalı."
+    ["wsl_restart_hint"]="PowerShell veya CMD'de 'wsl.exe --shutdown' çalıştırarak WSL'i yeniden başlatabilirsiniz."
+    ["running_wsl"]="WSL'de çalışıyor, wslu kurulumuna devam ediliyor."
+    ["wslu_not_found"]="wslu paketi bulunamadı. Kuruluyor..."
+    ["sudo_not_available"]="Sudo izinleri mevcut değil. wslu kurulumu atlanıyor."
+    ["wslu_optional"]="Not: wslu isteğe bağlıdır ve WSL tarayıcı entegrasyonu sağlar."
+    ["wslu_install_failed"]="wslu kurulamadı. Bu WSL tarayıcı entegrasyonu için isteğe bağlıdır."
+    ["wslu_manual_hint"]="wslu'yu daha sonra manuel olarak kurabilirsiniz: sudo apt install wslu"
+    ["wslu_installed"]="wslu başarıyla kuruldu."
+    ["wslu_already"]="wslu zaten kurulu."
+    ["config_browser"]="WSL için BROWSER ortam değişkeni yapılandırılıyor."
+    ["adding_browser"]="BROWSER export %s dosyasına ekleniyor"
+    ["browser_exists"]="BROWSER export zaten %s dosyasında mevcut."
+    ["browser_done"]="WSL tarayıcı entegrasyonu yapılandırıldı. Lütfen kabuğunuzu yeniden başlatın veya 'source ~/.bashrc' (veya ~/.zshrc) çalıştırın."
+    ["no_pkg_manager"]="wslu kurulumu için desteklenen paket yöneticisi bulunamadı."
+)
+
+get_text() {
+    local key="$1"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${WSLU_TEXT_TR[$key]:-${WSLU_TEXT_EN[$key]:-$key}}"
+    else
+        printf "%s" "${WSLU_TEXT_EN[$key]:-$key}"
+    fi
+}
+
+get_text_fmt() {
+    local key="$1"
+    shift
+    local fmt
+    fmt=$(get_text "$key")
+    # shellcheck disable=SC2059
+    printf "$fmt" "$@"
+}
+# --- End i18n Support ---
 
 configure_wsl_conf() {
     if ! is_wsl; then
         return
     fi
 
-    log_info_detail "Configuring wsl.conf to optimize WSL/Windows interop..."
+    log_info_detail "$(get_text config_wsl_conf)"
 
     local wsl_conf_content="[boot]\nsystemd=true\n\n[interop]\nappendWindowsPath = false\n"
     local wsl_conf_file="/etc/wsl.conf"
@@ -80,20 +144,20 @@ configure_wsl_conf() {
 
     # Check if the file exists and if changes are actually needed
     if [ -f "$wsl_conf_file" ] && cmp -s "$temp_conf" "$wsl_conf_file"; then
-        log_info_detail "wsl.conf is already correctly configured."
+        log_info_detail "$(get_text wsl_conf_ok)"
         rm "$temp_conf"
         return
     fi
 
-    log_info_detail "Writing new configuration to $wsl_conf_file..."
+    log_info_detail "$(get_text_fmt wsl_conf_writing "$wsl_conf_file")"
     # Use sudo to write the final content to the system location
     # Quoting the here-string marker ensures variables inside aren't expanded
     sudo tee "$wsl_conf_file" > /dev/null < "$temp_conf"
 
     rm "$temp_conf"
 
-    log_success_detail "wsl.conf configured. A WSL restart is required for changes to take effect."
-    log_info_detail "You can restart WSL by running 'wsl.exe --shutdown' in PowerShell or CMD."
+    log_success_detail "$(get_text wsl_conf_done)"
+    log_info_detail "$(get_text wsl_restart_hint)"
 }
 
 
@@ -110,20 +174,20 @@ is_wsl_fallback() {
 
 install_wslu() {
     if ! is_wsl_fallback; then
-        log_info_detail "Not running in WSL, skipping wslu installation."
+        log_info_detail "$(get_text not_wsl)"
         return
     fi
 
     # It's better to configure wsl.conf first
     configure_wsl_conf
 
-    log_info_detail "Running in WSL, proceeding with wslu installation."
+    log_info_detail "$(get_text running_wsl)"
 
     if ! command -v wslview &> /dev/null; then
-        log_info_detail "wslu package not found. Installing..."
+        log_info_detail "$(get_text wslu_not_found)"
         if ! sudo -v; then # Check for sudo permissions upfront
-             log_warn_detail "Sudo permissions not available. Skipping wslu installation."
-             log_info_detail "Note: wslu is optional and provides WSL browser integration."
+             log_warn_detail "$(get_text sudo_not_available)"
+             log_info_detail "$(get_text wslu_optional)"
              return 0
         fi
         
@@ -137,39 +201,39 @@ install_wslu() {
             elif command -v yum &> /dev/null; then
                 INSTALL_CMD="sudo yum install -y"
             else
-                log_error_detail "No supported package manager found for wslu installation."
+                log_error_detail "$(get_text no_pkg_manager)"
                 return 1
             fi
         fi
         
         if ! eval "$INSTALL_CMD" wslu; then
-            log_warn_detail "Failed to install wslu. This is optional for WSL browser integration."
-            log_info_detail "You can install wslu manually later with: sudo apt install wslu"
+            log_warn_detail "$(get_text wslu_install_failed)"
+            log_info_detail "$(get_text wslu_manual_hint)"
             return 0  # Don't fail the entire installation for an optional package
         fi
-        log_success_detail "wslu installed successfully."
+        log_success_detail "$(get_text wslu_installed)"
     else
-        log_info_detail "wslu is already installed."
+        log_info_detail "$(get_text wslu_already)"
     fi
     
-    log_info_detail "Configuring BROWSER environment variable for WSL."
+    log_info_detail "$(get_text config_browser)"
 
     local browser_export='export BROWSER="/usr/bin/wslview"'
     
     for rc_file in "$HOME/.bashrc" "$HOME/.zshrc"; do
         if [ -f "$rc_file" ]; then
             if ! grep -q 'export BROWSER="/usr/bin/wslview"' "$rc_file"; then
-                log_info_detail "Adding BROWSER export to $rc_file"
+                log_info_detail "$(get_text_fmt adding_browser "$rc_file")"
                 echo '' >> "$rc_file"
                 echo "# Set BROWSER to wslview for WSL integration" >> "$rc_file"
                 echo "$browser_export" >> "$rc_file"
             else
-                log_info_detail "BROWSER export already exists in $rc_file."
+                log_info_detail "$(get_text_fmt browser_exists "$rc_file")"
             fi
         fi
     done
 
-    log_success_detail "WSL browser integration configured. Please restart your shell or run 'source ~/.bashrc' (or ~/.zshrc)."
+    log_success_detail "$(get_text browser_done)"
 }
 
 install_wslu

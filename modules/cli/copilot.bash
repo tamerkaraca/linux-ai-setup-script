@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -49,6 +49,9 @@ declare -A COPILOT_TEXT_EN=(
     ["usage_alias_reload"]="Reload aliases:"
     ["usage_more"]="More info: https://github.com/github/copilot-cli"
     ["install_done"]="GitHub Copilot CLI installation completed!"
+    ["install_failed"]="GitHub Copilot CLI installation failed. Aborting."
+    ["cmd_not_found"]="Copilot command not found after installation. Aborting post-install steps."
+    ["version_info"]="GitHub Copilot CLI version:"
 )
 
 declare -A COPILOT_TEXT_TR=(
@@ -70,6 +73,9 @@ declare -A COPILOT_TEXT_TR=(
     ["usage_alias_reload"]="Aliasları tekrar yükleme:"
     ["usage_more"]="Daha fazla bilgi: https://github.com/github/copilot-cli"
     ["install_done"]="GitHub Copilot CLI kurulumu tamamlandı!"
+    ["install_failed"]="GitHub Copilot CLI kurulumu başarısız oldu. İptal ediliyor."
+    ["cmd_not_found"]="Copilot komutu kurulumdan sonra bulunamadı. Kurulum sonrası adımlar iptal ediliyor."
+    ["version_info"]="GitHub Copilot CLI sürümü:"
 )
 
 copilot_text() {
@@ -103,17 +109,17 @@ main() {
     local install_status=$?
 
     if [ $install_status -ne 0 ]; then
-        log_error_detail "GitHub Copilot CLI installation failed. Aborting."
+        log_error_detail "$(copilot_text install_failed)"
         return 1
     fi
 
     # The `install_package` function reloads the shell, but sometimes we need to locate the binary again
     if ! command -v copilot &> /dev/null; then
-        log_error_detail "Copilot command not found after installation. Aborting post-install steps."
+        log_error_detail "$(copilot_text cmd_not_found)"
         return 1
     fi
 
-    log_success_detail "GitHub Copilot CLI version: $(copilot --version)"
+    log_success_detail "$(copilot_text version_info) $(copilot --version)"
 
     if [ "$interactive_mode" = true ]; then
         echo

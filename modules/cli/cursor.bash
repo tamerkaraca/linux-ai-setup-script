@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -44,6 +44,9 @@ declare -A CURSOR_TEXT_EN=(
     ["install_done"]="Cursor Agent CLI installation completed!"
     ["package_required"]="The '--package' option requires a value."
     ["unknown_arg"]="Unknown argument: %s"
+    ["already_installed"]="Cursor Agent CLI is already installed."
+    ["installing_curl"]="Installing Cursor Agent CLI via curl script..."
+    ["install_fail_curl"]="Cursor Agent CLI installation failed."
 )
 
 declare -A CURSOR_TEXT_TR=(
@@ -63,6 +66,9 @@ declare -A CURSOR_TEXT_TR=(
     ["install_done"]="Cursor Agent CLI kurulumu tamamlandı!"
     ["package_required"]="'--package' seçeneği bir değer gerektirir."
     ["unknown_arg"]="Bilinmeyen argüman: %s"
+    ["already_installed"]="Cursor Agent CLI zaten kurulu."
+    ["installing_curl"]="Cursor Agent CLI curl betiği ile kuruluyor..."
+    ["install_fail_curl"]="Cursor Agent CLI kurulumu başarısız oldu."
 )
 
 cursor_text() {
@@ -87,16 +93,16 @@ main() {
     log_info_detail "$(cursor_text install_title)"
 
     if ! command -v cursor-agent &>/dev/null; then
-        log_info_detail "Installing Cursor Agent CLI via curl script..."
+        log_info_detail "$(cursor_text installing_curl)"
         local install_cmd="curl https://cursor.com/install -fsS | bash"
         if ! retry_command "$install_cmd"; then
-            log_error_detail "Cursor Agent CLI installation failed."
+            log_error_detail "$(cursor_text install_fail_curl)"
             return 1
         fi
         reload_shell_configs silent
         hash -r 2>/dev/null || true
     else
-        log_success_detail "Cursor Agent CLI is already installed."
+        log_success_detail "$(cursor_text already_installed)"
     fi
 
     local cursor_cmd="cursor-agent"

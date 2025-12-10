@@ -34,7 +34,7 @@ if [ "$utils_loaded" = false ] && declare -f source_module > /dev/null 2>&1; the
 fi
 
 if [ "$utils_loaded" = false ]; then
-    log_error "Unable to load utils.bash (tried multiple locations)"
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried multiple locations)"
     exit 1
 fi
 
@@ -66,25 +66,85 @@ is_wsl_fallback() {
     fi
 }
 
+# --- i18n Support ---
+declare -A WINAPP_TEXT_EN=(
+    ["not_wsl"]="Not running in WSL, skipping Windows application symlink creation."
+    ["sudo_not_found"]="sudo command not found. Skipping Windows application symlink creation."
+    ["sudo_no_pass"]="Sudo permissions not available without password. Skipping Windows application symlink creation."
+    ["run_later"]="You can run this module manually later with sudo if needed."
+    ["creating_symlinks"]="Creating symlinks for Windows applications for easy access from WSL..."
+    ["symlink_hint"]="This allows you to launch them by name (e.g., 'code .')"
+    ["username_fail"]="Could not automatically determine Windows username."
+    ["using_placeholder"]="Using 'USER' as a placeholder. You may need to edit the paths below."
+    ["creating_dir"]="Creating directory %s"
+    ["creating_symlink"]="Creating symlink for '%s'..."
+    ["symlink_created"]="Symlink for '%s' created at %s."
+    ["symlink_failed"]="Failed to create symlink for '%s' (sudo required)."
+    ["symlink_manual"]="You can create it manually: sudo ln -s '%s' '%s'"
+    ["symlink_exists"]="Symlink for '%s' already exists."
+    ["exe_not_found"]="Executable for '%s' not found at expected path: %s"
+    ["verify_path"]="Please verify the path and re-run the script if needed."
+    ["symlink_complete"]="Windows application symlinking process complete."
+)
+
+declare -A WINAPP_TEXT_TR=(
+    ["not_wsl"]="WSL'de çalışmıyor, Windows uygulama symlink oluşturma atlanıyor."
+    ["sudo_not_found"]="sudo komutu bulunamadı. Windows uygulama symlink oluşturma atlanıyor."
+    ["sudo_no_pass"]="Sudo izinleri parola olmadan kullanılamıyor. Windows uygulama symlink oluşturma atlanıyor."
+    ["run_later"]="Gerekirse bu modülü daha sonra sudo ile manuel olarak çalıştırabilirsiniz."
+    ["creating_symlinks"]="WSL'den kolay erişim için Windows uygulamalarına symlink'ler oluşturuluyor..."
+    ["symlink_hint"]="Bu, uygulamaları isimleriyle başlatmanızı sağlar (örn: 'code .')"
+    ["username_fail"]="Windows kullanıcı adı otomatik olarak belirlenemedi."
+    ["using_placeholder"]="Yer tutucu olarak 'USER' kullanılıyor. Aşağıdaki yolları düzenlemeniz gerekebilir."
+    ["creating_dir"]="%s dizini oluşturuluyor"
+    ["creating_symlink"]="'%s' için symlink oluşturuluyor..."
+    ["symlink_created"]="'%s' için symlink %s konumunda oluşturuldu."
+    ["symlink_failed"]="'%s' için symlink oluşturulamadı (sudo gerekli)."
+    ["symlink_manual"]="Manuel olarak oluşturabilirsiniz: sudo ln -s '%s' '%s'"
+    ["symlink_exists"]="'%s' için symlink zaten mevcut."
+    ["exe_not_found"]="'%s' için çalıştırılabilir dosya beklenen konumda bulunamadı: %s"
+    ["verify_path"]="Lütfen yolu doğrulayın ve gerekirse scripti tekrar çalıştırın."
+    ["symlink_complete"]="Windows uygulama symlink işlemi tamamlandı."
+)
+
+get_text() {
+    local key="$1"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${WINAPP_TEXT_TR[$key]:-${WINAPP_TEXT_EN[$key]:-$key}}"
+    else
+        printf "%s" "${WINAPP_TEXT_EN[$key]:-$key}"
+    fi
+}
+
+get_text_fmt() {
+    local key="$1"
+    shift
+    local fmt
+    fmt=$(get_text "$key")
+    # shellcheck disable=SC2059
+    printf "$fmt" "$@"
+}
+# --- End i18n Support ---
+
 create_windows_app_symlinks() {
     if ! is_wsl_fallback; then
-        log_info_detail "Not running in WSL, skipping Windows application symlink creation."
+        log_info_detail "$(get_text not_wsl)"
         return
     fi
 
     if ! command -v sudo &> /dev/null; then
-       log_warn_detail "sudo command not found. Skipping Windows application symlink creation."
+       log_warn_detail "$(get_text sudo_not_found)"
        return 0
     fi
     
     if ! sudo -n true 2>/dev/null; then
-       log_warn_detail "Sudo permissions not available without password. Skipping Windows application symlink creation."
-       log_info_detail "You can run this module manually later with sudo if needed."
+       log_warn_detail "$(get_text sudo_no_pass)"
+       log_info_detail "$(get_text run_later)"
        return 0
     fi
 
-    log_info "Creating symlinks for Windows applications for easy access from WSL..."
-    log_info "This allows you to launch them by name (e.g., 'code .')"
+    log_info "$(get_text creating_symlinks)"
+    log_info "$(get_text symlink_hint)"
     
     # -- IMPORTANT --
     # PLEASE VERIFY AND EDIT THE PATHS IN THIS SECTION TO MATCH YOUR WINDOWS INSTALLATION
@@ -96,8 +156,8 @@ create_windows_app_symlinks() {
     local windows_user
     windows_user=$(cmd.exe /c "echo %USERNAME%" 2>/dev/null | tr -d '\r')
     if [ -z "$windows_user" ]; then
-        log_warn_detail "Could not automatically determine Windows username."
-        log_warn_detail "Using 'USER' as a placeholder. You may need to edit the paths below."
+        log_warn_detail "$(get_text username_fail)"
+        log_warn_detail "$(get_text using_placeholder)"
         windows_user="USER"
     fi
     
@@ -115,7 +175,7 @@ create_windows_app_symlinks() {
     
     # Ensure the symlink directory exists
     if [ ! -d "$symlink_dir" ]; then
-        log_info_detail "Creating directory $symlink_dir"
+        log_info_detail "$(get_text_fmt creating_dir "$symlink_dir")"
         sudo mkdir -p "$symlink_dir"
     fi
 
@@ -125,23 +185,23 @@ create_windows_app_symlinks() {
 
         if [ -f "$win_path" ]; then
             if [ ! -L "$symlink_path" ]; then
-                log_info_detail "Creating symlink for '$app_name'..."
+                log_info_detail "$(get_text_fmt creating_symlink "$app_name")"
                 if sudo ln -s "$win_path" "$symlink_path" 2>/dev/null; then
-                    log_success_detail "Symlink for '$app_name' created at $symlink_path."
+                    log_success_detail "$(get_text_fmt symlink_created "$app_name" "$symlink_path")"
                 else
-                    log_warn_detail "Failed to create symlink for '$app_name' (sudo required)."
-                    log_info_detail "You can create it manually: sudo ln -s '$win_path' '$symlink_path'"
+                    log_warn_detail "$(get_text_fmt symlink_failed "$app_name")"
+                    log_info_detail "$(get_text_fmt symlink_manual "$win_path" "$symlink_path")"
                 fi
             else
-                log_info_detail "Symlink for '$app_name' already exists."
+                log_info_detail "$(get_text_fmt symlink_exists "$app_name")"
             fi
         else
-            log_warn_detail "Executable for '$app_name' not found at expected path: $win_path"
-            log_warn_detail "Please verify the path and re-run the script if needed."
+            log_warn_detail "$(get_text_fmt exe_not_found "$app_name" "$win_path")"
+            log_warn_detail "$(get_text verify_path)"
         fi
     done
 
-    log_success "Windows application symlinking process complete."
+    log_success "$(get_text symlink_complete)"
 }
 
 # Run the function and always exit successfully

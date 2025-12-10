@@ -143,16 +143,6 @@ declare -A SETUP_TEXT_TR=(
     ["downloading_utils"]="utils.bash %s konumuna indiriliyor..."
     ["from_url"]="URL'den: %s"
     ["utils_downloaded"]="utils.bash başarıyla indirildi"
-    ["download_attempt"]="Attempting to download: %s"
-    ["download_success"]="Download successful on attempt %d"
-    ["download_failed"]="All download attempts failed for: %s"
-    ["updating_system_packages"]="Updating system packages..."
-    ["update_cmd_not_defined"]="Update command not defined. Skipping system update."
-    ["cleaning_windows_paths"]="Cleaning Windows paths from shell configs..."
-    ["cleaned_windows_paths"]="Cleaned Windows paths from %s."
-    ["downloading_utils"]="Downloading utils.bash to %s..."
-    ["from_url"]="From URL: %s"
-    ["utils_downloaded"]="utils.bash downloaded successfully"
 )
 
 setup_text() {
@@ -164,7 +154,7 @@ setup_text() {
         printf "%s" "$default_value"
     fi
 }
-export -f setup_text
+# Note: Do NOT export setup_text - associative arrays cannot be exported
 
 setup_text_fmt() {
     local key="$1"
@@ -174,7 +164,7 @@ setup_text_fmt() {
     # shellcheck disable=SC2059
     printf "$fmt" "$@"
 }
-export -f setup_text_fmt
+# Note: Do NOT export setup_text_fmt - associative arrays cannot be exported
 # --- End Multi-language Setup ---
 
 # Simple inline download function for use before utils.bash is loaded
@@ -298,15 +288,27 @@ run_module() {
     local module_url="$BASE_URL/${module_name}.bash"
     shift
 
+    # Inline messages to avoid export issues with associative arrays
+    local msg_local msg_error msg_remote
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        msg_local="'$module_name' modülü yerel dosyadan çalıştırılıyor..."
+        msg_error="'$module_name' modülü çalıştırılırken bir hata oluştu."
+        msg_remote="'$module_name' modülü indiriliyor ve çalıştırılıyor..."
+    else
+        msg_local="Running module '$module_name' from local file..."
+        msg_error="An error occurred while running the '$module_name' module."
+        msg_remote="Downloading and running module '$module_name'..."
+    fi
+
     if [ -f "$local_path" ]; then
-        echo -e "${CYAN}${INFO_TAG}${NC} Running module '$module_name' from local file..."
+        echo -e "${CYAN}${INFO_TAG}${NC} ${msg_local}"
         if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
-            echo -e "${RED}${ERROR_TAG}${NC} An error occurred while running the '$module_name' module."
+            echo -e "${RED}${ERROR_TAG}${NC} ${msg_error}"
             return 1
         fi
     else
-        echo -e "${CYAN}${INFO_TAG}${NC} $(setup_text_fmt log_module_remote "$module_name")"
-        echo -e "${INFO_TAG} $(setup_text_fmt log_module_url "$module_url")"
+        echo -e "${CYAN}${INFO_TAG}${NC} ${msg_remote}"
+        echo -e "${INFO_TAG} URL: ${module_url}"
 
         # Create remote module directory structure
         local remote_dir="$HOME/.linux-ai-setup-script/remote_modules_$$"

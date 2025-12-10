@@ -17,7 +17,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -46,6 +46,9 @@ declare -A QWEN_TEXT_EN=(
     ["install_done"]="Qwen CLI installation completed!"
     ["package_required"]="The '--package' option requires a value."
     ["unknown_arg"]="Unknown argument: %s"
+    ["already_installed"]="Qwen CLI is already installed:"
+    ["installed_success"]="Qwen CLI installed:"
+    ["installing_pkg"]="Installing Qwen CLI using package: %s"
 )
 
 declare -A QWEN_TEXT_TR=(
@@ -64,6 +67,9 @@ declare -A QWEN_TEXT_TR=(
     ["install_done"]="Qwen CLI kurulumu tamamlandı!"
     ["package_required"]="'--package' seçeneği bir değer gerektirir."
     ["unknown_arg"]="Bilinmeyen argüman: %s"
+    ["already_installed"]="Qwen CLI zaten kurulu:"
+    ["installed_success"]="Qwen CLI kuruldu:"
+    ["installing_pkg"]="Qwen CLI şu paket ile kuruluyor: %s"
 )
 
 qwen_text() {
@@ -107,11 +113,11 @@ main() {
     log_info_detail "$(qwen_text install_title)"
     
     if command -v qwen &>/dev/null; then
-        log_success_detail "Qwen CLI is already installed: $(qwen --version 2>/dev/null)"
+        log_success_detail "$(qwen_text already_installed) $(qwen --version 2>/dev/null)"
     else
         require_node_version "$QWEN_MIN_NODE_VERSION" "Qwen CLI" || return 1
 
-        log_info_detail "Installing Qwen CLI using package: $package_spec"
+        log_info_detail "$(printf "$(qwen_text installing_pkg)" "$package_spec")"
         if ! install_package "Qwen CLI" "npm" "qwen" "$package_spec"; then
             log_error_detail "$(qwen_text install_fail "$package_spec")"
             return 1
@@ -124,7 +130,7 @@ main() {
             log_error_detail "$(qwen_text command_missing)"
             return 1
         fi
-        log_success_detail "Qwen CLI installed: $(qwen --version 2>/dev/null)"
+        log_success_detail "$(qwen_text installed_success) $(qwen --version 2>/dev/null)"
     fi
 
     if [ "$interactive_mode" = true ]; then

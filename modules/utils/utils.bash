@@ -156,10 +156,56 @@ get_i18n_message() {
     local message="$default"
     if [ "${LANGUAGE:-en}" = "tr" ]; then
         case "$key" in
+            # System
             "updating_system_packages") message="Sistem paketleri güncelleniyor..." ;;
             "update_cmd_not_defined") message="Güncelleme komutu tanımlanmamış. Sistem güncellemesi atlanıyor." ;;
             "cleaning_windows_paths") message="Kabuk yapılandırmalarından Windows yolları temizleniyor..." ;;
             "cleaned_windows_paths") message="$param dosyasından Windows yolları temizlendi." ;;
+            # Python
+            "starting_python") message="Python kurulumu başlatılıyor..." ;;
+            "python_already") message="Python zaten kurulu:" ;;
+            "installing_python") message="Python 3 kuruluyor..." ;;
+            "python_completed") message="Python kurulumu tamamlandı:" ;;
+            "python_failed") message="Python kurulumu başarısız!" ;;
+            # Pip
+            "starting_pip") message="Pip kurulumu/güncellemesi başlatılıyor..." ;;
+            "python_missing") message="Python eksik, önce kuruluyor..." ;;
+            "upgrading_pip") message="pip güncelleniyor..." ;;
+            "pip_not_found") message="Pip bulunamadı. Kurulmaya çalışılıyor..." ;;
+            "pip_getpip_failed") message="get-pip.py ile pip kurulumu başarısız!" ;;
+            "pip_getpip_ok") message="Pip get-pip.py ile kuruldu." ;;
+            "pip_ext_env") message="Externally-managed-environment algılandı, --break-system-packages ile yeniden deneniyor..." ;;
+            "pip_upgrade_failed_break") message="Pip güncellemesi --break-system-packages ile bile başarısız." ;;
+            "pip_upgrade_failed") message="Pip güncellemesi başarısız. Çıktı:" ;;
+            "pip_version") message="Pip sürümü:" ;;
+            # Pipx
+            "starting_pipx") message="Pipx kurulumu başlatılıyor..." ;;
+            "pipx_already") message="pipx zaten kurulu:" ;;
+            "installing_pipx") message="pipx kuruluyor..." ;;
+            "pipx_completed") message="Pipx kurulumu tamamlandı:" ;;
+            "pipx_failed") message="Pipx kurulumu başarısız!" ;;
+            # UV
+            "starting_uv") message="UV kurulumu başlatılıyor..." ;;
+            "uv_already") message="UV zaten kurulu:" ;;
+            "installing_uv") message="UV resmi script ile kuruluyor..." ;;
+            "uv_completed") message="UV kurulumu tamamlandı:" ;;
+            "uv_failed") message="UV kurulumu başarısız!" ;;
+            # Python tools menu
+            "python_tools_completed") message="Python araçları kurulumu tamamlandı!" ;;
+            # Package detection
+            "detecting_pkg") message="İşletim sistemi ve paket yöneticisi algılanıyor..." ;;
+            "pkg_manager") message="Paket yöneticisi:" ;;
+            "no_pkg_manager") message="Desteklenen paket yöneticisi bulunamadı!" ;;
+            # Path
+            "path_added") message="'%s' gelecekteki oturumlar için PATH'e eklendi (%s)." ;;
+            # install_package function
+            "installing_pkg") message="%s kuruluyor..." ;;
+            "pkg_already_installed") message="%s zaten kurulu." ;;
+            "attempting_install") message="'%s' kurulmaya çalışılıyor..." ;;
+            "unsupported_pkg_manager") message="Desteklenmeyen paket yöneticisi: %s" ;;
+            "pkg_install_failed") message="%s için tüm adaylar denendikten sonra kurulum başarısız oldu." ;;
+            "pkg_installed_success") message="%s başarıyla kuruldu." ;;
+            "pkg_installed_cmd_not_found") message="%s kuruldu ama '%s' komutu bulunamadı." ;;
             *) message="$default" ;;
         esac
     fi
@@ -313,78 +359,78 @@ export -f update_system
 
 # Python Tooling
 install_python() {
-    log_info_detail "Starting Python installation..."
+    log_info_detail "$(get_i18n_message starting_python "Starting Python installation...")"
     
     if command -v python3 &> /dev/null; then
-        log_success_detail "Python already installed: $(python3 --version)"
+        log_success_detail "$(get_i18n_message python_already "Python already installed:") $(python3 --version)"
         return 0
     fi
     
-    log_info_detail "Installing Python 3..."
+    log_info_detail "$(get_i18n_message installing_python "Installing Python 3...")"
     eval "$INSTALL_CMD" python3 python3-pip python3-venv
     
     if command -v python3 &> /dev/null; then
-        log_success_detail "Python installation completed: $(python3 --version)"
+        log_success_detail "$(get_i18n_message python_completed "Python installation completed:") $(python3 --version)"
     else
-        log_error_detail "Python installation failed!"
+        log_error_detail "$(get_i18n_message python_failed "Python installation failed!")"
         return 1
     fi
 }
 
 install_pip() {
-    log_info_detail "Starting Pip installation/update..."
+    log_info_detail "$(get_i18n_message starting_pip "Starting Pip installation/update...")"
     
     if ! command -v python3 &> /dev/null; then
-        log_warn_detail "Python is missing, installing it first..."
+        log_warn_detail "$(get_i18n_message python_missing "Python is missing, installing it first...")"
         if ! install_python; then
-            log_error_detail "Python installation failed!"
+            log_error_detail "$(get_i18n_message python_failed "Python installation failed!")"
             return 1
         fi
     fi
     
-    log_info_detail "Upgrading pip..."
+    log_info_detail "$(get_i18n_message upgrading_pip "Upgrading pip...")"
     
     local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
     
     if ! python3 -m pip --version &> /dev/null; then
-        log_warn_detail "Pip not found. Trying to install it..."
+        log_warn_detail "$(get_i18n_message pip_not_found "Pip not found. Trying to install it...")"
         if ! (curl -sS https://bootstrap.pypa.io/get-pip.py | python3); then
-            log_error_detail "Pip installation via get-pip.py failed!"
+            log_error_detail "$(get_i18n_message pip_getpip_failed "Pip installation via get-pip.py failed!")"
             return 1
         fi
-        log_success_detail "Pip installed via get-pip.py."
+        log_success_detail "$(get_i18n_message pip_getpip_ok "Pip installed via get-pip.py.")"
     fi
 
     if ! output=$($pip_upgrade_cmd 2>&1); then
         if echo "$output" | grep -q "externally-managed-environment"; then
-            log_info_detail "Externally-managed-environment detected, retrying with --break-system-packages..."
+            log_info_detail "$(get_i18n_message pip_ext_env "Externally-managed-environment detected, retrying with --break-system-packages...")"
             if ! $pip_upgrade_cmd --break-system-packages; then
-                log_error_detail "Pip upgrade failed even with --break-system-packages."
+                log_error_detail "$(get_i18n_message pip_upgrade_failed_break "Pip upgrade failed even with --break-system-packages.")"
                 return 1
             fi
         else
-            log_error_detail "Pip upgrade failed. Output: $output"
+            log_error_detail "$(get_i18n_message pip_upgrade_failed "Pip upgrade failed. Output:") $output"
             return 1
         fi
     fi
     
-    log_success_detail "Pip version: $(python3 -m pip --version)"
+    log_success_detail "$(get_i18n_message pip_version "Pip version:") $(python3 -m pip --version)"
 }
 
 install_pipx() {
-    log_info_detail "Starting Pipx installation..."
+    log_info_detail "$(get_i18n_message starting_pipx "Starting Pipx installation...")"
     
     if ! command -v python3 &> /dev/null; then
-        log_warn_detail "Python is missing, installing it first..."
+        log_warn_detail "$(get_i18n_message python_missing "Python is missing, installing it first...")"
         install_python
     fi
     
     if command -v pipx &> /dev/null; then
-        log_success_detail "pipx is already installed: $(pipx --version)"
+        log_success_detail "$(get_i18n_message pipx_already "pipx is already installed:") $(pipx --version)"
         return 0
     fi
     
-    log_info_detail "Installing pipx..."
+    log_info_detail "$(get_i18n_message installing_pipx "Installing pipx...")"
     if [ "$PKG_MANAGER" = "apt" ]; then
         eval "$INSTALL_CMD" pipx
     elif [ "$PKG_MANAGER" = "dnf" ]; then
@@ -400,24 +446,24 @@ install_pipx() {
     reload_shell_configs silent
     
     if command -v pipx &> /dev/null; then
-        log_success_detail "Pipx installation completed: $(pipx --version 2>/dev/null || echo 'installed')"
+        log_success_detail "$(get_i18n_message pipx_completed "Pipx installation completed:") $(pipx --version 2>/dev/null || echo 'installed')"
     else
-        log_error_detail "Pipx installation failed!"
+        log_error_detail "$(get_i18n_message pipx_failed "Pipx installation failed!")"
         return 1
     fi
 }
 
 install_uv() {
-    log_info_detail "Starting UV installation..."
+    log_info_detail "$(get_i18n_message starting_uv "Starting UV installation...")"
 
     if command -v uv &>/dev/null; then
-        log_success_detail "UV is already installed: $(uv --version)"
+        log_success_detail "$(get_i18n_message uv_already "UV is already installed:") $(uv --version)"
         return 0
     fi
     
-    log_info_detail "Installing UV via official script..."
+    log_info_detail "$(get_i18n_message installing_uv "Installing UV via official script...")"
     if ! (curl -LsSf https://astral.sh/uv/install.sh | sh); then
-        log_error_detail "UV installation failed!"
+        log_error_detail "$(get_i18n_message uv_failed "UV installation failed!")"
         return 1
     fi
     
@@ -425,9 +471,9 @@ install_uv() {
     reload_shell_configs silent
 
     if command -v uv &>/dev/null; then
-        log_success_detail "UV installation completed: $(uv --version)"
+        log_success_detail "$(get_i18n_message uv_completed "UV installation completed:") $(uv --version)"
     else
-        log_error_detail "UV installation failed!"
+        log_error_detail "$(get_i18n_message uv_failed "UV installation failed!")"
         return 1
     fi
 }
@@ -465,16 +511,16 @@ install_package() {
     shift 3
     local packages=("$@")
 
-    log_info_detail "Installing $name..."
+    log_info_detail "$(get_i18n_message installing_pkg "Installing $name..." "$name")"
 
     if command -v "$cmd" &> /dev/null; then
-        log_success_detail "$name is already installed."
+        log_success_detail "$(get_i18n_message pkg_already_installed "$name is already installed." "$name")"
         return 0
     fi
 
     local installed=false
     for package in "${packages[@]}"; do
-        log_info_detail "Attempting to install '$package'..."
+        log_info_detail "$(get_i18n_message attempting_install "Attempting to install '$package'..." "$package")"
         case "$manager" in
             npm)
                 require_node_version 18 "$name" || return 1
@@ -505,22 +551,22 @@ install_package() {
                 fi
                 ;;
             *)
-                log_error_detail "Unsupported package manager: $manager"
+                log_error_detail "$(get_i18n_message unsupported_pkg_manager "Unsupported package manager: $manager" "$manager")"
                 return 1
                 ;;
         esac
     done
 
     if [ "$installed" = false ]; then
-        log_error_detail "Failed to install $name after trying all candidates."
+        log_error_detail "$(get_i18n_message pkg_install_failed "Failed to install $name after trying all candidates." "$name")"
         return 1
     fi
 
     if command -v "$cmd" &> /dev/null; then
-        log_success_detail "$name installed successfully."
+        log_success_detail "$(get_i18n_message pkg_installed_success "$name installed successfully." "$name")"
         return 0
     else
-        log_error_detail "$name installed but command '$cmd' not found."
+        log_error_detail "$(get_i18n_message pkg_installed_cmd_not_found "$name installed but command '$cmd' not found." "$name")"
         return 1
     fi
 }

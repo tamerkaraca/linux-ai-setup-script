@@ -14,7 +14,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -36,11 +36,15 @@ declare -A CLAUDE_TEXT_EN=(
     ["run_claude_login"]="Please run 'claude login' and finish authentication."
     ["press_enter"]="Press Enter to continue..."
     ["skip_auth_all"]="Authentication skipped in 'Install All' mode."
-    ["manual_login"]="Please run '${GREEN}claude login${NC}' manually later."
+    ["manual_login"]="Please run 'claude login' manually later."
     ["tty_missing"]="No TTY detected; cannot run 'claude login' in-script."
     ["login_hint"]="Tip: run 'claude login' directly in your terminal."
     ["login_error"]="'claude login' failed. Ink-based UIs may require raw terminal mode."
     ["install_done"]="Claude Code installation and configuration finished!"
+    ["installing"]="Installing Claude Code CLI..."
+    ["already_installed"]="Claude Code CLI is already installed."
+    ["install_failed"]="Claude Code CLI installation failed. Aborting post-install steps."
+    ["cmd_not_found"]="Claude command not found after installation. Aborting post-install steps."
 )
 
 declare -A CLAUDE_TEXT_TR=(
@@ -48,11 +52,15 @@ declare -A CLAUDE_TEXT_TR=(
     ["run_claude_login"]="Lütfen 'claude login' komutunu çalıştırın ve oturumu tamamlayın."
     ["press_enter"]="Devam etmek için Enter'a basın..."
     ["skip_auth_all"]="'Tümünü Kur' modunda kimlik doğrulama atlandı."
-    ["manual_login"]="Lütfen daha sonra '${GREEN}claude login${NC}' komutunu manuel olarak çalıştırın."
+    ["manual_login"]="Lütfen daha sonra 'claude login' komutunu manuel olarak çalıştırın."
     ["tty_missing"]="TTY bulunamadı; 'claude login' script içinde çalıştırılamıyor."
     ["login_hint"]="İpucu: Terminalinizde doğrudan 'claude login' komutunu çalıştırın."
     ["login_error"]="'claude login' sırasında hata oluştu. Ink arayüzleri ham terminal moduna ihtiyaç duyabilir."
     ["install_done"]="Claude Code kurulumu ve yapılandırması tamamlandı!"
+    ["installing"]="Claude Code CLI kuruluyor..."
+    ["already_installed"]="Claude Code CLI zaten kurulu."
+    ["install_failed"]="Claude Code CLI kurulumu başarısız. Kurulum sonrası adımlar iptal ediliyor."
+    ["cmd_not_found"]="Claude komutu kurulumdan sonra bulunamadı. Kurulum sonrası adımlar iptal ediliyor."
 )
 
 claude_text() {
@@ -91,18 +99,19 @@ main() {
     # Use the universal installer from utils.sh
     # It handles checking for existence, prerequisites (like npm), and installation.
     require_node_version 20 "Claude Code CLI" || return 1
+    log_info_detail "$(claude_text installing)"
     install_package "Claude Code CLI" "npm" "claude" "@anthropic-ai/claude-code"
     local install_status=$?
 
     # If installation failed, exit
     if [ $install_status -ne 0 ]; then
-        log_error_detail "Claude Code CLI installation failed. Aborting post-install steps."
+        log_error_detail "$(claude_text install_failed)"
         return 1
     fi
     
     # If the command is still not found after successful install (e.g. PATH issue), exit.
     if ! command -v claude &> /dev/null; then
-        log_error_detail "Claude command not found after installation. Aborting post-install steps."
+        log_error_detail "$(claude_text cmd_not_found)"
         return 1
     fi
 

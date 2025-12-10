@@ -17,7 +17,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -47,6 +47,7 @@ declare -A CLINE_TEXT_EN=(
     ["install_done"]="Cline CLI installation completed!"
     ["build_tools_install"]="Installing required native build tools for Cline CLI: %s"
     ["build_tools_warn"]="Could not auto-install build tools. Ensure 'make', 'g++', and 'python3' are available."
+    ["found"]="Cline CLI found:"
 )
 
 declare -A CLINE_TEXT_TR=(
@@ -63,6 +64,7 @@ declare -A CLINE_TEXT_TR=(
     ["install_done"]="Cline CLI kurulumu tamamlandı!"
     ["build_tools_install"]="Cline CLI için gerekli derleme araçları kuruluyor: %s"
     ["build_tools_warn"]="Derleme araçları otomatik kurulamadı. Lütfen 'make', 'g++' ve 'python3' komutlarının mevcut olduğundan emin olun."
+    ["found"]="Cline CLI bulundu:"
 )
 
 cline_text() {
@@ -121,7 +123,7 @@ main() {
     
     local cline_cmd="cline"
 
-    log_success_detail "Cline CLI found: $cline_cmd ($($cline_cmd --version 2>/dev/null))"
+    log_success_detail "$(cline_text found) $cline_cmd ($($cline_cmd --version 2>/dev/null))"
 
     # Post-install interactive login
     if [ "$interactive_mode" = true ]; then

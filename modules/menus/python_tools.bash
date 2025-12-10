@@ -33,7 +33,7 @@ if [ "$utils_loaded" = false ] && declare -f source_module > /dev/null 2>&1; the
 fi
 
 if [ "$utils_loaded" = false ]; then
-    log_error "Unable to load utils.bash (tried multiple locations)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried multiple locations)" >&2
     exit 1
 fi
 
@@ -180,7 +180,7 @@ install_python_stack() {
     install_pipx
     install_uv
     reload_shell_configs
-    log_success_detail "Python tooling installation completed!"
+    log_success_detail "$(get_i18n_message python_tools_completed \"Python tooling installation completed!\")"
 }
 
 # Ana kurulum akışı

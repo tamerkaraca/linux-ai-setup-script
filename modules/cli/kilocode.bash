@@ -18,7 +18,7 @@ if [ -f "$utils_local" ]; then
 elif declare -f source_module > /dev/null 2>&1; then
     source_module "utils/utils.bash" "modules/utils/utils.bash"
 else
-    log_error "Unable to load utils.bash (tried $utils_local)" >&2
+    echo "[HATA/ERROR] utils.bash yüklenemedi / Unable to load utils.bash (tried $utils_local)" >&2
     exit 1
 fi
 
@@ -62,6 +62,11 @@ declare -A KILOCODE_TEXT_EN=(
     ["alt_install_failed"]="All installation methods failed"
     ["alt_install_suggest"]="Consider installing Python 3.12 or using a different Node.js version"
     ["alt_install_suggest_cmd"]="Consider installing Python 3.12: sudo apt install python3.12 python3.12-distutils"
+    ["package_required"]="'--package' option requires a value."
+    ["unknown_arg"]="Unknown argument: %s"
+    ["installed_no_native"]="Kilocode CLI installed successfully (without native dependencies)."
+    ["installed_py312"]="Kilocode CLI installed successfully (with Python 3.12)."
+    ["installed_no_optional"]="Kilocode CLI installed successfully (without optional dependencies)."
 )
 
 declare -A KILOCODE_TEXT_TR=(
@@ -92,6 +97,11 @@ declare -A KILOCODE_TEXT_TR=(
     ["alt_install_failed"]="Tüm kurulum yöntemleri başarısız oldu"
     ["alt_install_suggest"]="Python 3.12 kurmayı veya farklı Node.js sürümü kullanmayı düşünün"
     ["alt_install_suggest_cmd"]="Python 3.12 kurmayı düşünün: sudo apt install python3.12 python3.12-distutils"
+    ["package_required"]="'--package' seçeneği bir değer gerektirir."
+    ["unknown_arg"]="Bilinmeyen argüman: %s"
+    ["installed_no_native"]="Kilocode CLI başarıyla kuruldu (native bağımlılıklar olmadan)."
+    ["installed_py312"]="Kilocode CLI başarıyla kuruldu (Python 3.12 ile)."
+    ["installed_no_optional"]="Kilocode CLI başarıyla kuruldu (opsiyonel bağımlılıklar olmadan)."
 )
 
 kilocode_text() {
@@ -132,14 +142,14 @@ main() {
         case "$1" in
             --package) 
                 if [ -z "${2:-}" ]; then
-                    log_error_detail "'--package' option requires a value."
+                    log_error_detail "$(kilocode_text package_required)"
                     return 1
                 fi
                 package_spec="$2"
                 shift
                 ;; 
             *)
-                log_warn_detail "Unknown argument: $1"
+                log_warn_detail "$(printf "$(kilocode_text unknown_arg)" "$1")"
                 ;; 
         esac
         shift || true
@@ -153,15 +163,15 @@ main() {
         if ! check_python_compatibility; then
             log_info_detail "$(kilocode_text alt_install_no_native)"
             if retry_command "npm install -g --ignore-scripts \"$package_spec\" 2>/dev/null"; then
-                log_success_detail "Kilocode CLI installed successfully (without native dependencies)."
+                log_success_detail "$(kilocode_text installed_no_native)"
             elif command -v python3.12 &>/dev/null; then
                 log_info_detail "$(kilocode_text alt_install_python312)"
                 if retry_command "PYTHON=/usr/bin/python3.12 npm install -g \"$package_spec\" 2>/dev/null"; then
-                    log_success_detail "Kilocode CLI installed successfully (with Python 3.12)."
+                    log_success_detail "$(kilocode_text installed_py312)"
                 else
                     log_info_detail "$(kilocode_text alt_install_no_optional)"
                     if retry_command "npm install -g --no-optional \"$package_spec\" 2>/dev/null"; then
-                        log_success_detail "Kilocode CLI installed successfully (without optional dependencies)."
+                        log_success_detail "$(kilocode_text installed_no_optional)"
                     else
                         log_error_detail "$(kilocode_text alt_install_failed)"
                         log_info_detail "$(kilocode_text alt_install_suggest)"
@@ -172,7 +182,7 @@ main() {
             else
                 log_info_detail "$(kilocode_text alt_install_no_optional)"
                 if retry_command "npm install -g --no-optional \"$package_spec\""; then
-                    log_success_detail "Kilocode CLI installed successfully (without optional dependencies)."
+                    log_success_detail "$(kilocode_text installed_no_optional)"
                 else
                     log_error_detail "$(kilocode_text install_fail \""$package_spec"\")"
                     log_info_detail "$(kilocode_text alt_install_suggest_cmd)"

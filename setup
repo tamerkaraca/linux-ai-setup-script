@@ -1,0 +1,792 @@
+#!/bin/bash
+set -euo pipefail
+
+# Basic color definitions (will be overridden by utils.bash)
+INFO_TAG="[INFO]"
+WARN_TAG="[WARNING]"
+ERROR_TAG="[ERROR]"
+SUCCESS_TAG="[SUCCESS]"
+GREEN='\033[0;32m'
+RED='\033[0;31m'
+YELLOW='\033[1;33m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+
+# Windows CRLF düzeltme kontrolü
+if [ -f "$0" ] && command -v file &> /dev/null; then
+    if file "$0" | grep -q "CRLF"; then
+        echo "Windows line endings detected, fixing..."
+        
+        if command -v dos2unix &> /dev/null;
+        then
+            dos2unix "$0"
+        elif command -v sed &> /dev/null;
+        then
+            sed -i 's/\r$//' "$0"
+        elif command -v tr &> /dev/null;
+        then
+            tr -d '\r' < "$0" > "$0.tmp" && mv "$0.tmp" "$0"
+        fi
+        
+        chmod +x "$0"
+        
+        echo "Fix complete, restarting script..."
+        exec bash "$0" "$@"
+    fi
+fi
+
+# Detect if we're running from a specific branch
+if [ -f "$0" ] && command -v git &> /dev/null && [ -d .git ]; then
+    # Local execution - detect current branch
+    CURRENT_BRANCH=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "main")
+    SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/${CURRENT_BRANCH}}"
+else
+    # Remote execution - check if a specific branch was requested
+    if [ -n "${SETUP_BRANCH:-}" ]; then
+        SCRIPT_BASE_URL="https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/${SETUP_BRANCH}"
+    else
+        # Default to main for backward compatibility
+        SCRIPT_BASE_URL="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main}"
+    fi
+fi
+export SCRIPT_BASE_URL
+export SETUP_BRANCH="${CURRENT_BRANCH:-main}"
+
+# --- Start Multi-language Setup ---
+declare -A SETUP_TEXT_EN=(
+    ["log_module_local"]="Running module '%s' from local file..."
+    ["log_module_error"]="An error occurred while running the '%s' module."
+    ["log_module_at"]="Module was at: %s"
+    ["log_working_dir"]="Working directory was: %s"
+    ["log_module_remote"]="Downloading and running module '%s'..."
+    ["log_remote_prepare_failed"]="Failed to prepare remote module directory."
+    ["log_module_download_failed"]="Failed to download module '%s'."
+    ["menu_language_option"]="Language Settings"
+    ["menu_current_language"]="Current Language"
+    ["prompt_choice"]="Your choice"
+    ["info_language_switched"]="Language has been set."
+    ["warning_invalid_choice"]="Invalid choice"
+    ["menu_title"]="Main Menu"
+    ["menu_option1"]="Update System and Install Basic Packages"
+    ["menu_option2"]="Install Python Tools (Python, Pip, Pipx, UV)"
+    ["menu_option3"]="Install Node.js Tools (Node, NPM, NVM)"
+    ["menu_option4"]="Install AI CLI Tools"
+    ["menu_option5"]="Install AI Frameworks"
+    ["menu_option6"]="Configure Git Global Settings"
+    ["menu_option7"]="Configure GLM/Claude Provider"
+    ["menu_option8"]="Install Auxiliary AI Tools (OpenSpec, Agents, etc.)"
+    ["menu_option9"]="Install PHP Versions"
+    ["menu_option10"]="Install GitHub CLI"
+    ["menu_option11"]="Remove AI Frameworks"
+    ["menu_option12"]="Manage MCP Servers"
+    ["menu_option13"]="Install Terminal Tools (Zsh, Oh My Zsh)"
+    ["menu_option14"]="ASDF Version Manager (Node, Java, PHP)"
+    ["menu_optionA"]="Install Everything (Recommended)"
+    ["menu_optionR"]="Uninstall All Tools"
+    ["menu_option0"]="Exit"
+    ["menu_multi_hint"]="You can make multiple selections with commas (e.g., 1,2,5)."
+    ["warning_no_selection"]="No selection made. Please try again."
+    ["info_returning"]="Exiting..."
+    ["prompt_press_enter"]="Press Enter to continue..."
+    ["prompt_install_php"]="Install PHP Versions? (y/n)"
+    ["crlf_detected"]="Windows line endings detected, fixing..."
+    ["crlf_restarting"]="Fix complete, restarting script..."
+    ["curl_missing"]="'curl' command not found; cannot load module '%s'."
+    ["module_load_failed"]="Failed to load module from %s."
+)
+
+declare -A SETUP_TEXT_TR=(
+    ["log_module_local"]="'%s' modülü yerel dosyadan çalıştırılıyor..."
+    ["log_module_error"]="'%s' modülü çalıştırılırken bir hata oluştu."
+    ["log_module_at"]="Modül konumu: %s"
+    ["log_working_dir"]="Çalışma dizini: %s"
+    ["log_module_remote"]="'%s' modülü indiriliyor ve çalıştırılıyor..."
+    ["log_remote_prepare_failed"]="Uzak modül dizini hazırlanamadı."
+    ["log_module_download_failed"]="'%s' modülü indirilemedi."
+    ["menu_language_option"]="Dil Ayarları"
+    ["menu_current_language"]="Mevcut Dil"
+    ["prompt_choice"]="Seçiminiz"
+    ["info_language_switched"]="Dil ayarlandı."
+    ["warning_invalid_choice"]="Geçersiz seçim"
+    ["menu_title"]="Ana Menü"
+    ["menu_option1"]="Sistemi Güncelle ve Temel Paketleri Kur"
+    ["menu_option2"]="Python Araçlarını Kur (Python, Pip, Pipx, UV)"
+    ["menu_option3"]="Node.js Araçlarını Kur (Node, NPM, NVM)"
+    ["menu_option4"]="AI CLI Araçlarını Kur"
+    ["menu_option5"]="AI Framework'lerini Kur"
+    ["menu_option6"]="Git Global Ayarlarını Yapılandır"
+    ["menu_option7"]="GLM/Claude Sağlayıcısını Yapılandır"
+    ["menu_option8"]="Yardımcı AI Araçlarını Kur (OpenSpec, Ajanlar, vb.)"
+    ["menu_option9"]="PHP Sürümleri Kur"
+    ["menu_option10"]="GitHub CLI Kur"
+    ["menu_option11"]="AI Framework'lerini Kaldır"
+    ["menu_option12"]="MCP Sunucularını Yönet"
+    ["menu_option13"]="Terminal Araçlarını Kur (Zsh, Oh My Zsh)"
+    ["menu_option14"]="ASDF Sürüm Yöneticisi (Node, Java, PHP)"
+    ["menu_optionA"]="Tümünü Kur (Önerilen)"
+    ["menu_optionR"]="Tüm Araçları Kaldır"
+    ["menu_option0"]="Çıkış"
+    ["menu_multi_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,2,5)."
+    ["warning_no_selection"]="Hiçbir seçim yapılmadı. Lütfen tekrar deneyin."
+    ["info_returning"]="Çıkılıyor..."
+    ["prompt_press_enter"]="Devam etmek için Enter'a basın..."
+    ["prompt_install_php"]="PHP Sürümleri kurulsun mu? (e/h)"
+    ["crlf_detected"]="Windows satır sonu karakterleri tespit edildi, düzeltiliyor..."
+    ["crlf_restarting"]="Düzeltme tamamlandı, script yeniden başlatılıyor..."
+    ["curl_missing"]="'curl' komutu bulunamadı; '%s' modülü yüklenemiyor."
+    ["module_load_failed"]="'%s' adresinden modül yüklenemedi."
+    ["download_attempt"]="İndirme deneniyor: %s"
+    ["download_success"]="%d. denemede indirme başarılı"
+    ["download_failed"]="Tüm indirme denemeleri başarısız: %s"
+    ["updating_system_packages"]="Sistem paketleri güncelleniyor..."
+    ["update_cmd_not_defined"]="Güncelleme komutu tanımlanmamış. Sistem güncellemesi atlanıyor."
+    ["cleaning_windows_paths"]="Kabuk yapılandırmalarından Windows yolları temizleniyor..."
+    ["cleaned_windows_paths"]="%s dosyasından Windows yolları temizlendi."
+    ["downloading_utils"]="utils.bash %s konumuna indiriliyor..."
+    ["from_url"]="URL'den: %s"
+    ["utils_downloaded"]="utils.bash başarıyla indirildi"
+)
+
+setup_text() {
+    local key="$1"
+    local default_value="${SETUP_TEXT_EN[$key]:-$key}"
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        printf "%s" "${SETUP_TEXT_TR[$key]:-$default_value}"
+    else
+        printf "%s" "$default_value"
+    fi
+}
+# Note: Do NOT export setup_text - associative arrays cannot be exported
+
+setup_text_fmt() {
+    local key="$1"
+    shift
+    local fmt
+    fmt=$(setup_text "$key")
+    # shellcheck disable=SC2059
+    printf "$fmt" "$@"
+}
+# Note: Do NOT export setup_text_fmt - associative arrays cannot be exported
+# --- End Multi-language Setup ---
+
+# Simple inline download function for use before utils.bash is loaded
+download_file() {
+    local url="$1"
+    local output="$2"
+    local max_attempts=3
+    local attempt=1
+
+    # Debug output
+    echo "${INFO_TAG} Attempting to download: $(basename "$url")"
+
+    # Create directory if it doesn't exist
+    mkdir -p "$(dirname "$output")"
+
+    while [ $attempt -le $max_attempts ]; do
+        # Try curl first with enhanced parameters
+        if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
+           --user-agent "linux-ai-setup-script" "$url" -o "$output" 2>/tmp/curl_error.log; then
+            echo "${SUCCESS_TAG} Download successful on attempt $attempt"
+            return 0
+        fi
+
+        # Show curl error if available
+        if [ -f /tmp/curl_error.log ] && [ -s /tmp/curl_error.log ]; then
+            echo "${WARN_TAG} curl error: $(cat /tmp/curl_error.log | head -1)"
+            rm -f /tmp/curl_error.log
+        fi
+
+        # Fallback to wget if available
+        if command -v wget &> /dev/null; then
+            echo "${INFO_TAG} Trying with wget..."
+            if wget --timeout=10 --tries=2 --user-agent="linux-ai-setup-script" \
+                    -qO "$output" "$url" 2>/tmp/wget_error.log; then
+                echo "${SUCCESS_TAG} Download successful with wget on attempt $attempt"
+                return 0
+            fi
+            # Show wget error if available
+            if [ -f /tmp/wget_error.log ] && [ -s /tmp/wget_error.log ]; then
+                echo "${WARN_TAG} wget error: $(cat /tmp/wget_error.log | head -1)"
+                rm -f /tmp/wget_error.log
+            fi
+        fi
+
+        # Clean up partial file if it exists
+        [ -f "$output" ] && rm -f "$output"
+
+        if [ $attempt -lt $max_attempts ]; then
+            echo "${YELLOW}${WARN_TAG}${NC} Download attempt $attempt/$max_attempts failed, retrying in 2 seconds..."
+            sleep 2
+        fi
+        ((attempt++))
+    done
+
+    echo "${ERROR_TAG} All download attempts failed for: $(basename "$url")"
+    return 1
+}
+
+source_module() {
+    local local_path="$1"
+    local remote_rel_path="$2"
+    if [ -f "$local_path" ]; then
+        # shellcheck source=/dev/null
+        source "$local_path"
+    else
+        if ! command -v curl &> /dev/null && ! command -v wget &> /dev/null; then
+            echo "${ERROR_TAG} $(setup_text_fmt curl_missing "$remote_rel_path")"
+            exit 1
+        fi
+        local remote_url="${SCRIPT_BASE_URL}/${remote_rel_path}"
+        local temp_file
+        temp_file=$(mktemp)
+
+        # Use the inline download function
+        if ! download_file "$remote_url" "$temp_file"; then
+            echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
+            echo "${ERROR_TAG} Please check your internet connection and try again."
+            # Check if we're in WSL
+            if grep -qi microsoft /proc/version 2>/dev/null; then
+                echo "${INFO_TAG} WSL detected: If the issue persists, try running from WSL2 instead of WSL1."
+            fi
+            rm "$temp_file"
+            exit 1
+        fi
+
+        source "$temp_file" || {
+            echo "${ERROR_TAG} $(setup_text_fmt module_load_failed "$remote_url")"
+            rm "$temp_file"
+            exit 1
+        }
+        rm "$temp_file"
+    fi
+}
+source_module "./modules/utils/utils.bash" "modules/utils/utils.bash"
+source_module "./modules/utils/banner.bash" "modules/utils/banner.bash"
+source_module "./modules/utils/platform_detection.bash" "modules/utils/platform_detection.bash"
+
+BASE_URL="${BASE_URL:-${SCRIPT_BASE_URL}/modules}"
+export BASE_URL
+
+
+REMOTE_MODULE_DIR=""
+export REMOTE_MODULE_DIR
+
+# Cleanup function for backward compatibility
+cleanup_remote_modules() {
+    if [ -n "${REMOTE_MODULE_DIR:-}" ] && [ -d "${REMOTE_MODULE_DIR:-}" ]; then
+        rm -rf "${REMOTE_MODULE_DIR}"
+    fi
+}
+
+# Legacy prepare function (now empty, handled in run_module)
+prepare_remote_module_dir() {
+    return 0
+}
+
+# Script çalıştırma fonksiyonu
+run_module() {
+    local module_name="$1"
+    local local_path="./modules/${module_name}.bash"
+    local module_url="$BASE_URL/${module_name}.bash"
+    shift
+
+    # Inline messages to avoid export issues with associative arrays
+    local msg_local msg_error msg_remote
+    if [ "${LANGUAGE:-en}" = "tr" ]; then
+        msg_local="'$module_name' modülü yerel dosyadan çalıştırılıyor..."
+        msg_error="'$module_name' modülü çalıştırılırken bir hata oluştu."
+        msg_remote="'$module_name' modülü indiriliyor ve çalıştırılıyor..."
+    else
+        msg_local="Running module '$module_name' from local file..."
+        msg_error="An error occurred while running the '$module_name' module."
+        msg_remote="Downloading and running module '$module_name'..."
+    fi
+
+    if [ -f "$local_path" ]; then
+        echo -e "${CYAN}${INFO_TAG}${NC} ${msg_local}"
+        if ! PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$local_path" "$@"; then
+            echo -e "${RED}${ERROR_TAG}${NC} ${msg_error}"
+            return 1
+        fi
+    else
+        echo -e "${CYAN}${INFO_TAG}${NC} ${msg_remote}"
+        echo -e "${INFO_TAG} URL: ${module_url}"
+
+        # Create remote module directory structure
+        local remote_dir="$HOME/.linux-ai-setup-script/remote_modules_$$"
+        mkdir -p "$remote_dir"
+
+        # Create the proper directory structure based on module path
+        if [[ "$module_name" == menus/* ]]; then
+            mkdir -p "$remote_dir/menus"
+            local remote_file="$remote_dir/menus/${module_name#menus/}.bash"
+            # Create utils directory for menus
+            mkdir -p "$remote_dir/utils"
+        elif [[ "$module_name" == setup/* ]]; then
+            mkdir -p "$remote_dir/setup"
+            local remote_file="$remote_dir/setup/${module_name#setup/}.bash"
+            # Create utils directory for setup
+            mkdir -p "$remote_dir/utils"
+        elif [[ "$module_name" == cli/* ]]; then
+            mkdir -p "$remote_dir/cli"
+            local remote_file="$remote_dir/cli/${module_name#cli/}.bash"
+            # Create utils directory for cli
+            mkdir -p "$remote_dir/utils"
+        elif [[ "$module_name" == aux/* ]]; then
+            mkdir -p "$remote_dir/aux"
+            local remote_file="$remote_dir/aux/${module_name#aux/}.bash"
+            # Create utils directory for aux
+            mkdir -p "$remote_dir/utils"
+        else
+            local remote_file="$remote_dir/${module_name}.bash"
+            mkdir -p "$remote_dir/utils"
+        fi
+
+        # Create a helper script with common functions for remote modules FIRST
+        cat > "$remote_dir/utils/remote_helper.bash" << 'EOF'
+#!/bin/bash
+# Remote helper functions for modules
+set -euo pipefail
+
+# Simple text function for remote modules (fallback)
+setup_text() {
+    local key="$1"
+    case "$key" in
+        "info_tag") echo "BİLGİ" ;;
+        "success_tag") echo "BAŞARILI" ;;
+        "warning_tag") echo "UYARI" ;;
+        "error_tag") echo "HATA" ;;
+        *) echo "$key" ;;
+    esac
+}
+
+setup_text_fmt() {
+    local key="$1"
+    shift
+    local fmt
+    case "$key" in
+        "download_attempt") fmt="İndirme deneniyor: %s" ;;
+        "download_success") fmt="%d. denemede indirme başarılı" ;;
+        "download_failed") fmt="Tüm indirme denemeleri başarısız: %s" ;;
+        *) fmt="$key" ;;
+    esac
+    # shellcheck disable=SC2059
+    printf "$fmt" "$@"
+}
+
+# Download function for remote modules
+download_file() {
+    local url="$1"
+    local output="$2"
+    local max_attempts=3
+    local attempt=1
+
+    # Use i18n messages if available, fallback to English
+    local info_tag="[INFO]"
+    local success_tag="[SUCCESS]"
+    local warning_tag="[WARNING]"
+    local error_tag="[ERROR]"
+
+    # Try to get localized tags if setup_text function is available
+    if declare -f setup_text &>/dev/null; then
+        info_tag="[$(setup_text info_tag)]"
+        success_tag="[$(setup_text success_tag)]"
+        warning_tag="[$(setup_text warning_tag)]"
+        error_tag="[$(setup_text error_tag)]"
+    fi
+
+    echo "$info_tag $(setup_text_fmt download_attempt "$(basename "$url")")"
+    mkdir -p "$(dirname "$output")"
+
+    while [ $attempt -le $max_attempts ]; do
+        if curl -fsSL --connect-timeout 10 --max-time 60 --retry 2 --retry-delay 1 \
+           --user-agent "linux-ai-setup-script" "$url" -o "$output" 2>/tmp/curl_error.log; then
+            echo "$success_tag $(setup_text_fmt download_success "$attempt")"
+            return 0
+        fi
+
+        if [ -f /tmp/curl_error.log ] && [ -s /tmp/curl_error.log ]; then
+            echo "$warning_tag curl error: $(cat /tmp/curl_error.log | head -1)"
+            rm -f /tmp/curl_error.log
+        fi
+
+        if command -v wget &> /dev/null; then
+            echo "$info_tag Trying with wget..."
+            if wget --timeout=10 --tries=2 --user-agent="linux-ai-setup-script" \
+                    -qO "$output" "$url" 2>/tmp/wget_error.log; then
+                echo "$success_tag $(setup_text_fmt download_success "$attempt")"
+                return 0
+            fi
+            if [ -f /tmp/wget_error.log ] && [ -s /tmp/wget_error.log ]; then
+                echo "$warning_tag wget error: $(cat /tmp/wget_error.log | head -1)"
+                rm -f /tmp/wget_error.log
+            fi
+        fi
+
+        [ -f "$output" ] && rm -f "$output"
+
+        if [ $attempt -lt $max_attempts ]; then
+            echo "$warning_tag Download attempt $attempt/$max_attempts failed, retrying in 2 seconds..."
+            sleep 2
+        fi
+        ((attempt++))
+    done
+
+    echo "$error_tag $(setup_text_fmt download_failed "$(basename "$url")")"
+    return 1
+}
+
+# Source module function for remote modules
+source_module() {
+    local local_path="$1"
+    local remote_rel_path="$2"
+    if [ -f "$local_path" ]; then
+        source "$local_path"
+    else
+        if ! command -v curl &> /dev/null && ! command -v wget &> /dev/null; then
+            echo "[ERROR] curl command not found; cannot load module '$remote_rel_path'."
+            exit 1
+        fi
+        local remote_url="${SCRIPT_BASE_URL:-https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main}/${remote_rel_path}"
+        local temp_file
+        temp_file=$(mktemp)
+        if ! download_file "$remote_url" "$temp_file"; then
+            echo "[ERROR] Failed to load module from $remote_url"
+            rm "$temp_file"
+            exit 1
+        fi
+        source "$temp_file" || {
+            echo "[ERROR] Failed to source module from $remote_url"
+            rm "$temp_file"
+            exit 1
+        }
+        rm "$temp_file"
+    fi
+}
+
+export -f download_file
+export -f source_module
+EOF
+
+        # Download utils.bash using the remote_helper's download_file function
+        if [ ! -f "$remote_dir/utils/utils.bash" ]; then
+            echo -e "${INFO_TAG} $(setup_text_fmt downloading_utils "$remote_dir/utils/utils.bash")"
+            echo -e "${INFO_TAG} $(setup_text_fmt from_url "${SCRIPT_BASE_URL}/modules/utils/utils.bash")"
+            if ! (cd "$remote_dir" && source utils/remote_helper.bash && download_file "${SCRIPT_BASE_URL}/modules/utils/utils.bash" "utils/utils.bash"); then
+                echo -e "${RED}${ERROR_TAG}${NC} Failed to download utils.bash"
+                echo -e "${ERROR_TAG} Directory contents:"
+                ls -la "$remote_dir/" 2>/dev/null || echo "Cannot list directory"
+                rm -rf "$remote_dir"
+                return 1
+            fi
+            echo -e "${SUCCESS_TAG} $(setup_text utils_downloaded)"
+        fi
+
+        # Download banner.bash
+        if [ ! -f "$remote_dir/utils/banner.bash" ]; then
+            if ! (cd "$remote_dir" && source utils/remote_helper.bash && download_file "${SCRIPT_BASE_URL}/modules/utils/banner.bash" "utils/banner.bash"); then
+                echo -e "${RED}${ERROR_TAG}${NC} Failed to download banner.bash"
+                rm -rf "$remote_dir"
+                return 1
+            fi
+        fi
+
+        # Download the module
+        echo -e "${INFO_TAG} Attempting to download: $(basename "$module_url")"
+        echo -e "${INFO_TAG} To: $remote_file"
+        echo -e "${INFO_TAG} From: $module_url"
+        if ! download_file "$module_url" "$remote_file"; then
+            echo -e "${RED}${ERROR_TAG}${NC} Failed to download module '$module_name'."
+            echo -e "${ERROR_TAG} Attempted URL: $module_url"
+            echo -e "${ERROR_TAG} Directory contents before cleanup:"
+            ls -la "$remote_dir/" 2>/dev/null || echo "Cannot list directory"
+            rm -rf "$remote_dir"
+            return 1
+        fi
+
+        # Show final directory structure
+        echo -e "${INFO_TAG} Final directory structure:"
+        find "$remote_dir" -type f 2>/dev/null || true
+
+        # Run the module with proper environment
+        echo -e "${INFO_TAG} Running module from: $(dirname "$remote_file")"
+        if ! (cd "$remote_dir" && source utils/remote_helper.bash && PKG_MANAGER="$PKG_MANAGER" UPDATE_CMD="$UPDATE_CMD" INSTALL_CMD="$INSTALL_CMD" LANGUAGE="$LANGUAGE" bash "$remote_file" "$@"); then
+            echo -e "${RED}${ERROR_TAG}${NC} $(setup_text_fmt log_module_error "$module_name")"
+            echo -e "${ERROR_TAG} $(setup_text_fmt log_module_at "$remote_file")"
+            echo -e "${ERROR_TAG} $(setup_text_fmt log_working_dir "$remote_dir")"
+            rm -rf "$remote_dir"
+            return 1
+        fi
+
+        # Clean up
+        rm -rf "$remote_dir"
+    fi
+    return 0
+}
+export -f run_module
+export -f prepare_remote_module_dir
+export -f cleanup_remote_modules
+
+language_menu() {
+    clear
+    echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+    text=" $(setup_text menu_language_option) "
+    len=${#text}
+    padding=$(( (72 - len) / 2 ))
+    printf "${BLUE}║%*s%s%*s║${NC}\n" "$padding" "" "$text" "$((72 - len - padding))" ""
+    echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
+    echo -e "  ${GREEN}1${NC} - English"
+    echo -e "  ${GREEN}2${NC} - Türkçe"
+    echo -e "\n$(setup_text menu_current_language): $(get_language_label "$LANGUAGE")"
+    read -r -p "$(setup_text prompt_choice): " lang_choice </dev/tty
+    case "$lang_choice" in
+        1)
+            set_language "en" && echo -e "${GREEN}$(setup_text info_language_switched)${NC}" ;;
+        2)
+            set_language "tr" && echo -e "${GREEN}$(setup_text info_language_switched)${NC}" ;;
+        *)
+            echo -e "${YELLOW}$(setup_text warning_invalid_choice): ${lang_choice}${NC}" ;;
+    esac
+    sleep 1
+}
+
+# Ana menü
+main_menu() {
+    detect_platform # Platformu ve paket yöneticisini başta tespit et
+
+    while true; do
+        clear
+        render_setup_banner "$SCRIPT_VERSION" "https://github.com/tamerkaraca/linux-ai-setup-script"
+
+        # Show platform-specific menu
+        if is_macos; then
+            echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+            text=" $(setup_text menu_title) - macOS "
+            len=${#text}
+            padding=$(( (72 - len) / 2 ))
+            printf "${BLUE}║%*s%s%*s║${NC}\n" "$padding" "" "$text" "$((72 - len - padding))" ""
+            echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
+            echo -e "  ${GREEN}1${NC} - Install/Update Homebrew"
+            echo -e "  ${GREEN}2${NC} - $(setup_text menu_option2)"
+            echo -e "  ${GREEN}3${NC} - Install AI CLI Tools (Homebrew)"
+            echo -e "  ${GREEN}4${NC} - Install AI Frameworks (pipx)"
+            echo -e "  ${GREEN}5${NC} - $(setup_text menu_option6)"
+            echo -e "  ${GREEN}6${NC} - $(setup_text menu_option7)"
+            echo -e "  ${GREEN}7${NC} - $(setup_text menu_option8)"
+            echo -e "  ${GREEN}8${NC} - $(setup_text menu_option9)"
+            echo -e "  ${GREEN}9${NC} - $(setup_text menu_option10)"
+            echo -e "  ${GREEN}10${NC} - $(setup_text menu_option11)"
+            echo -e "  ${GREEN}11${NC} - $(setup_text menu_option12)"
+            echo -e "  ${GREEN}A${NC} - Install Everything (macOS)"
+            echo -e "  ${GREEN}L${NC} - $(setup_text menu_language_option) ($(get_language_label "$LANGUAGE"))"
+            echo -e "  ${RED}R${NC} - $(setup_text menu_optionR)"
+            echo -e "  ${RED}0${NC} - $(setup_text menu_option0)"
+        else
+            echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
+            text=" $(setup_text menu_title) - Linux/WSL "
+            len=${#text}
+            padding=$(( (72 - len) / 2 ))
+            printf "${BLUE}║%*s%s%*s║${NC}\n" "$padding" "" "$text" "$((72 - len - padding))" ""
+            echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}\n"
+            echo -e "  ${GREEN}1${NC} - $(setup_text menu_option1)"
+            echo -e "  ${GREEN}2${NC} - $(setup_text menu_option2)"
+            echo -e "  ${GREEN}3${NC} - $(setup_text menu_option3)"
+            echo -e "  ${GREEN}4${NC} - $(setup_text menu_option4)"
+            echo -e "  ${GREEN}5${NC} - $(setup_text menu_option5)"
+            echo -e "  ${GREEN}6${NC} - $(setup_text menu_option6)"
+            echo -e "  ${GREEN}7${NC} - $(setup_text menu_option7)"
+            echo -e "  ${GREEN}8${NC} - $(setup_text menu_option8)"
+            echo -e "  ${GREEN}9${NC} - $(setup_text menu_option9)"
+            echo -e "  ${GREEN}10${NC} - $(setup_text menu_option10)"
+            echo -e "  ${GREEN}11${NC} - $(setup_text menu_option11)"
+            echo -e "  ${GREEN}12${NC} - $(setup_text menu_option12)"
+            echo -e "  ${GREEN}13${NC} - $(setup_text menu_option13)"
+            echo -e "  ${GREEN}14${NC} - $(setup_text menu_option14)"
+            echo -e "  ${GREEN}A${NC} - $(setup_text menu_optionA)"
+            echo -e "  ${GREEN}L${NC} - $(setup_text menu_language_option) ($(get_language_label "$LANGUAGE"))"
+            echo -e "  ${RED}R${NC} - $(setup_text menu_optionR)"
+            echo -e "  ${RED}0${NC} - $(setup_text menu_option0)"
+        fi
+        echo -e "\n${YELLOW}$(setup_text menu_multi_hint)${NC}"
+        echo
+        read -r -p "${YELLOW}$(setup_text prompt_choice):${NC} " choice_input </dev/tty
+
+        if [ -z "$(echo "$choice_input" | tr -d '[:space:]')" ]; then
+            echo -e "${YELLOW}$(setup_text warning_no_selection)${NC}"
+            sleep 1
+            continue
+        fi
+
+        IFS=',' read -ra USER_CHOICES <<< "$choice_input"
+        exit_menu=false
+
+        for raw_choice in "${USER_CHOICES[@]}"; do
+            choice=$(echo "$raw_choice" | tr -d '[:space:]')
+            [ -z "$choice" ] && continue
+            choice=$(echo "$choice" | tr '[:lower:]' '[:upper:]')
+
+            case "$choice" in
+                1)
+                    if is_macos; then
+                        run_module "setup/homebrew"
+                    else
+                        update_system
+                        # Try wslu module but make it optional
+                        if ! run_module "setup/wslu" 2>/dev/null; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: wslu module failed to download. This is optional for browser integration."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
+                        # Try configure_windows_apps module but make it optional
+                        if ! run_module "setup/configure_windows_apps" 2>/dev/null; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: Windows apps configuration module failed to download."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
+                        clean_windows_paths_from_rc
+                    fi
+                    ;;
+                2) run_module "menus/python_tools" ;;
+                3)
+                    if is_macos; then
+                        run_module "setup/macos_ai_tools"
+                    else
+                        run_module "menus/node"
+                    fi
+                    ;;
+                4)
+                    if is_macos; then
+                        run_module "setup/macos_ai_frameworks"
+                    else
+                        run_module "menus/ai_cli_tools"
+                    fi
+                    ;;
+                5)
+                    if is_macos; then
+                        run_module "setup/configure_git"
+                    else
+                        run_module "menus/ai_frameworks"
+                    fi
+                    ;;
+                6)
+                    if is_macos; then
+                        run_module "setup/configure_glm_claude"
+                    else
+                        run_module "setup/configure_git"
+                    fi
+                    ;;
+                7)
+                    if is_macos; then
+                        run_module "menus/aux_tools"
+                    else
+                        run_module "setup/configure_glm_claude"
+                    fi
+                    ;;
+                8)
+                    if is_macos; then
+                        run_module "menus/php_versions"
+                    else
+                        run_module "menus/aux_tools"
+                    fi
+                    ;;
+                9)
+                    if is_macos; then
+                        run_module "setup/github_cli"
+                    else
+                        run_module "menus/php_versions"
+                    fi
+                    ;;
+                10)
+                    if is_macos; then
+                        run_module "menus/remove_ai_frameworks"
+                    else
+                        run_module "setup/github_cli"
+                    fi
+                    ;;
+                11)
+                    if is_macos; then
+                        run_module "menus/mcp_servers"
+                    else
+                        run_module "menus/remove_ai_frameworks"
+                    fi
+                    ;;
+                12)
+                    if is_macos; then
+                        log_info "Option not available on macOS"
+                    else
+                        run_module "menus/mcp_servers"
+                    fi
+                    ;;
+                13) run_module "menus/terminal_tools" ;;
+                14) run_module "menus/asdf_tools" ;;
+                L)
+                    language_menu
+                    ;;
+                R)
+                    run_module "utils/cleanup_all"
+                    ;;
+                A)
+                    if is_macos; then
+                        run_module "setup/homebrew"
+                        run_module "menus/python_tools"
+                        run_module "setup/macos_ai_tools" "all"
+                        run_module "setup/macos_ai_frameworks" "all"
+                        run_module "setup/configure_git"
+                        run_module "setup/configure_glm_claude"
+                        run_module "menus/aux_tools" "all"
+                        run_module "setup/github_cli"
+                        run_module "menus/terminal_tools" "all"
+                        echo -e "\n${YELLOW}$(setup_text prompt_install_php)${NC}"
+                        read -r install_php_choice </dev/tty
+                        if [[ "$install_php_choice" =~ ^[EeYy]$ ]]; then
+                            run_module "menus/php_versions"
+                        fi
+                    else
+                        # Option 1
+                        update_system
+                        # Try wslu module but make it optional
+                        if ! run_module "setup/wslu" 2>/dev/null; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: wslu module failed to download. This is optional for browser integration."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
+                        # Try configure_windows_apps module but make it optional
+                        if ! run_module "setup/configure_windows_apps" 2>/dev/null; then
+                            echo -e "${YELLOW}${WARN_TAG}${NC} Warning: Windows apps configuration module failed to download."
+                            echo -e "${CYAN}${INFO_TAG}${NC} Continuing with the rest of the installation..."
+                        fi
+                        clean_windows_paths_from_rc
+
+                        # Option 2
+                        run_module "menus/python_tools" "all"
+
+                        # Option 3
+                        run_module "menus/node" "all"
+
+                        # Option 4
+                        run_module "menus/ai_cli_tools" "all"
+
+                        # Option 6
+                        run_module "setup/configure_git"
+
+                        # Option 10
+                        run_module "setup/github_cli"
+                    fi
+                    ;; 
+                0)
+                    echo -e "${GREEN}$(setup_text info_returning)${NC}"
+                    exit_menu=true
+                    break
+                    ;; 
+                *)
+                    echo -e "${RED}$(setup_text warning_invalid_choice): $raw_choice${NC}" ;;
+            esac
+        done
+
+        if [ "$exit_menu" = true ]; then
+            exit 0
+        fi
+        echo -e "\n${YELLOW}$(setup_text prompt_press_enter)${NC}"
+        read -r </dev/tty
+    done
+}
+
+# Script başladığında ana menüyü çağır
+main_menu

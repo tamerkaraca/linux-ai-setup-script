@@ -1,0 +1,416 @@
+# AI Development Environment Setup Script
+
+> Single-command bootstrapper for a modern AI workstation on Linux/WSL and macOS. Interactive menus, remote-safe modules, colorful banners, and bilingual guidance (English & Turkish).
+
+[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
+
+## Technologies Used
+
+### Core Technologies
+[![Bash](https://img.shields.io/badge/Bash-4EAA25?style=flat-square&logo=gnu-bash&logoColor=white)](https://www.gnu.org/software/bash/)
+[![Node.js](https://img.shields.io/badge/Node.js-43853D?style=flat-square&logo=node.js&logoColor=white)](https://nodejs.org/)
+[![Python](https://img.shields.io/badge/Python-3776AB?style=flat-square&logo=python&logoColor=white)](https://www.python.org/)
+[![PHP](https://img.shields.io/badge/PHP-777BB4?style=flat-square&logo=php&logoColor=white)](https://www.php.net/)
+[![Git](https://img.shields.io/badge/Git-F05032?style=flat-square&logo=git&logoColor=white)](https://git-scm.com/)
+[![Linux](https://img.shields.io/badge/Linux-FCC624?style=flat-square&logo=linux&logoColor=black)](https://www.linux.org/)
+[![macOS](https://img.shields.io/badge/macOS-000000?style=flat-square&logo=apple&logoColor=white)](https://www.apple.com/macos/)
+
+### Package Managers & Tools
+[![Homebrew](https://img.shields.io/badge/Homebrew-000000?style=flat-square&logo=homebrew&logoColor=white)](https://brew.sh/)
+[![pipx](https://img.shields.io/badge/pipx-2C5AA0?style=flat-square&logo=pypi&logoColor=white)](https://pipx.pypa.io/)
+[![npm](https://img.shields.io/badge/npm-CB3837?style=flat-square&logo=npm&logoColor=white)](https://www.npmjs.com/)
+[![Yarn](https://img.shields.io/badge/Yarn-2C8EBB?style=flat-square&logo=yarn&logoColor=white)](https://yarnpkg.com/)
+[![pnpm](https://img.shields.io/badge/pnpm-F69220?style=flat-square&logo=pnpm&logoColor=white)](https://pnpm.io/)
+[![Bun](https://img.shields.io/badge/Bun-000000?style=flat-square&logo=bun&logoColor=white)](https://bun.sh/)
+[![Composer](https://img.shields.io/badge/Composer-885630?style=flat-square&logo=composer&logoColor=white)](https://getcomposer.org/)
+[![Zsh](https://img.shields.io/badge/Zsh-000000?style=flat-square&logo=zsh&logoColor=white)](https://zsh.sourceforge.io/)
+
+### AI Tools & Frameworks
+[![Claude Code](https://img.shields.io/badge/Claude%20Code-000000?style=flat-square&logo=anthropic&logoColor=white)](https://github.com/anthropics/claude-code)
+[![Gemini CLI](https://img.shields.io/badge/Gemini%20CLI-4285F4?style=flat-square&logo=google&logoColor=white)](https://github.com/google-gemini/gemini-cli)
+[![OpenCode](https://img.shields.io/badge/OpenCode-000000?style=flat-square&logo=github&logoColor=white)](https://github.com/opencode-ai/opencode)
+[![Qoder](https://img.shields.io/badge/Qoder-000000?style=flat-square)](https://docs.qoder.com/cli/quick-start/)
+[![Qwen](https://img.shields.io/badge/Qwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://github.com/QwenLM/qwen-code/)
+[![OpenAI Codex](https://img.shields.io/badge/OpenAI%20Codex-412991?style=flat-square&logo=openai&logoColor=white)](https://github.com/openai/codex/)
+[![Cursor Agent](https://img.shields.io/badge/Cursor%20Agent-000000?style=flat-square&logo=cursor&logoColor=white)](https://cursor.com/cli/)
+[![Cline](https://img.shields.io/badge/Cline-000000?style=flat-square)](https://github.com/cline/cline/)
+[![Aider](https://img.shields.io/badge/Aider-000000?style=flat-square&logo=python&logoColor=white)](https://github.com/Aider-AI/aider/)
+[![GitHub Copilot](https://img.shields.io/badge/GitHub%20Copilot-000000?style=flat-square&logo=github&logoColor=white)](https://github.com/github/copilot-cli/)
+[![Kilocode](https://img.shields.io/badge/Kilocode-000000?style=flat-square)](https://github.com/Kilo-Org/kilocode/)
+[![Auggie](https://img.shields.io/badge/Auggie-000000?style=flat-square)](https://github.com/augmentcode/auggie/)
+[![Droid](https://img.shields.io/badge/Droid-000000?style=flat-square)](https://factory.ai/)
+[![Jules](https://img.shields.io/badge/Jules-4285F4?style=flat-square&logo=google&logoColor=white)](https://jules.google/docs/)
+[![Continue](https://img.shields.io/badge/Continue-000000?style=flat-square&logo=vercel&logoColor=white)](https://www.continue.dev/)
+[![SuperGemini](https://img.shields.io/badge/SuperGemini-4285F4?style=flat-square&logo=google&logoColor=white)](https://github.com/SuperClaude-Org/SuperGemini_Framework)
+[![SuperQwen](https://img.shields.io/badge/SuperQwen-FF6B35?style=flat-square&logo=alibaba&logoColor=white)](https://github.com/SuperClaude-Org/SuperQwen_Framework)
+[![SuperClaude](https://img.shields.io/badge/SuperClaude-000000?style=flat-square&logo=anthropic&logoColor=white)](https://github.com/SuperClaude-Org/SuperClaude_Framework)
+
+---
+
+## Table of Contents
+
+1. [English Guide](#-english-guide)
+   - [Overview](#overview)
+   - [Architecture](#architecture)
+   - [Requirements](#requirements)
+   - [Installation](#installation)
+   - [Primary Menu Reference](#primary-menu-reference)
+   - [CLI & Framework Sub-menus](#cli--framework-sub-menus)
+   - [Usage Notes](#usage-notes)
+   - [Troubleshooting](#troubleshooting)
+   - [Contributing](#contributing)
+   - [Credits](#credits)
+   - [License](#license)
+2. [Türkçe Rehber](#-türkçe-rehber)
+   - [Genel Bakış](#genel-bakış)
+   - [Mimari](#mimari)
+   - [Gereksinimler](#gereksinimler)
+   - [Kurulum](#kurulum)
+   - [Ana Menü Özeti](#ana-menü-özeti)
+   - [Alt Menü Detayları](#alt-menü-detayları)
+   - [Kullanım Notları](#kullanım-notları)
+   - [Sorun Giderme](#sorun-giderme)
+   - [Katkı](#katkı)
+   - [Emek Verenler](#emek-verenler)
+   - [Lisans](#lisans)
+
+---
+
+## English Guide
+
+### Overview
+
+`setup` prepares a workstation for AI development on Linux/WSL and macOS. It auto-detects the operating system and package manager, resolves Windows CRLF line endings, installs system dependencies, bootstraps Python/Node/PHP stacks, and exposes curated menus for AI CLIs, AI frameworks, and auxiliary tools. The UI is bilingual: English is the default, Turkish is auto-selected when your locale starts with `tr`, and you can toggle languages anytime via menu option `L`.
+
+#### Platform Support
+- **Linux/WSL**: Uses native package managers (apt, dnf, yum, pacman) with traditional installation methods
+- **macOS**: Uses Homebrew package manager with optimized Cask and Formula installations for AI tools
+
+### Architecture
+
+| Component | Description |
+|-----------|-------------|
+| **Self-healing launcher** | Detects CRLF, re-runs itself after fixing permissions/line endings. |
+| **Remote-safe modules** | When invoked via `bash -c "$(curl …)"`, `setup` downloads helper modules to a temp directory and exports helper functions so nested scripts operate as if run locally. |
+
+| **Menu runner** | `run_module` prefers local `./modules/*.sh`; otherwise downloads from GitHub and passes environment variables (`PKG_MANAGER`, `INSTALL_CMD` etc.) to sub-processes. |
+
+### Requirements
+
+- Linux distribution exposing `apt`, `dnf`, `yum`, or `pacman`.
+- `bash` 5+, `sudo` rights, internet access.
+- `curl` or `wget` (auto-installed when missing for remote runs).
+- Optional: `dos2unix`, `shellcheck`, `jq` (installed automatically when relevant).
+
+The banner renderer ships with the repo, so no extra packages are fetched just to print headers.
+
+### Installation
+
+#### 1. Quick One-Liner (recommended)
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+```
+
+or with `wget`:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup | bash
+```
+
+#### 2. Local Clone
+
+```bash
+git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
+cd linux-ai-setup-script
+chmod +x setup
+bash -n setup && shellcheck setup  # optional
+./setup
+```
+
+### Primary Menu Reference
+
+| Option | Description |
+|--------|-------------|
+| `1` | Update system packages + install essentials (`curl`, `wget`, `git`, `jq`, `zip`, compilers). On WSL, also installs `wslu` to provide host browser access for CLI tools. |
+| `2` | Install Python toolchain: Python 3, Pip, ensurepip fallback, Pipx, UV; auto-reloads shell RC files. |
+| `3` | Open the Node.js tooling sub-menu (NVM + Node LTS, Bun, CLI extras). |
+| `4` | Install AI CLI tools (opens sub-menu). |
+| `5` | Install AI frameworks (opens sub-menu; handles Pipx, GLM prompts, tty-safe runs). |
+| `6` | Git configuration (name/email, signing, alias suggestions). |
+| `7` | Claude Code provider menu (GLM-4.6 or Moonshot kimi-k2 with masked key + base URL helpers). |
+| `8` | Install Auxiliary AI Tools (OpenSpec, Agents, etc.). |
+| `9` | Install PHP and Composer with selectable versions and Laravel-friendly extensions. |
+| `10` | Install GitHub CLI with official repo keys. |
+| `11` | Remove all AI frameworks (Linux only). |
+| `12` | MCP server management (macOS only; list, clean `~/.gemini`, `~/.qwen`, `~/.claude`). |
+| `A` | Install essential development environment | Installs options `1, 2, 3, 4, 6, 10` sequentially (skips interactive logins, prints summaries). |
+| `R` | Uninstall All Tools | Removes all tools and configurations installed by the script, resetting to a clean state. |
+| `L` | Switch the interface language (English ↔ Türkçe, auto-detected default). |
+| `0` | Exit. |
+
+### CLI & Framework Sub-menus
+
+#### Node.js Tooling Menu
+Option `3` now opens an interactive menu that accepts comma-separated selections (`1,3`) and also exposes a `4` shortcut to run every component. Each choice calls the hardened installers under `modules/install_nodejs_tools.sh`, so you can mix-and-match without re-running the entire stack.
+
+| Option | Component | Highlights |
+|--------|-----------|------------|
+| `1` | Node.js via NVM | Installs/updates NVM, refreshes shell RC files, and installs the latest LTS release. |
+| `2` | Bun runtime | Runs Bun’s official installer, adds `~/.bun/bin` to PATH, and prints the detected version. |
+| `3` | Node CLI extras | Enables Corepack and installs `pnpm` + `yarn` globally, perfect for repo scripts and CI. |
+| `4` | Install every component | Executes options `1-3` sequentially. |
+| `0` | Return to main menu | No changes applied. |
+
+#### AI CLI Menu
+The sub-menu accepts comma-separated selections (`1,3,7`) or a `14` shortcut that installs every CLI sequentially. Interactive runs pause for logins, whereas batch runs remember the missing auth commands and print them in a summary.
+
+| Option | Tool | Highlights |
+|--------|------|------------|
+| `1` | [Claude Code CLI](https://github.com/anthropics/claude-code) | Attaches to `/dev/tty` so Anthropic’s Ink prompts work even during remote runs. |
+| `2` | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | Requires Node.js ≥ 20, performs npm fallback installs, and reminds you to run `gemini auth`. |
+| `3` | [OpenCode CLI](https://github.com/opencode-ai/opencode) | Handles remote-safe installs for the OpenCode beta tooling and prints `opencode login` hints. |
+| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Probes several npm scopes and attempts installation using a list of candidate package names, ensuring robust installation. |
+| `5` | [Qwen CLI](https://github.com/QwenLM/qwen-code/) | Enforces Node.js ≥ 18, bootstraps Node when missing, and uses `/dev/tty` for `qwen login` prompts with a `--package` override. |
+| `6` | [OpenAI Codex CLI](https://github.com/openai/codex/) | Installs Codex/Cursor helpers and points you to the ChatGPT or `OPENAI_API_KEY` auth flow. |
+| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Installs `cursor-agent` via its official curl script, ensures `cursor-agent` command availability, and reminds you to run `cursor-agent login` (interactive runs open `/dev/tty`). |
+| `8` | [Cline CLI](https://github.com/cline/cline/) | Requires Node.js ≥ 18, attempts installation using a list of candidate npm package names (`cline`, `@cline/cli`, `cline-cli`), and prompts for `cline login` only during interactive runs. |
+| `9` | [Aider CLI](https://github.com/Aider-AI/aider/) | Uses the official `aider-install` script for a robust installation, handling Python versions and dependencies automatically. |
+| `10` | [GitHub Copilot CLI](https://github.com/github/copilot-cli/) | Installs via npm and prints both `copilot auth login` and `copilot auth activate` reminders. |
+| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | Installs `@kilocode/cli` via npm, enforces Node.js ≥ 18, includes robust Python compatibility checks and fallbacks, and prints reminders to run `kilocode config` plus architect/debug/auto modes. |
+| `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | Installs `@augmentcode/auggie` (Node.js ≥ 22) and walks through `auggie login`, `.augment/commands`, and CI-friendly flags. |
+| `13` | [Droid CLI](https://factory.ai/) | Provides Factory’s quickstart instructions for installing the droid CLI (interactive terminal) and reminds you to follow the official guide. |
+| `14` | [Jules CLI](https://jules.google/docs/) | Installs `@google/jules` globally (Node.js ≥ 18) and guides through `jules login` for authentication. |
+| `15` | [Continue CLI](https://docs.continue.dev/cli/overview) | Installs `@continuedev/cli` via npm, providing access to the Continue developer assistant. |
+| `16` | Install every CLI | Runs options `1-15` in batch mode (logins skipped, summary printed at the end). |
+
+#### Auxiliary AI Tools Menu
+This new menu, accessible via option `8` in the main menu, groups together tools for spec-driven development and agent libraries.
+
+| Option | Tool | Highlights |
+|--------|------|------------|
+| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | Installs `@fission-ai/openspec` globally (Node.js ≥ 18) so you can run `openspec init/plan/sync`. |
+| `2` | [specify-cli](https://github.com/github/spec-kit) | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. Requires Python tools to be installed. |
+| `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
+| `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
+| `5` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | Installs a collection of agents for `opencode` from the darrenhinde/OpenAgents repository. |
+| `A` | Install All | Installs all auxiliary tools sequentially. |
+
+#### AI Framework Menu
+The framework menu ensures `pipx` exists (installing Python first if necessary), then lets you provision individual Super* stacks or all of them in one go. Each installer routes prompts through `/dev/tty`, so API-key input works even when `setup` was piped through `curl`.
+
+| Option | Framework | Highlights |
+|--------|-----------|------------|
+| `1` | [SuperGemini](https://github.com/SuperClaude-Org/SuperGemini_Framework) | Installs the Gemini-native workflow via `pipx`, including login hints and PATH refresh. |
+| `2` | [SuperQwen](https://github.com/SuperClaude-Org/SuperQwen_Framework) | Wraps the official installer with `attach_tty_and_run` so Qwen credentials can be entered safely. |
+| `3` | [SuperClaude](https://github.com/SuperClaude-Org/SuperClaude_Framework) | Provides the Anthropic toolkit with the same TTY safeguards and cleanup helpers. |
+| `4` | Install every framework | Sequentially installs all three frameworks (duplicate runs are skipped gracefully). |
+
+### Usage Notes
+
+- **Language toggle:** English is the default, Turkish is auto-detected when your locale starts with `tr`, and you can flip languages anytime via menu option `L`.
+- **Environment reloads:** PATH updates for `pipx`, `uv`, `nvm`, `bun`, `gh`, etc., are appended to `~/.bashrc`, `~/.zshrc`, and `~/.profile`. The script auto-sources whichever exists so new commands are usable immediately.
+- **Remote execution:** The menu structure, colorized logs, and sub-modules behave the same whether you cloned locally or piped via curl.
+- **API keys:** Super* installers guide you through provider portals (Gemini, Anthropic, OpenAI). GLM configuration masks existing keys (`abcd***wxyz`) and only replaces them if you supply a new value.
+- **TTY requirements:** The Claude Code, SuperQwen, and SuperClaude installers now route to `/dev/tty`, preventing Ink-based CLIs from exiting with “Raw mode is not supported”.
+
+### Troubleshooting
+
+| Symptom | Resolution |
+|---------|------------|
+| `curl: (3) URL rejected: No host part` | Ensure you are on the latest `setup` (≥ `7d4ee0a`). The script now exports `SCRIPT_BASE_URL` and caches modules with fully qualified URLs. |
+| `mask_secret: command not found` | Pull latest changes; GLM config now sources `modules/utils.sh` even in remote runs. |
+| `SuperQwen install` aborts without prompting | Fixed by `attach_tty_and_run`; rerun option `5` → SuperQwen. |
+| Aider CLI install fails | The script now uses the official `aider-install` script, which is more robust. If it still fails, check the logs from the installer. |
+| CLI still missing after install | Re-open the terminal or run `source ~/.bashrc`; confirm `$PATH` contains `~/.local/bin` and `~/.nvm`. |
+| `pip` errors about externally-managed environment | `install_pip` now falls back to `ensurepip`, distro packages, or `get-pip.py --break-system-packages`. Re-run option `2`. |
+| `file: command not found` or syntax errors in `install_specify_cli.sh` | Fixed by ensuring `file` command check and correcting associative array syntax. |
+
+### Contributing
+
+1. Fork repository and create a feature branch.
+2. Run `shellcheck` on touched scripts plus `bash -n` for syntax checks. Ensure all issues are resolved.
+3. Update README/localized docs when adding menus or modules.
+4. Submit a PR describing motivation, impacted scripts, and sample output (screenshots/logs for interactive flows help reviewers).
+5. For module changes, verify both local and remote (`bash -c "$(curl …)"`) workflows.
+
+#### Script Validation
+All scripts in this repository are validated with:
+- **Syntax checks:** `bash -n` for all shell scripts
+- **Static analysis:** `shellcheck` for best practices and security
+- **Line ending normalization:** Automatic CRLF to LF conversion
+- **Current status:** ✅ 54 scripts validated (53 modules + setup)
+
+### Credits
+
+- **Maintainer:** Tamer Karaca (@tamerkaraca)  
+- **Framework Authors:** SuperGemini/SuperQwen/SuperClaude teams, Anthropic, Google, OpenAI, GitHub Copilot CLI contributors.
+
+### License
+
+This project is licensed under the **MIT License**. See [`LICENSE`](./LICENSE) for full text.
+
+---
+
+## Türkçe Rehber
+
+### Genel Bakış
+
+`setup`, Linux tabanlı geliştirici makinelerinde uçtan uca AI ortamı kurar. Paket yöneticisini otomatik saptar, CRLF düzeltir, Python/Node/PHP ekosistemlerini kurar, AI CLI & framework menüleri sunar. Arayüz iki dillidir: varsayılan İngilizcedir, sistem dili `tr` ile başlıyorsa otomatik olarak Türkçe açılır ve menüdeki `L` seçeneğiyle anında dil değiştirebilirsiniz.
+
+### Mimari
+
+| Bileşen | Açıklama |
+|---------|---------|
+| **Kendini onaran başlatıcı** | CRLF algılar, izin/dosya sorunlarını düzeltip script’i yeniden başlatır. |
+| **Uzaktan güvenli modüller** | `bash -c "$(curl …)"` yöntemiyle çalıştırıldığında yardımcı modülleri geçici dizine indirir ve alt süreçlerle paylaşır. |
+
+| **Menü çalıştırıcısı** | Önce yerel `./modules/*.sh` dosyalarını, yoksa GitHub sürümlerini kullanır. |
+
+### Gereksinimler
+
+- `apt`, `dnf`, `yum` veya `pacman` içeren Linux dağıtımı.
+- `bash` 5+, `sudo` hakları, aktif internet bağlantısı.
+- `curl` veya `wget` (uzaktan kurulum için zorunlu).
+- Banner panelleri depo ile birlikte gelir; ekstra bir ASCII aracı kurmanıza gerek kalmaz.
+
+### Kurulum
+
+#### 1. Tek Satırlık Kurulum
+
+```bash
+bash -c "$(curl -fsSL https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup)"
+```
+
+veya `wget` ile:
+
+```bash
+wget -qO- https://raw.githubusercontent.com/tamerkaraca/linux-ai-setup-script/main/setup | bash
+```
+
+#### 2. Yerel Klon
+
+```bash
+git clone https://github.com/tamerkaraca/linux-ai-setup-script.git
+cd linux-ai-setup-script
+chmod +x setup
+bash -n setup && shellcheck setup  # isteğe bağlı
+./setup
+```
+
+### Ana Menü Özeti
+
+| Seçenek | Açıklama |
+|---------|---------|
+| `1` | Sistem güncellemesi + temel paketler. WSL'de, CLI araçları için ana makine tarayıcısına erişim sağlamak üzere `wslu` paketini de kurar. |
+| `2` | Python + Pip/Pipx/UV kurulumu, PATH güncellemeleri. |
+| `3` | Node.js araç alt menüsü (NVM + Node LTS, Bun, CLI ekstraları). |
+| `4` | AI CLI araçları (alt menü). |
+| `5` | AI Frameworkleri (SuperGemini/SuperQwen/SuperClaude). |
+| `6` | Git yapılandırması. |
+| `7` | Claude Code sağlayıcı menüsü (GLM-4.6 veya Moonshot kimi-k2 ayarları). |
+| `8` | Yardımcı AI Araçlarını Kur (OpenSpec, Ajanlar, vb.). |
+| `9` | PHP & Composer kurulum sihirbazı. |
+| `10` | GitHub CLI. |
+| `11` | AI Framework kaldırma menüsü (sadece Linux). |
+| `12` | MCP sunucu yönetimi (sadece macOS; listele, `~/.gemini`, `~/.qwen`, `~/.claude` temizle). |
+| `A` | Temel geliştirme ortamını kurar | `1, 2, 3, 4, 6, 10` seçeneklerini sırayla kurar (interaktif girişleri atlar, özetleri yazdırır). |
+| `R` | Tüm Araçları Kaldır | Script tarafından kurulan tüm araçları ve yapılandırmaları kaldırarak sistemi temiz bir duruma getirir. |
+| `L` | Dili değiştir (varsayılan İngilizce, `tr` lokalli sistemlerde otomatik Türkçe açılır). |
+| `0` | Çıkış. |
+
+### Alt Menü Detayları
+
+#### Node.js Araç Menüsü
+`3` numaralı seçenek artık çoklu seçim desteği olan bir alt menü açar. Virgülle ayrılmış girişler (`1,3`) desteklenir ve `4` kısayolu tüm bileşenleri ardışık olarak kurar.
+
+| Seçenek | Bileşen | Detaylar |
+|---------|---------|----------|
+| `1` | Node.js (NVM + LTS) | NVM’i kurar/günceller, shell RC dosyalarını ayarlar ve son LTS Node sürümünü yükler. |
+| `2` | Bun runtime | Resmî Bun kurulum betiğini çalıştırır, `~/.bun/bin` dizinini PATH’e ekler ve sürümü gösterir. |
+| `3` | Node CLI ekstraları | Corepack’i etkinleştirir, `pnpm` ve `yarn`’ı global olarak kurar; CI çalışmaları için idealdir. |
+| `4` | Tüm bileşenler | `1-3` seçeneklerini sırayla çalıştırır. |
+| `0` | Ana menü | Değişiklik yapılmadan geri dönülür. |
+
+#### AI CLI Menüsü
+Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `14` kısayolunu kabul eder. Toplu kurulumlar interaktif oturum açma adımlarını atlar fakat gereken komutları özet olarak yazdırır.
+
+| Seçenek | Araç | Detaylar |
+|---------|------|----------|
+| `1` | [Claude Code CLI](https://github.com/anthropics/claude-code) | Anthropic’in Ink tabanlı arayüzünü `/dev/tty` üzerinden açar, uzaktan çalıştırmalarda bile kesinti olmaz. |
+| `2` | [Gemini CLI](https://github.com/google-gemini/gemini-cli) | Node.js ≥ 20 gereksinimini kontrol eder, npm fallback kurulumları yapar ve `gemini auth` hatırlatması verir. |
+| `3` | [OpenCode CLI](https://github.com/opencode-ai/opencode) | Beta OpenCode araçlarını uzaktan güvenli şekilde kurar ve `opencode login` komutunu hatırlatır. |
+| `4` | [Qoder CLI](https://docs.qoder.com/cli/quick-start/) | Birden çok npm paket adını dener ve sağlam kurulum sağlamak için aday paket adlarının bir listesini kullanarak kurulumu dener. |
+| `5` | [Qwen CLI](https://github.com/QwenLM/qwen-code/) | Node.js ≥ 18 şartını uygular, gerekirse Node kurulumunu başlatır, `/dev/tty` ile `qwen login` akışını yönetir. |
+| `6` | [OpenAI Codex CLI](https://github.com/openai/codex/) | Codex/Cursor yardımcılarını yükler, ChatGPT veya `OPENAI_API_KEY` tabanlı giriş akışını açıklar. |
+| `7` | [Cursor Agent CLI](https://cursor.com/cli/) | Resmi curl betiği aracılığıyla `cursor-agent` kurar, `cursor-agent` komutunun kullanılabilirliğini sağlar ve `cursor-agent login` komutunu çalıştırmanızı hatırlatır (interaktif çalıştırmalar `/dev/tty` açar). |
+| `8` | [Cline CLI](https://github.com/cline/cline/) | Node.js ≥ 18 gerektirir, aday npm paket adlarının bir listesini (`cline`, `@cline/cli`, `cline-cli`) kullanarak kurulumu dener ve sadece etkileşimli çalışmalarda `cline login` komutunu tetikler. |
+| `9` | [Aider CLI](https://github.com/Aider-AI/aider/) | Kurulum için resmi `aider-install` betiğini kullanır, bu sayede Python sürümleri ve bağımlılıklar otomatik olarak yönetilir. |
+| `10` | [GitHub Copilot CLI](https://github.com/github/copilot-cli/) | npm global kurulumunu otomatik yapar, `copilot auth login` ve `copilot auth activate` komutlarını hatırlatır. |
+| `11` | [Kilocode CLI](https://github.com/Kilo-Org/kilocode/) | `@kilocode/cli` paketini npm aracılığıyla kurar, Node.js ≥ 18'i uygular, sağlam Python uyumluluk kontrolleri ve geri dönüşleri içerir ve `kilocode config` ile architect/debug/auto modlarını çalıştırmanızı hatırlatır. |
+| `12` | [Auggie CLI](https://github.com/augmentcode/auggie/) | `@augmentcode/auggie` paketini Node.js ≥ 22 doğrulaması ile kurar, `auggie login` ve `.augment/commands` içeriğini hatırlatır. |
+| `13` | [Droid CLI](https://factory.ai/) | Factory'nin droid istemcisi için quickstart bağlantısını ve manuel komutları gösterir. |
+| `14` | [Jules CLI](https://jules.google/docs/) | `@google/jules` paketini global kurar (Node.js ≥ 18); `jules login` ile kimlik doğrulaması yapmanızı sağlar. |
+| `15` | [Continue CLI](https://docs.continue.dev/cli/overview) | `@continuedev/cli`'yi npm aracılığıyla kurar ve Continue geliştirici asistanına erişim sağlar. |
+| `16` | Hepsini Kur | `1-15` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
+
+#### Yardımcı AI Araçları Menüsü
+Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon odaklı geliştirme araçlarını ve ajan kütüphanelerini bir araya getirir.
+
+| Seçenek | Araç | Detaylar |
+|---------|------|------------|
+| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | `@fission-ai/openspec` paketini global kurar (Node.js ≥ 18); `openspec init/plan/sync` komutlarını kullanabilirsiniz. |
+| `2` | [specify-cli](https://github.com/github/spec-kit) | GitHub'ın `spec-kit` deposundan `specify-cli` aracını `uv` ile kurar. Python araçlarının kurulu olmasını gerektirir. |
+| `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
+| `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | `wshobson/agents` koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
+| `5` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | `opencode` için darrenhinde/OpenAgents deposundan bir ajan koleksiyonu kurar. |
+| `A` | Hepsini Kur | Tüm yardımcı araçları sırayla kurar. |
+
+#### AI Framework Menüsü
+Önce `pipx` ve gerekirse Python kurulumunu doğrular, ardından Super* framework’lerini tek tek veya toplu olarak kurar. API anahtar istemleri `/dev/tty` üzerinden aktığı için `curl | bash` senaryolarında bile güvenli şekilde giriş yapabilirsiniz.
+
+| Seçenek | Framework | Detaylar |
+|---------|-----------|----------|
+| `1` | [SuperGemini](https://github.com/SuperClaude-Org/SuperGemini_Framework) | `pipx` ile kurulur, PATH güncellemesini ve gerekli login komutlarını otomatik özetler. |
+| `2` | [SuperQwen](https://github.com/SuperClaude-Org/SuperQwen_Framework) | `attach_tty_and_run` ile sarıldığı için Qwen kimlik doğrulamaları kesintisiz ilerler. |
+| `3` | [SuperClaude](https://github.com/SuperClaude-Org/SuperClaude_Framework) | Aynı TTY korumalarıyla Anthropic araçlarını kurar, gerekirse temizleme yordamları sağlar. |
+| `4` | Hepsini Kur | Tüm Super* framework’lerini arka arkaya kurar; daha önce kurulanlar atlanır veya güncellenir. |
+
+### Kullanım Notları
+
+- **Dil geçişi:** Varsayılan dil İngilizce’dir; yerel ayarlarınız `tr` ile başlıyorsa menü Türkçe açılır ve `L` seçeneğiyle anında dil değiştirebilirsiniz.
+- **PATH güncellemeleri** script tarafından otomatik `source` edilir; yeni komutlar aynı terminalde erişilebilir.
+- **API anahtarları** maskelenerek gösterilir, boş bırakılırsa mevcut değer korunur.
+- **TTY gereksinimleri** `attach_tty_and_run` ile çözüldü; artık `Raw mode is not supported` hatası alınmaz.
+- **Uzaktan çalışma** sırasında modüller geçici dizine alınır ve tekrar kullanılmak üzere önbelleğe atılır.
+
+### Sorun Giderme
+
+- `curl: (3)` hatası: En güncel `setup` sürümünü kullanın; `SCRIPT_BASE_URL` artık her alt süreçte mevcut.
+- `mask_secret` hatası: GLM menüsü artık utils’i otomatik yüklüyor.
+- SuperQwen/SuperClaude menüsü girdi beklemiyorsa: Güncel sürüme geçin; `attach_tty_and_run` eklendi.
+- Aider CLI kurulumu başarısız olursa: Betik artık daha sağlam olan resmi `aider-install` betiğini kullanıyor. Hata devam ederse, yükleyicinin loglarını kontrol edin.
+- Komut bulunamıyorsa: Terminali kapatıp açın veya `source ~/.bashrc` çalıştırın.
+
+### Katkı
+
+1. Fork + branch açın.
+2. Script değişikliklerinde `shellcheck` ve `bash -n` çalıştırın.
+3. README/TR bölümlerini yeni özelliklerle güncelleyin.
+4. PR özetine ekran görüntüsü veya log ekleyin.
+
+#### Script Doğrulama
+Bu depodaki tüm scriptler aşağıdaki yöntemlerle doğrulanmıştır:
+- **Sözdizimi kontrolleri:** Tüm shell scriptler için `bash -n`
+- **Statik analiz:** En iyi pratikler ve güvenlik için `shellcheck`
+- **Satır sonu normalizasyonu:** Otomatik CRLF'den LF'ye dönüşüm
+- **Mevcut durum:** ✅ 54 script doğrulandı (53 modül + setup)
+
+### Emek Verenler
+
+- **Geliştirici:** Tamer Karaca  
+- **Framework Ekipleri:** SuperGemini/SuperQwen/SuperClaude, Anthropic, Google, OpenAI, GitHub Copilot CLI katkıcıları
+
+### Lisans
+
+Bu proje **MIT Lisansı** ile dağıtılır. Ayrıntılar için [LICENSE](./LICENSE) dosyasına bakın.

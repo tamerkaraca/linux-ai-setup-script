@@ -191,7 +191,7 @@ This menu (option `8`) has been significantly enhanced to include a dedicated, m
 |--------|------|------------|
 | `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | Installs `@fission-ai/openspec` globally for spec-driven development. |
 | `2` | [specify-cli](https://github.com/github/spec-kit) | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. |
-| `3` | **davila7 Community Templates** | Opens a dynamic, multi-level menu to browse and install hundreds of templates (**Agents, Commands, Skills, Hooks, MCPs, Plugins, and Settings**) from the popular `davila7/claude-code-templates` repository using `npx`. |
+| `3` | **[davila7 Community Templates](https://github.com/davila7/claude-code-templates)** | Opens a dynamic, multi-level menu to browse and install hundreds of templates (**Agents, Commands, Skills, Hooks, MCPs, Plugins, and Settings**) from the popular `davila7/claude-code-templates` repository using `npx`. |
 | `4` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | Installs a collection of agents for `opencode`. |
 | `5` | [Conductor (Gemini CLI Ext)](https://developers.googleblog.com/conductor-introducing-context-driven-development-for-gemini-cli/) | Installs the official Conductor extension for Gemini CLI. |
 | `A` | Install All | Installs all auxiliary tools sequentially. |
@@ -361,7 +361,7 @@ Bu menü (8. seçenek), `davila7/claude-code-templates` deposu için özel, çok
 |---------|------|------------|
 | `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | Spesifikasyon odaklı geliştirme için `@fission-ai/openspec` paketini global olarak kurar. |
 | `2` | [specify-cli](https://github.com/github/spec-kit) | GitHub'ın `specify-cli` aracını `uv` kullanarak `spec-kit` deposundan kurar. |
-| `3` | **davila7 Topluluk Şablonları** | Popüler `davila7/claude-code-templates` deposundan yüzlerce şablonu (**Ajanlar, Komutlar, Yetenekler, Kancalar, MCP'ler, Eklentiler ve Ayarlar**) `npx` kullanarak kurmak için dinamik, çok seviyeli bir menü açar. |
+| `3` | **[davila7 Topluluk Şablonları](https://github.com/davila7/claude-code-templates)** | Popüler `davila7/claude-code-templates` deposundan yüzlerce şablonu (**Ajanlar, Komutlar, Yetenekler, Kancalar, MCP'ler, Eklentiler ve Ayarlar**) `npx` kullanarak kurmak için dinamik, çok seviyeli bir menü açar. |
 | `4` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | `opencode` için bir ajan koleksiyonu kurar. |
 | `5` | [Conductor (Gemini CLI Ext)](https://developers.googleblog.com/conductor-introducing-context-driven-development-for-gemini-cli/) | Gemini CLI için resmi Conductor eklentisini kurar. |
 | `A` | Hepsini Kur | Tüm yardımcı araçları sırayla kurar. |

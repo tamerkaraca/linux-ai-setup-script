@@ -41,13 +41,14 @@ fi
 
 declare -A AUX_MENU_TEXT_EN=(
     ["menu_title"]="Auxiliary AI Tools & Agents Menu"
-    ["option1"]="OpenSpec CLI (Spec-Driven Development)"
-    ["option2"]="specify-cli (from github/spec-kit)"
+    ["option1"]="OpenSpec CLI"
+    ["option2"]="specify-cli"
     ["option3"]="Contains Studio Agents (for Claude)"
     ["option4"]="Wes Hobson Agents (for Claude)"
-    ["option5"]="OpenAgents (darrenhinde/OpenAgents)"
-    ["option6"]="Conductor (Gemini CLI Extension)"
-    ["option7"]="AgentSkills Agents (for Claude)"
+    ["option5"]="AgentSkills Agents (for Claude)"
+    ["option6"]="davila7 Templates (for Claude)"
+    ["option7"]="OpenAgents (darrenhinde/OpenAgents)"
+    ["option8"]="Conductor (Gemini CLI Extension)"
     ["optionA"]="Install All Auxiliary Tools"
     ["option_return"]="Return to Main Menu"
     ["menu_hint"]="You can make multiple selections with commas (e.g., 1,3)."
@@ -56,16 +57,16 @@ declare -A AUX_MENU_TEXT_EN=(
     ["warning_invalid_choice"]="Invalid choice"
     ["prompt_continue"]="Install another auxiliary tool? (y/n) [n]: "
 )
-
 declare -A AUX_MENU_TEXT_TR=(
     ["menu_title"]="Yardımcı AI Araçları ve Ajanları Menüsü"
-    ["option1"]="OpenSpec CLI (Spesifikasyon Odaklı Geliştirme)"
-    ["option2"]="specify-cli (github/spec-kit'ten)"
+    ["option1"]="OpenSpec CLI"
+    ["option2"]="specify-cli"
     ["option3"]="Contains Studio Agents (Claude için)"
     ["option4"]="Wes Hobson Agents (Claude için)"
-    ["option5"]="OpenAgents (darrenhinde/OpenAgents)"
-    ["option6"]="Conductor (Gemini CLI Eklentisi)"
-    ["option7"]="AgentSkills Agents (Claude için)"
+    ["option5"]="AgentSkills Agents (Claude için)"
+    ["option6"]="davila7 Şablonları (Claude için)"
+    ["option7"]="OpenAgents (darrenhinde/OpenAgents)"
+    ["option8"]="Conductor (Gemini CLI Eklentisi)"
     ["optionA"]="Tüm Yardımcı Araçları Kur"
     ["option_return"]="Ana Menüye Dön"
     ["menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,3)."
@@ -100,6 +101,7 @@ install_aux_tools_menu() {
             echo -e "  ${GREEN}5${NC} - $(aux_menu_text option5)"
             echo -e "  ${GREEN}6${NC} - $(aux_menu_text option6)"
             echo -e "  ${GREEN}7${NC} - $(aux_menu_text option7)"
+            echo -e "  ${GREEN}8${NC} - $(aux_menu_text option8)"
             echo -e "  ${GREEN}A${NC} - $(aux_menu_text optionA)"
             echo -e "  ${GREEN}0${NC} - $(aux_menu_text option_return)"
             echo -e "${YELLOW}$(aux_menu_text menu_hint)${NC}"
@@ -123,17 +125,19 @@ install_aux_tools_menu() {
                 2) run_module "auxiliary/specify" ;;
                 3) run_module "auxiliary/claude_agents" "contains" ;;
                 4) run_module "auxiliary/claude_agents" "wshobson" ;;
-                5) run_module "auxiliary/open_agents" ;;
-                6) run_module "auxiliary/conductor" ;;
-                7) run_module "auxiliary/claude_agents" "agentskills" ;;
-                A|a) 
-run_module "auxiliary/openspec"
-    run_module "auxiliary/specify"
-    run_module "auxiliary/claude_agents" "contains"
-    run_module "auxiliary/claude_agents" "wshobson"
-    run_module "auxiliary/open_agents"
-    run_module "auxiliary/conductor"
-    run_module "auxiliary/claude_agents" "agentskills"
+                5) run_module "auxiliary/claude_agents" "agentskills" ;;
+                6) run_module "menus/davila7_menu" ;;
+                7) run_module "auxiliary/open_agents" ;;
+                8) run_module "auxiliary/conductor" ;;
+                A|a)
+                    run_module "auxiliary/openspec"
+                    run_module "auxiliary/specify"
+                    run_module "auxiliary/claude_agents" "contains"
+                    run_module "auxiliary/claude_agents" "wshobson"
+                    run_module "auxiliary/claude_agents" "agentskills"
+                    # davila7 has its own menu, skip in "install all"
+                    run_module "auxiliary/open_agents"
+                    run_module "auxiliary/conductor"
                     all_installed=true
                     ;;
                 0) 

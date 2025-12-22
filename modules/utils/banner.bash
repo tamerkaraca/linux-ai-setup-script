@@ -1,6 +1,6 @@
 #!/bin/bash
 
-export SCRIPT_VERSION="V3.0.0"
+export SCRIPT_VERSION="V3.1.0"
 
 : "${RED:=$'\033[0;31m'}"
 : "${GREEN:=$'\033[0;32m'}"

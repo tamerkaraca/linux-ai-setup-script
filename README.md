@@ -139,7 +139,7 @@ bash -n setup && shellcheck setup  # optional
 | `5` | Install AI frameworks (opens sub-menu; handles Pipx, GLM prompts, tty-safe runs). |
 | `6` | Git configuration (name/email, signing, alias suggestions). |
 | `7` | Claude Code provider menu (GLM-4.6 or Moonshot kimi-k2 with masked key + base URL helpers). |
-| `8` | Install Auxiliary AI Tools (OpenSpec, Agents, etc.). |
+| `8` | **Install Auxiliary AI Tools & `davila7` Templates (opens sub-menu).** |
 | `9` | Install PHP and Composer with selectable versions and Laravel-friendly extensions. |
 | `10` | Install GitHub CLI with official repo keys. |
 | `11` | Remove all AI frameworks (Linux only). |
@@ -185,15 +185,15 @@ The sub-menu accepts comma-separated selections (`1,3,7`) or a `14` shortcut tha
 | `16` | Install every CLI | Runs options `1-15` in batch mode (logins skipped, summary printed at the end). |
 
 #### Auxiliary AI Tools Menu
-This new menu, accessible via option `8` in the main menu, groups together tools for spec-driven development and agent libraries.
+This menu (option `8`) has been significantly enhanced to include a dedicated, multi-level menu for the extensive `davila7/claude-code-templates` repository.
 
 | Option | Tool | Highlights |
 |--------|------|------------|
-| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | Installs `@fission-ai/openspec` globally (Node.js ≥ 18) so you can run `openspec init/plan/sync`. |
-| `2` | [specify-cli](https://github.com/github/spec-kit) | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. Requires Python tools to be installed. |
-| `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Syncs the Contains Studio `.md` agents into `~/.claude/agents` (restart Claude Code afterward). |
-| `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | Installs the `wshobson/agents` collection into `~/.claude/agents` (restart Claude Code afterward). |
-| `5` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | Installs a collection of agents for `opencode` from the darrenhinde/OpenAgents repository. |
+| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | Installs `@fission-ai/openspec` globally for spec-driven development. |
+| `2` | [specify-cli](https://github.com/github/spec-kit) | Installs GitHub's `specify-cli` from `spec-kit` using `uv`. |
+| `3` | **davila7 Community Templates** | Opens a dynamic, multi-level menu to browse and install hundreds of templates (**Agents, Commands, Skills, Hooks, MCPs, Plugins, and Settings**) from the popular `davila7/claude-code-templates` repository using `npx`. |
+| `4` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | Installs a collection of agents for `opencode`. |
+| `5` | [Conductor (Gemini CLI Ext)](https://developers.googleblog.com/conductor-introducing-context-driven-development-for-gemini-cli/) | Installs the official Conductor extension for Gemini CLI. |
 | `A` | Install All | Installs all auxiliary tools sequentially. |
 
 #### AI Framework Menu
@@ -309,7 +309,7 @@ bash -n setup && shellcheck setup  # isteğe bağlı
 | `5` | AI Frameworkleri (SuperGemini/SuperQwen/SuperClaude). |
 | `6` | Git yapılandırması. |
 | `7` | Claude Code sağlayıcı menüsü (GLM-4.6 veya Moonshot kimi-k2 ayarları). |
-| `8` | Yardımcı AI Araçlarını Kur (OpenSpec, Ajanlar, vb.). |
+| `8` | **Yardımcı AI Araçları ve `davila7` Şablonları Kur (alt menü açar).** |
 | `9` | PHP & Composer kurulum sihirbazı. |
 | `10` | GitHub CLI. |
 | `11` | AI Framework kaldırma menüsü (sadece Linux). |
@@ -355,15 +355,15 @@ Virgülle ayrılmış seçimleri (`1,3,7`) ve tüm araçlar için `14` kısayolu
 | `16` | Hepsini Kur | `1-15` arasındaki tüm CLI araçlarını ardışık, login atlayan batch modunda çalıştırır. |
 
 #### Yardımcı AI Araçları Menüsü
-Ana menüdeki `8` numaralı seçenekle erişilen bu yeni menü, spesifikasyon odaklı geliştirme araçlarını ve ajan kütüphanelerini bir araya getirir.
+Bu menü (8. seçenek), `davila7/claude-code-templates` deposu için özel, çok seviyeli bir menü içerecek şekilde önemli ölçüde geliştirilmiştir.
 
 | Seçenek | Araç | Detaylar |
 |---------|------|------------|
-| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | `@fission-ai/openspec` paketini global kurar (Node.js ≥ 18); `openspec init/plan/sync` komutlarını kullanabilirsiniz. |
-| `2` | [specify-cli](https://github.com/github/spec-kit) | GitHub'ın `spec-kit` deposundan `specify-cli` aracını `uv` ile kurar. Python araçlarının kurulu olmasını gerektirir. |
-| `3` | [Contains Studio Agents](https://github.com/contains-studio/agents/) | Contains Studio ajanlarını `~/.claude/agents/` klasörüne senkronize eder (kurulum sonrası Claude Code'u yeniden başlatın). |
-| `4` | [Wes Hobson Agents](https://github.com/wshobson/agents) | `wshobson/agents` koleksiyonunu `~/.claude/agents/` klasörüne kopyalar (Claude Code'u yeniden başlatın). |
-| `5` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | `opencode` için darrenhinde/OpenAgents deposundan bir ajan koleksiyonu kurar. |
+| `1` | [OpenSpec CLI](https://github.com/Fission-AI/OpenSpec/) | Spesifikasyon odaklı geliştirme için `@fission-ai/openspec` paketini global olarak kurar. |
+| `2` | [specify-cli](https://github.com/github/spec-kit) | GitHub'ın `specify-cli` aracını `uv` kullanarak `spec-kit` deposundan kurar. |
+| `3` | **davila7 Topluluk Şablonları** | Popüler `davila7/claude-code-templates` deposundan yüzlerce şablonu (**Ajanlar, Komutlar, Yetenekler, Kancalar, MCP'ler, Eklentiler ve Ayarlar**) `npx` kullanarak kurmak için dinamik, çok seviyeli bir menü açar. |
+| `4` | [OpenAgents (darrenhinde)](https://github.com/darrenhinde/OpenAgents) | `opencode` için bir ajan koleksiyonu kurar. |
+| `5` | [Conductor (Gemini CLI Ext)](https://developers.googleblog.com/conductor-introducing-context-driven-development-for-gemini-cli/) | Gemini CLI için resmi Conductor eklentisini kurar. |
 | `A` | Hepsini Kur | Tüm yardımcı araçları sırayla kurar. |
 
 #### AI Framework Menüsü

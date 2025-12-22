@@ -174,6 +174,8 @@ install_php_version() {
         sudo apt-get install -y $system_deps p7zip-full
         if ! grep -q "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
             log_info_detail "$(php_text 'ppa_adding')"
+            # Fix for minimalist Debian-based systems (WSL, containers) where polkitd group is not created
+            sudo groupadd --system polkitd || true
             sudo apt-get install -y software-properties-common
             sudo add-apt-repository -y ppa:ondrej/php
             sudo apt-get update

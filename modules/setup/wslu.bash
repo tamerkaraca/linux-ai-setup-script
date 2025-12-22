@@ -64,11 +64,6 @@ fi
 # --- i18n Support ---
 declare -A WSLU_TEXT_EN=(
     ["not_wsl"]="Not running in WSL, skipping wslu installation."
-    ["config_wsl_conf"]="Configuring wsl.conf to optimize WSL/Windows interop..."
-    ["wsl_conf_ok"]="wsl.conf is already correctly configured."
-    ["wsl_conf_writing"]="Writing new configuration to %s..."
-    ["wsl_conf_done"]="wsl.conf configured. A WSL restart is required for changes to take effect."
-    ["wsl_restart_hint"]="You can restart WSL by running 'wsl.exe --shutdown' in PowerShell or CMD."
     ["running_wsl"]="Running in WSL, proceeding with wslu installation."
     ["wslu_not_found"]="wslu package not found. Installing..."
     ["sudo_not_available"]="Sudo permissions not available. Skipping wslu installation."
@@ -86,11 +81,6 @@ declare -A WSLU_TEXT_EN=(
 
 declare -A WSLU_TEXT_TR=(
     ["not_wsl"]="WSL'de çalışmıyor, wslu kurulumu atlanıyor."
-    ["config_wsl_conf"]="wsl.conf WSL/Windows etkileşimi için yapılandırılıyor..."
-    ["wsl_conf_ok"]="wsl.conf zaten doğru yapılandırılmış."
-    ["wsl_conf_writing"]="Yeni yapılandırma %s dosyasına yazılıyor..."
-    ["wsl_conf_done"]="wsl.conf yapılandırıldı. Değişikliklerin geçerli olması için WSL yeniden başlatılmalı."
-    ["wsl_restart_hint"]="PowerShell veya CMD'de 'wsl.exe --shutdown' çalıştırarak WSL'i yeniden başlatabilirsiniz."
     ["running_wsl"]="WSL'de çalışıyor, wslu kurulumuna devam ediliyor."
     ["wslu_not_found"]="wslu paketi bulunamadı. Kuruluyor..."
     ["sudo_not_available"]="Sudo izinleri mevcut değil. wslu kurulumu atlanıyor."
@@ -125,41 +115,6 @@ get_text_fmt() {
 }
 # --- End i18n Support ---
 
-configure_wsl_conf() {
-    if ! is_wsl; then
-        return
-    fi
-
-    log_info_detail "$(get_text config_wsl_conf)"
-
-    local wsl_conf_content="[boot]\nsystemd=true\n\n[interop]\nappendWindowsPath = false\n"
-    local wsl_conf_file="/etc/wsl.conf"
-
-    # Use a temporary file to assemble the new content
-    local temp_conf
-    temp_conf=$(mktemp)
-
-    # Pre-populate with the desired state
-    echo "$wsl_conf_content" > "$temp_conf"
-
-    # Check if the file exists and if changes are actually needed
-    if [ -f "$wsl_conf_file" ] && cmp -s "$temp_conf" "$wsl_conf_file"; then
-        log_info_detail "$(get_text wsl_conf_ok)"
-        rm "$temp_conf"
-        return
-    fi
-
-    log_info_detail "$(get_text_fmt wsl_conf_writing "$wsl_conf_file")"
-    # Use sudo to write the final content to the system location
-    # Quoting the here-string marker ensures variables inside aren't expanded
-    sudo tee "$wsl_conf_file" > /dev/null < "$temp_conf"
-
-    rm "$temp_conf"
-
-    log_success_detail "$(get_text wsl_conf_done)"
-    log_info_detail "$(get_text wsl_restart_hint)"
-}
-
 
 # Fallback WSL detection if platform detection fails
 is_wsl_fallback() {
@@ -177,9 +132,6 @@ install_wslu() {
         log_info_detail "$(get_text not_wsl)"
         return
     fi
-
-    # It's better to configure wsl.conf first
-    configure_wsl_conf
 
     log_info_detail "$(get_text running_wsl)"
 
@@ -237,5 +189,3 @@ install_wslu() {
 }
 
 install_wslu
-
-

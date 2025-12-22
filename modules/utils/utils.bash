@@ -28,8 +28,6 @@ export RED GREEN YELLOW BLUE CYAN NC
 
 
 
-
-
 # Log functions
 log_info() {
     echo -e "${CYAN}${INFO_TAG}${NC} $1"
@@ -188,6 +186,16 @@ get_i18n_message() {
             "pip_upgrade_failed_break") message="Pip güncellemesi --break-system-packages ile bile başarısız." ;;
             "pip_upgrade_failed") message="Pip güncellemesi başarısız. Çıktı:" ;;
             "pip_version") message="Pip sürümü:" ;;
+            "pip_install_failed") message="Pip kurulumu başarısız." ;;
+            "pip_fixing_broken") message="Kırık paketler düzeltilmeye çalışılıyor..." ;;
+            "pip_broken_fixed") message="Kırık paketler düzeltildi." ;;
+            "pip_retrying_install") message="Kurulum yeniden deneniyor..." ;;
+            "pip_apt_success") message="Pip apt paket yöneticisi ile kuruldu." ;;
+            "pip_manual_fix") message="Paket yöneticisi manuel düzeltiliyor..." ;;
+            "pip_removing_polkitd") message="Bozuk polkitd paketi ve bağımlılıkları kaldırılıyor..." ;;
+            "pip_reconfiguring_polkitd") message="polkitd yeniden yapılandırılıyor..." ;;
+            "pip_using_alternative") message="Alternatif yöntem deneniyor..." ;;
+            "pip_purging_broken") message="Bozuk paketler tamamen temizleniyor..." ;;
             # Pipx
             "starting_pipx") message="Pipx kurulumu başlatılıyor..." ;;
             "pipx_already") message="pipx zaten kurulu:" ;;
@@ -331,8 +339,8 @@ ensure_path_contains_dir() {
 
 # Package Management
 detect_package_manager() {
-    log_info_detail "Detecting operating system and package manager..."
-    
+    log_info_detail "$(get_i18n_message detecting_pkg "Detecting operating system and package manager...")"
+
     if command -v dnf &> /dev/null; then
         PKG_MANAGER="dnf"
         UPDATE_CMD="sudo dnf upgrade -y"
@@ -350,19 +358,19 @@ detect_package_manager() {
         # UPDATE_CMD="sudo pacman -Syu --noconfirm"
         INSTALL_CMD="sudo pacman -S --noconfirm"
     else
-        log_error_detail "No supported package manager was found!"
+        log_error_detail "$(get_i18n_message no_pkg_manager "No supported package manager was found!")"
         exit 1
     fi
-    
-    log_success_detail "Package manager: $PKG_MANAGER"
+
+    log_success_detail "$(get_i18n_message pkg_manager "Package manager:") $PKG_MANAGER"
 }
 
 update_system() {
-    log_info_detail "$(get_i18n_message "updating_system_packages" "Updating system packages...")"
+    log_info_detail "$(get_i18n_message updating_system_packages "Updating system packages...")"
     if [ -n "${UPDATE_CMD:-}" ]; then
         eval "$UPDATE_CMD"
     else
-        log_warn_detail "$(get_i18n_message "update_cmd_not_defined" "Update command not defined. Skipping system update.")"
+        log_warn_detail "$(get_i18n_message update_cmd_not_defined "Update command not defined. Skipping system update.")"
     fi
 }
 export -f update_system
@@ -370,15 +378,15 @@ export -f update_system
 # Python Tooling
 install_python() {
     log_info_detail "$(get_i18n_message starting_python "Starting Python installation...")"
-    
+
     if command -v python3 &> /dev/null; then
         log_success_detail "$(get_i18n_message python_already "Python already installed:") $(python3 --version)"
         return 0
     fi
-    
+
     log_info_detail "$(get_i18n_message installing_python "Installing Python 3...")"
     eval "$INSTALL_CMD" python3 python3-pip python3-venv
-    
+
     if command -v python3 &> /dev/null; then
         log_success_detail "$(get_i18n_message python_completed "Python installation completed:") $(python3 --version)"
     else
@@ -387,9 +395,75 @@ install_python() {
     fi
 }
 
+fix_broken_packages() {
+    log_warn_detail "$(get_i18n_message pip_fixing_broken "Attempting to fix broken packages...")"
+
+    # Check if polkitd is causing issues
+    if dpkg -l 2>/dev/null | grep -q "polkitd.*[hi]"; then
+        log_warn_detail "$(get_i18n_message pip_purging_broken "Purging broken polkitd and dependencies...")"
+
+        # Purge all affected packages aggressively
+        sudo DEBIAN_FRONTEND=noninteractive dpkg --purge --force-remove-reinstreq \
+            polkitd packagekit packagekit-tools software-properties-common 2>/dev/null || true
+
+        # Remove any remaining config
+        sudo rm -f /etc/polkit-1/polkitd.conf 2>/dev/null || true
+    fi
+
+    # Configure all unpacked packages
+    sudo DEBIAN_FRONTEND=noninteractive dpkg --configure -a 2>/dev/null || true
+
+    # Fix broken dependencies
+    if sudo DEBIAN_FRONTEND=noninteractive apt --fix-broken install -y -f 2>&1; then
+        log_success_detail "$(get_i18n_message pip_broken_fixed "Broken packages fixed.")
+        return 0
+    else
+        log_warn_detail "$(get_i18n_message pip_manual_fix "Attempting manual fix...")
+        # Remove and reinstall
+        sudo DEBIAN_FRONTEND=noninteractive apt remove -y -f \
+            polkitd packagekit packagekit-tools software-properties-common 2>/dev/null || true
+        sudo DEBIAN_FRONTEND=noninteractive apt autoremove -y 2>/dev/null || true
+        sudo DEBIAN_FRONTEND=noninteractive apt --fix-broken install -y 2>&1
+        return $?
+    fi
+}
+
+install_pip_via_getpip() {
+    log_info_detail "$(get_i18n_message pip_using_alternative "Attempting to install pip using get-pip.py as fallback...")"
+
+    local getpip_url="https://bootstrap.pypa.io/get-pip.py"
+    local temp_file=$(mktemp /tmp/get-pip-XXXXXX.py)
+
+    if ! curl -fsSL "$getpip_url" -o "$temp_file" 2>/dev/null; then
+        log_error_detail "Failed to download get-pip.py"
+        rm -f "$temp_file"
+        return 1
+    fi
+
+    # Try without --user first (system-wide)
+    log_info_detail "Attempting system-wide installation..."
+    if python3 "$temp_file" 2>&1; then
+        rm -f "$temp_file"
+        log_success_detail "$(get_i18n_message pip_getpip_ok "Pip installed via get-pip.py.")"
+        return 0
+    fi
+
+    # If that fails, try with --break-system-packages
+    log_info_detail "Attempting with --break-system-packages flag..."
+    if python3 -m pip install --break-system-packages "$temp_file" 2>&1; then
+        rm -f "$temp_file"
+        log_success_detail "$(get_i18n_message pip_getpip_ok "Pip installed via get-pip.py.")"
+        return 0
+    fi
+
+    rm -f "$temp_file"
+    log_error_detail "$(get_i18n_message pip_getpip_failed "Pip installation via get-pip.py failed!")"
+    return 1
+}
+
 install_pip() {
     log_info_detail "$(get_i18n_message starting_pip "Starting Pip installation/update...")"
-    
+
     if ! command -v python3 &> /dev/null; then
         log_warn_detail "$(get_i18n_message python_missing "Python is missing, installing it first...")"
         if ! install_python; then
@@ -397,72 +471,98 @@ install_pip() {
             return 1
         fi
     fi
-    
-    # Try to install pip using the system package manager first
+
+    # Check if pip is already installed
+    if python3 -m pip --version >/dev/null 2>&1; then
+        log_success_detail "$(get_i18n_message pip_version "Pip already installed:") $(python3 -m pip --version)"
+        log_info_detail "$(get_i18n_message upgrading_pip "Upgrading pip...")"
+
+        local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
+        local ext_managed_file
+        ext_managed_file=$(python3 -c 'import sys; print(f"/usr/lib/python{sys.version_info.major}.{sys.version_info.minor}/EXTERNALLY-MANAGED")' 2>/dev/null)
+
+        if [ -n "$ext_managed_file" ] && [ -f "$ext_managed_file" ]; then
+            log_info_detail "$(get_i18n_message pip_ext_env "Externally-managed-environment detected, using --break-system-packages...")"
+            pip_upgrade_cmd="$pip_upgrade_cmd --break-system-packages"
+        fi
+
+        if output=$($pip_upgrade_cmd 2>&1); then
+            log_success_detail "$(get_i18n_message pip_version "Pip version:") $(python3 -m pip --version)"
+            return 0
+        else
+            log_warn_detail "$(get_i18n_message pip_upgrade_failed "Pip upgrade failed. Output:") $output"
+            return 0  # Don't fail, pip is already installed
+        fi
+    fi
+
+    # Try to install pip using system package manager
     if [ "$PKG_MANAGER" = "apt" ]; then
         log_info_detail "Installing pip via apt package manager..."
-        if ! eval "$INSTALL_CMD python3-pip"; then
-            log_error_detail "Failed to install pip via apt"
-            return 1
+
+        # Fix broken packages first to avoid polkitd issues
+        if dpkg -l 2>/dev/null | grep -q "polkitd.*[hi]"; then
+            log_warn_detail "$(get_i18n_message pip_fixing_broken "Detected broken packages, fixing first...")"
+            fix_broken_packages
         fi
-        log_success_detail "Pip installed via apt package manager."
+
+        # Try to install directly
+        if sudo DEBIAN_FRONTEND=noninteractive apt install -y python3-pip 2>&1; then
+            log_success_detail "$(get_i18n_message pip_apt_success "Pip installed via apt package manager.")"
+            return 0
+        fi
+
+        # If apt failed, use get-pip.py fallback
+        log_error_detail "$(get_i18n_message pip_install_failed "Pip installation failed.")"
+        log_info_detail "$(get_i18n_message pip_using_alternative "Using get-pip.py fallback...")"
+        install_pip_via_getpip
+        return $?
+
     elif [ "$PKG_MANAGER" = "dnf" ]; then
         log_info_detail "Installing pip via dnf package manager..."
-        if ! eval "$INSTALL_CMD python3-pip"; then
+        if ! eval "$INSTALL_CMD" python3-pip; then
             log_error_detail "Failed to install pip via dnf"
-            return 1
+            install_pip_via_getpip
+            return $?
         fi
         log_success_detail "Pip installed via dnf package manager."
+        return 0
+
     elif [ "$PKG_MANAGER" = "pacman" ]; then
         log_info_detail "Installing pip via pacman package manager..."
-        if ! eval "$INSTALL_CMD python-pip"; then
+        if ! eval "$INSTALL_CMD" python-pip; then
             log_error_detail "Failed to install pip via pacman"
-            return 1
+            install_pip_via_getpip
+            return $?
         fi
         log_success_detail "Pip installed via pacman package manager."
+        return 0
+
     else
-        # Use get-pip.py with user installation
-        log_info_detail "Installing pip via get-pip.py with user installation..."
-        if ! curl -sS https://bootstrap.pypa.io/get-pip.py | python3 --user; then
-            log_error_detail "$(get_i18n_message pip_getpip_failed "Pip installation via get-pip.py failed!")"
-            return 1
-        fi
-        log_success_detail "$(get_i18n_message pip_getpip_ok "Pip installed via get-pip.py.")"
+        # Use get-pip.py as primary method
+        install_pip_via_getpip
+        return $?
     fi
-
-    # Now try to upgrade pip
-    log_info_detail "$(get_i18n_message upgrading_pip "Upgrading pip...")"
-    local pip_upgrade_cmd="python3 -m pip install --upgrade pip"
-
-    # Check for the marker file for PEP 668, which causes "externally-managed-environment"
-    local ext_managed_file
-    ext_managed_file=$(python3 -c 'import sys; print(f"/usr/lib/python{sys.version_info.major}.{sys.version_info.minor}/EXTERNALLY-MANAGED")' 2>/dev/null)
-    if [ -n "$ext_managed_file" ] && [ -f "$ext_managed_file" ]; then
-        log_info_detail "$(get_i18n_message pip_ext_env "Externally-managed-environment detected, using --break-system-packages...")"
-        pip_upgrade_cmd="$pip_upgrade_cmd --break-system-packages"
-    fi
-
-    if ! output=$($pip_upgrade_cmd 2>&1); then
-        log_error_detail "$(get_i18n_message pip_upgrade_failed "Pip upgrade failed. Output:") $output"
-        return 1
-    fi
-    
-    log_success_detail "$(get_i18n_message pip_version "Pip version:") $(python3 -m pip --version)"
 }
 
 install_pipx() {
     log_info_detail "$(get_i18n_message starting_pipx "Starting Pipx installation...")"
-    
+
     if ! command -v python3 &> /dev/null; then
         log_warn_detail "$(get_i18n_message python_missing "Python is missing, installing it first...")"
         install_python
     fi
-    
+
+    # Fix broken packages before installing pipx
+    if [ "$PKG_MANAGER" = "apt" ] && dpkg -l 2>/dev/null | grep -q "polkitd.*[hi]"; then
+        log_warn_detail "$(get_i18n_message pip_fixing_broken "Detected broken packages, fixing before pipx installation...")"
+        fix_broken_packages
+    fi
+
     if command -v pipx &> /dev/null; then
         log_success_detail "$(get_i18n_message pipx_already "pipx is already installed:") $(pipx --version)"
         return 0
     fi
-    
+
     log_info_detail "$(get_i18n_message installing_pipx "Installing pipx...")"
     if [ "$PKG_MANAGER" = "apt" ]; then
         eval "$INSTALL_CMD" pipx
@@ -474,10 +574,10 @@ install_pipx() {
         python3 -m pip install --user pipx
         python3 -m pipx ensurepath
     fi
-    
+
     ensure_path_contains_dir "$HOME/.local/bin" "pipx"
     reload_shell_configs silent
-    
+
     if command -v pipx &> /dev/null; then
         log_success_detail "$(get_i18n_message pipx_completed "Pipx installation completed:") $(pipx --version 2>/dev/null || echo 'installed')"
     else
@@ -493,13 +593,13 @@ install_uv() {
         log_success_detail "$(get_i18n_message uv_already "UV is already installed:") $(uv --version)"
         return 0
     fi
-    
+
     log_info_detail "$(get_i18n_message installing_uv "Installing UV via official script...")"
     if ! (curl -LsSf https://astral.sh/uv/install.sh | sh); then
         log_error_detail "$(get_i18n_message uv_failed "UV installation failed!")"
         return 1
     fi
-    
+
     ensure_path_contains_dir "$HOME/.local/bin" "uv"
     reload_shell_configs silent
 
@@ -599,7 +699,7 @@ install_package() {
         log_success_detail "$(get_i18n_message pkg_installed_success "$name installed successfully." "$name")"
         return 0
     else
-        log_error_detail "$(get_i18n_message pkg_installed_cmd_not_found "$name installed but command '$cmd' not found." "$name")"
+        log_error_detail "$(get_i18n_message pkg_installed_cmd_not_found "$name installed but command '$cmd' not found." "$name" "$cmd")"
         return 1
     fi
 }
@@ -708,7 +808,7 @@ export -f retry_command
 export -f download_with_fallback
 
 clean_windows_paths_from_rc() {
-    log_info_detail "$(get_i18n_message "cleaning_windows_paths" "Cleaning Windows paths from shell configs...")"
+    log_info_detail "$(get_i18n_message cleaning_windows_paths "Cleaning Windows paths from shell configs...")"
 
     # Clean current PATH for this session
     local original_path="$PATH"
@@ -720,15 +820,12 @@ clean_windows_paths_from_rc() {
         if [ -f "$rc_file" ]; then
             # Backup the original file
             cp "$rc_file" "${rc_file}.bak"
-            
+
             # Remove lines that export a PATH containing /mnt/
             sed -i '/export PATH=.*\/mnt\//d' "$rc_file"
-            
-            log_success_detail "$(get_i18n_message "cleaned_windows_paths" "Cleaned Windows paths from $rc_file." "$rc_file")"
+
+            log_success_detail "$(get_i18n_message cleaned_windows_paths "Cleaned Windows paths from $rc_file." "$rc_file")"
         fi
     done
 }
 export -f clean_windows_paths_from_rc
-
-# Other functions follow...
-# ...

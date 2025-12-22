@@ -15,9 +15,8 @@ HEADING_WIDTH=70
 center_text() {
     local text="$1"
     local width="$2"
-    local plain
-    plain=$(printf '%s' "$text" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local len=${#plain}
+    local len
+    len=$(get_visible_length "$text")
     if [ "$len" -ge "$width" ]; then
         printf "%s" "$text"
         return
@@ -30,9 +29,8 @@ center_text() {
 
 panel_line_raw() {
     local content="$1"
-    local plain
-    plain=$(printf '%s' "$content" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local len=${#plain}
+    local len
+    len=$(get_visible_length "$content")
     local pad=$((HEADING_WIDTH - len + 1))
     [ "$pad" -lt 1 ] && pad=1
     printf "%s %s%*s%s\n" "${BLUE}║${NC}" "$content" "$pad" "" "${BLUE}║${NC}"
@@ -49,14 +47,19 @@ print_heading_panel() {
     echo -e "${BLUE}${border_bottom}${NC}"
 }
 
+# Function to get the visible length of a string, stripping ANSI escape codes
+get_visible_length() {
+    printf '%s' "$1" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g' | wc -m
+}
+
 print_info_panel() {
     local version="$1"
     local repo="$2"
-    local info_title="Script Bilgileri"
-    local version_label="Versiyon"
-    local developer_label="Geliştirici"
-    local github_label="GitHub Hesabı"
-    local repo_label="Depo"
+    local info_title
+    local version_label
+    local developer_label
+    local github_label
+    local repo_label
 
     if [ "${LANGUAGE:-en}" = "en" ]; then
         info_title="Script Information"
@@ -64,31 +67,45 @@ print_info_panel() {
         developer_label="Developer"
         github_label="GitHub Account"
         repo_label="Repository"
+    else
+        info_title="Script Bilgileri"
+        version_label="Versiyon"
+        developer_label="Geliştirici"
+        github_label="GitHub Hesabı"
+        repo_label="Depo"
     fi
 
     echo -e "${BLUE}╔════════════════════════════════════════════════════════════════════════╗${NC}"
     panel_line_raw "$(center_text "${BOLD}${info_title}${NC}" "$HEADING_WIDTH")"
     echo -e "${BLUE}╠════════════════════════════════════════════════════════════════════════╣${NC}"
+
+    local col1_width=20 # Width for labels like "Version"
+    local col2_width=$((HEADING_WIDTH - col1_width - 2)) # Remaining width for values
+
+    # Version Line
+    local version_line="${version_label}"
     local version_value="${GREEN}${version}${NC}"
-    local version_plain
-    version_plain=$(printf '%s' "$version_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local version_pad=$((49 - ${#version_plain}))
-    printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${version_label}" "$version_value" "$version_pad" "" "${BLUE}║${NC}"
+    local version_formatted=$(printf "%-*s: %s" "$col1_width" "$version_line" "$version_value")
+    panel_line_raw "$(center_text "$version_formatted" "$HEADING_WIDTH")"
+    
+    # Developer Line
+    local developer_line="${developer_label}"
     local developer_value="${GREEN}Tamer KARACA${NC}"
-    local developer_plain
-    developer_plain=$(printf '%s' "$developer_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local developer_pad=$((49 - ${#developer_plain}))
-    printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${developer_label}" "$developer_value" "$developer_pad" "" "${BLUE}║${NC}"
+    local developer_formatted=$(printf "%-*s: %s" "$col1_width" "$developer_line" "$developer_value")
+    panel_line_raw "$(center_text "$developer_formatted" "$HEADING_WIDTH")"
+
+    # GitHub Line
+    local github_line="${github_label}"
     local github_value="${CYAN}@tamerkaraca${NC}"
-    local github_plain
-    github_plain=$(printf '%s' "$github_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local github_pad=$((49 - ${#github_plain}))
-    printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${github_label}" "$github_value" "$github_pad" "" "${BLUE}║${NC}"
+    local github_formatted=$(printf "%-*s: %s" "$col1_width" "$github_line" "$github_value")
+    panel_line_raw "$(center_text "$github_formatted" "$HEADING_WIDTH")"
+
+    # Repo Line
+    local repo_line="${repo_label}"
     local repo_value="${CYAN}${repo}${NC}"
-    local repo_plain
-    repo_plain=$(printf '%s' "$repo_value" | sed -r 's/\x1B\[[0-9;]*[A-Za-z]//g')
-    local repo_pad=$((49 - ${#repo_plain}))
-    printf "%s %-20s: %s%*s%s\n" "${BLUE}║${NC}" "${repo_label}" "$repo_value" "$repo_pad" "" "${BLUE}║${NC}"
+    local repo_formatted=$(printf "%-*s: %s" "$col1_width" "$repo_line" "$repo_value")
+    panel_line_raw "$(center_text "$repo_formatted" "$HEADING_WIDTH")"
+    
     echo -e "${BLUE}╚════════════════════════════════════════════════════════════════════════╝${NC}"
 }
 

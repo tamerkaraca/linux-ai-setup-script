@@ -13,7 +13,7 @@ declare -A AGENT_TEXT_EN=(
     ["installed"]="%s agents installed (%s files)."
     ["location"]="Location: %s"
     ["restart"]="Restart Claude Code to see the new agents."
-    ["unknown_target"]="Unknown target '%s'. Use 'contains' or 'wshobson'."
+    ["unknown_target"]="Unknown target '%s'. Use 'contains', 'wshobson', or 'agentskills'."
 )
 
 declare -A AGENT_TEXT_TR=(
@@ -25,7 +25,7 @@ declare -A AGENT_TEXT_TR=(
     ["installed"]="%s ajanları yüklendi (%s dosya)."
     ["location"]="Konum: %s"
     ["restart"]="Değişikliklerin görünmesi için Claude Code'u yeniden başlatın."
-    ["unknown_target"]="Bilinmeyen hedef '%s'. 'contains' veya 'wshobson' kullanın."
+    ["unknown_target"]="Bilinmeyen hedef '%s'. 'contains', 'wshobson' veya 'agentskills' kullanın."
 )
 
 agent_text() {
@@ -128,6 +128,10 @@ install_wshobson_agents() {
     install_agents_repo "https://github.com/wshobson/agents.git" "Wes Hobson"
 }
 
+install_agentskills_agents() {
+    install_agents_repo "https://github.com/agentskills/agentskills.git" "AgentSkills"
+}
+
 main() {
     local target="${1:-contains}"
     case "$target" in
@@ -136,6 +140,9 @@ main() {
             ;;
         wshobson|wes)
             install_wshobson_agents
+            ;;
+        agentskills)
+            install_agentskills_agents
             ;;
         *)
             log_warn_detail "$(agent_printf "msg" "unknown_target" "$target" && echo "$msg")"

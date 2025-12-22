@@ -47,6 +47,7 @@ declare -A AUX_MENU_TEXT_EN=(
     ["option4"]="Wes Hobson Agents (for Claude)"
     ["option5"]="OpenAgents (darrenhinde/OpenAgents)"
     ["option6"]="Conductor (Gemini CLI Extension)"
+    ["option7"]="AgentSkills Agents (for Claude)"
     ["optionA"]="Install All Auxiliary Tools"
     ["option_return"]="Return to Main Menu"
     ["menu_hint"]="You can make multiple selections with commas (e.g., 1,3)."
@@ -64,6 +65,7 @@ declare -A AUX_MENU_TEXT_TR=(
     ["option4"]="Wes Hobson Agents (Claude için)"
     ["option5"]="OpenAgents (darrenhinde/OpenAgents)"
     ["option6"]="Conductor (Gemini CLI Eklentisi)"
+    ["option7"]="AgentSkills Agents (Claude için)"
     ["optionA"]="Tüm Yardımcı Araçları Kur"
     ["option_return"]="Ana Menüye Dön"
     ["menu_hint"]="Birden fazla seçim için virgül kullanabilirsiniz (örn: 1,3)."
@@ -97,6 +99,7 @@ install_aux_tools_menu() {
             echo -e "  ${GREEN}4${NC} - $(aux_menu_text option4)"
             echo -e "  ${GREEN}5${NC} - $(aux_menu_text option5)"
             echo -e "  ${GREEN}6${NC} - $(aux_menu_text option6)"
+            echo -e "  ${GREEN}7${NC} - $(aux_menu_text option7)"
             echo -e "  ${GREEN}A${NC} - $(aux_menu_text optionA)"
             echo -e "  ${GREEN}0${NC} - $(aux_menu_text option_return)"
             echo -e "${YELLOW}$(aux_menu_text menu_hint)${NC}"
@@ -122,6 +125,7 @@ install_aux_tools_menu() {
                 4) run_module "auxiliary/claude_agents" "wshobson" ;;
                 5) run_module "auxiliary/open_agents" ;;
                 6) run_module "auxiliary/conductor" ;;
+                7) run_module "auxiliary/claude_agents" "agentskills" ;;
                 A|a) 
 run_module "auxiliary/openspec"
     run_module "auxiliary/specify"
@@ -129,6 +133,7 @@ run_module "auxiliary/openspec"
     run_module "auxiliary/claude_agents" "wshobson"
     run_module "auxiliary/open_agents"
     run_module "auxiliary/conductor"
+    run_module "auxiliary/claude_agents" "agentskills"
                     all_installed=true
                     ;;
                 0) 

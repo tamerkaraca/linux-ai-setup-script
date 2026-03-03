@@ -30,6 +30,14 @@ declare -A PHP_TEXT_EN=(
     ["installing_composer_for"]="Installing Composer for PHP %s..."
     ["ppa_adding"]="Adding ondrej/php PPA..."
     ["ppa_exists"]="ondrej/php PPA already exists."
+    ["ppa_tools_installing"]="Installing repository management tools..."
+    ["ppa_tools_missing"]="Repository tools could not be installed. Please install software-properties-common manually."
+    ["ppa_add_failed"]="Failed to add ondrej/php PPA."
+    ["ubuntu_only_repo"]="ondrej/php is Ubuntu-only. Trying Debian-compatible PHP repository instead..."
+    ["sury_adding"]="Adding packages.sury.org PHP repository..."
+    ["sury_exists"]="packages.sury.org PHP repository already exists."
+    ["sury_add_failed"]="Failed to add packages.sury.org PHP repository."
+    ["apt_version_unavailable"]="PHP %s packages are unavailable for this distro/repository set."
     ["remi_enabling"]="Enabling Remi repository for PHP %s..."
     ["install_success"]="PHP %s installed successfully."
     ["install_failed"]="Failed to install PHP %s."
@@ -50,6 +58,14 @@ declare -A PHP_TEXT_TR=(
     ["installing_composer_for"]="PHP %s için Composer kuruluyor..."
     ["ppa_adding"]="ondrej/php PPA deposu ekleniyor..."
     ["ppa_exists"]="ondrej/php PPA deposu zaten mevcut."
+    ["ppa_tools_installing"]="Depo yönetim araçları kuruluyor..."
+    ["ppa_tools_missing"]="Depo araçları kurulamadı. Lütfen software-properties-common paketini manuel kurun."
+    ["ppa_add_failed"]="ondrej/php PPA deposu eklenemedi."
+    ["ubuntu_only_repo"]="ondrej/php yalnızca Ubuntu içindir. Debian uyumlu PHP deposu denenecek..."
+    ["sury_adding"]="packages.sury.org PHP deposu ekleniyor..."
+    ["sury_exists"]="packages.sury.org PHP deposu zaten mevcut."
+    ["sury_add_failed"]="packages.sury.org PHP deposu eklenemedi."
+    ["apt_version_unavailable"]="PHP %s paketleri bu dağıtım/depo kombinasyonunda bulunamadı."
     ["remi_enabling"]="PHP %s için Remi deposu etkinleştiriliyor..."
     ["install_success"]="PHP %s başarıyla kuruldu."
     ["install_failed"]="PHP %s kurulumu başarısız oldu."
@@ -64,21 +80,39 @@ declare -A PHP_TEXT_TR=(
 
 php_text() {
     local key="$1"
-    # Provide a default value from the English map in case the key is missing
+    shift || true
     local default_value="${PHP_TEXT_EN[$key]:-$key}"
-    
+    local text_template=""
+
     if [ "${LANGUAGE:-en}" = "tr" ]; then
-        # If language is Turkish, use the Turkish map, falling back to the default
-        printf "%s" "${PHP_TEXT_TR[$key]:-$default_value}"
+        text_template="${PHP_TEXT_TR[$key]:-$default_value}"
     else
-        # Otherwise, use the English/default value
-        printf "%s" "$default_value"
+        text_template="$default_value"
+    fi
+
+    if [ "$#" -gt 0 ]; then
+        printf "$text_template" "$@"
+    else
+        printf "%s" "$text_template"
     fi
 }
 
 # --- Core Logic ---
 
 PHP_VERSIONS=("7.0" "7.1" "7.2" "7.3" "7.4" "8.0" "8.1" "8.2" "8.3" "8.4" "8.5" "8.6")
+
+is_ubuntu_like_system() {
+    if [ ! -r /etc/os-release ]; then
+        return 1
+    fi
+
+    local id=""
+    local id_like=""
+    id="$(awk -F= '$1=="ID" {gsub(/"/,"",$2); print tolower($2)}' /etc/os-release)"
+    id_like="$(awk -F= '$1=="ID_LIKE" {gsub(/"/,"",$2); print tolower($2)}' /etc/os-release)"
+
+    [[ "$id" == "ubuntu" || "$id_like" == *"ubuntu"* ]]
+}
 
 # Add a unique alias to a shell config file if it doesn't exist
 add_alias_if_not_exists() {
@@ -89,7 +123,6 @@ add_alias_if_not_exists() {
     local marker="# PHP Aliases by linux-ai-setup-script"
 
     if ! grep -q "alias ${alias_name}=" "$shell_config_file" 2>/dev/null; then
-        # Add a marker if it's the first time
         if ! grep -q "$marker" "$shell_config_file" 2>/dev/null; then
             echo -e "\n$marker" >> "$shell_config_file"
         fi
@@ -100,7 +133,6 @@ add_alias_if_not_exists() {
     fi
 }
 
-# Setup aliases for a specific PHP version
 setup_php_aliases() {
     local version="$1"
     local short_ver="${version//./}"
@@ -110,7 +142,7 @@ setup_php_aliases() {
     if is_macos; then
         php_executable="/usr/local/opt/php@${version}/bin/php"
     fi
-    
+
     log_info_detail "$(php_text 'setting_aliases' "$version")"
 
     for shell_file in "$HOME/.bashrc" "$HOME/.zshrc"; do
@@ -122,12 +154,11 @@ setup_php_aliases() {
     done
 }
 
-# Install Composer for a specific PHP version
 install_composer_for_version() {
     local version="$1"
     local php_executable="/usr/bin/php${version}"
     local composer_phar="/usr/local/bin/composer-${version}.phar"
-    
+
     if is_macos; then
         php_executable="/usr/local/opt/php@${version}/bin/php"
     fi
@@ -138,7 +169,7 @@ install_composer_for_version() {
         log_success_detail "Composer for PHP $version already exists."
         return 0
     fi
-    
+
     if curl -sS https://getcomposer.org/installer | "$php_executable"; then
         sudo mv composer.phar "$composer_phar"
         log_success_detail "$(php_text 'composer_success' "$version")"
@@ -148,15 +179,77 @@ install_composer_for_version() {
     fi
 }
 
-# Install a specific PHP version and its components
+ensure_ondrej_ppa() {
+    log_info_detail "$(php_text 'ppa_adding')"
+    sudo apt-get update
+
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y polkitd || true
+    sudo groupadd --system polkitd 2>/dev/null || true
+    sudo DEBIAN_FRONTEND=noninteractive dpkg --configure -a || true
+
+    if ! command -v add-apt-repository >/dev/null 2>&1; then
+        log_info_detail "$(php_text 'ppa_tools_installing')"
+        if ! sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common; then
+            sudo apt-get update || true
+            sudo DEBIAN_FRONTEND=noninteractive apt-get install -y software-properties-common python3-software-properties || true
+        fi
+    fi
+
+    if ! command -v add-apt-repository >/dev/null 2>&1; then
+        log_error_detail "$(php_text 'ppa_tools_missing')"
+        return 1
+    fi
+
+    if ! sudo add-apt-repository -y ppa:ondrej/php; then
+        log_error_detail "$(php_text 'ppa_add_failed')"
+        return 1
+    fi
+
+    sudo apt-get update
+}
+
+ensure_sury_php_repo() {
+    if grep -Rqs "packages.sury.org/php" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
+        log_info_detail "$(php_text 'sury_exists')"
+        return 0
+    fi
+
+    log_info_detail "$(php_text 'sury_adding')"
+    sudo apt-get update
+    sudo DEBIAN_FRONTEND=noninteractive apt-get install -y ca-certificates curl gnupg2 lsb-release apt-transport-https
+
+    local codename=""
+    codename="$(awk -F= '$1=="VERSION_CODENAME" {gsub(/"/,"",$2); print $2}' /etc/os-release)"
+    if [ -z "$codename" ] && command -v lsb_release >/dev/null 2>&1; then
+        codename="$(lsb_release -sc)"
+    fi
+
+    if [ -z "$codename" ]; then
+        log_error_detail "$(php_text 'sury_add_failed')"
+        return 1
+    fi
+
+    sudo mkdir -p /etc/apt/keyrings
+    if ! curl -fsSL https://packages.sury.org/php/apt.gpg | sudo gpg --dearmor -o /etc/apt/keyrings/sury-php.gpg; then
+        log_error_detail "$(php_text 'sury_add_failed')"
+        return 1
+    fi
+
+    echo "deb [signed-by=/etc/apt/keyrings/sury-php.gpg] https://packages.sury.org/php/ ${codename} main" | \
+        sudo tee /etc/apt/sources.list.d/sury-php.list >/dev/null
+
+    if ! sudo apt-get update; then
+        log_error_detail "$(php_text 'sury_add_failed')"
+        return 1
+    fi
+}
+
 install_php_version() {
     local version="$1"
     log_info_detail "$(php_text 'installing_php' "$version")"
 
-    # Comprehensive list of extensions for Laravel
     local pkgs_apt="php${version} php${version}-cli php${version}-common php${version}-intl php${version}-zip php${version}-curl php${version}-xml php${version}-mbstring php${version}-mysql php${version}-pgsql php${version}-bcmath php${version}-gd php${version}-redis php${version}-imagick php${version}-dom"
-    
-    # Sodium is built-in since PHP 7.2, only add it for older versions
+
     if [[ "$(echo -e "${version}\n7.2" | sort -V | head -n1)" != "7.2" ]]; then
         pkgs_apt+=" php${version}-sodium"
     fi
@@ -172,24 +265,27 @@ install_php_version() {
         fi
     elif [ "$PKG_MANAGER" = "apt" ]; then
         sudo apt-get install -y $system_deps p7zip-full
-        if ! grep -q "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
-            log_info_detail "$(php_text 'ppa_adding')"
-            
-            # Pre-install polkitd and fix group issue before installing software-properties-common
-            sudo apt-get install -y polkitd || true
-            sudo groupadd --system polkitd || true
-            sudo dpkg --configure -a || true
 
-            sudo apt-get install -y software-properties-common
-            sudo add-apt-repository -y ppa:ondrej/php
-            sudo apt-get update
-        else
+        if grep -q "ondrej/php" /etc/apt/sources.list /etc/apt/sources.list.d/* 2>/dev/null; then
             log_info_detail "$(php_text 'ppa_exists')"
+        elif is_ubuntu_like_system; then
+            if ! ensure_ondrej_ppa; then
+                log_error_detail "$(php_text 'install_failed' "$version")"
+                return 1
+            fi
+        else
+            log_warn_detail "$(php_text 'ubuntu_only_repo')"
+            if ! ensure_sury_php_repo; then
+                log_error_detail "$(php_text 'install_failed' "$version")"
+                return 1
+            fi
         fi
+
         log_info_detail "$(php_text 'installing_deps_for' "$version")"
         if ! sudo apt-get install -y --allow-downgrades $pkgs_apt; then
-             log_error_detail "$(php_text 'install_failed' "$version")"
-             return 1
+            log_error_detail "$(php_text 'apt_version_unavailable' "$version")"
+            log_error_detail "$(php_text 'install_failed' "$version")"
+            return 1
         fi
     elif [ "$PKG_MANAGER" = "dnf" ] || [ "$PKG_MANAGER" = "yum" ]; then
         sudo dnf -y install $system_deps p7zip
@@ -199,8 +295,8 @@ install_php_version() {
         sudo dnf -y module enable "php:remi-${version}"
         log_info_detail "$(php_text 'installing_deps_for' "$version")"
         if ! sudo dnf -y install $pkgs_dnf; then
-             log_error_detail "$(php_text 'install_failed' "$version")"
-             return 1
+            log_error_detail "$(php_text 'install_failed' "$version")"
+            return 1
         fi
     else
         log_error "Unsupported package manager: $PKG_MANAGER"
@@ -208,13 +304,11 @@ install_php_version() {
     fi
 
     log_success_detail "$(php_text 'install_success' "$version")"
-    
+
     if install_composer_for_version "$version"; then
         setup_php_aliases "$version"
     fi
 }
-
-# --- UI Functions ---
 
 display_menu() {
     print_heading_panel "$(php_text menu_title)"
@@ -231,8 +325,6 @@ display_menu() {
     log_info_detail "$(php_text menu_hint)"
     echo
 }
-
-# --- Main Loop ---
 
 main() {
     while true; do
@@ -257,7 +349,7 @@ main() {
 
         IFS=',' read -ra selections <<< "$choice_input"
         for selection in "${selections[@]}"; do
-            selection=$(echo "$selection" | tr -d '[:space:]')
+            selection="$(echo "$selection" | tr -d '[:space:]')"
             if [[ "$selection" =~ ^[0-9]+$ ]] && [ "$selection" -ge 1 ] && [ "$selection" -le ${#PHP_VERSIONS[@]} ]; then
                 version_to_install="${PHP_VERSIONS[$((selection - 1))]}"
                 install_php_version "$version_to_install"
@@ -265,7 +357,7 @@ main() {
                 log_error_detail "$(php_text 'invalid_choice' "$selection")"
             fi
         done
-        
+
         log_success_detail "Selected PHP operations complete."
         read -r -p "Press Enter to continue..." _tmp </dev/tty
     done
